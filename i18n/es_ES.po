@@ -1,0 +1,233 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * marketing_automation_tool
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-30 12:00+0000\n"
+"PO-Revision-Date: 2025-08-30 12:00+0000\n"
+"Last-Translator: Gilson Rincón <gilson.rincon@soluttoconsulting.com>\n"
+"Language-Team: Spanish <es@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es_ES\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: marketing_automation_tool
+#: model:ir.model.fields,field_description:marketing_automation_tool.field_res_config_settings__marketing_automation_token
+msgid "Authentication Token"
+msgstr "Token de Autenticación"
+
+#. module: marketing_automation_tool
+#: model:ir.model.fields,field_description:marketing_automation_tool.field_res_config_settings__marketing_automation_url
+msgid "Automation Hub URL (n8n)"
+msgstr "URL del Hub de Automatización (n8n)"
+
+#. module: marketing_automation_tool
+#: model:ir.model,name:marketing_automation_tool.model_blog_post_translation_wizard
+msgid "Blog Post Translation Wizard"
+msgstr "Asistente de Traducción de Artículos"
+
+#. module: marketing_automation_tool
+#: model:ir.model.fields,field_description:marketing_automation_tool.field_blog_post_translation_wizard__post_ids
+msgid "Blog Posts"
+msgstr "Artículos del Blog"
+
+#. module: marketing_automation_tool
+#: model:ir.actions.server,name:marketing_automation_tool.action_blog_post_send_to_translate
+#: model:ir.actions.act_window,name:marketing_automation_tool.action_blog_post_translation_wizard
+msgid "Send to Translate"
+msgstr "Enviar a Traducir"
+
+#. module: marketing_automation_tool
+#: selection:blog.post,translation_status:0
+msgid "Not Translated"
+msgstr "No Traducido"
+
+#. module: marketing_automation_tool
+#: selection:blog.post,translation_status:0
+msgid "Sent for Translation"
+msgstr "Enviado para Traducción"
+
+#. module: marketing_automation_tool
+#: selection:blog.post,translation_status:0
+msgid "Translated"
+msgstr "Traducido"
+
+#. module: marketing_automation_tool
+#: selection:blog.post,translation_status:0
+msgid "Translation Error"
+msgstr "Error de Traducción"
+
+#. module: marketing_automation_tool
+#: model:ir.model.fields,field_description:marketing_automation_tool.field_blog_post__translation_status
+msgid "Translation Status"
+msgstr "Estado de Traducción"
+
+#. module: marketing_automation_tool
+#: model:ir.model.fields,field_description:marketing_automation_tool.field_blog_post_translation_wizard__target_lang
+msgid "Target Language"
+msgstr "Idioma Destino"
+
+#. module: marketing_automation_tool
+#: model:ir.model.fields,field_description:marketing_automation_tool.field_blog_post_translation_wizard__post_count
+msgid "Number of Posts"
+msgstr "Número de Artículos"
+
+#. module: marketing_automation_tool
+#: model:ir.model.fields,help:marketing_automation_tool.field_res_config_settings__marketing_automation_url
+msgid "Base URL of the n8n automation hub endpoint"
+msgstr "URL base del endpoint del hub de automatización n8n"
+
+#. module: marketing_automation_tool
+#: model:ir.model.fields,help:marketing_automation_tool.field_res_config_settings__marketing_automation_token
+msgid "Security token for authenticating requests to the automation service"
+msgstr "Token de seguridad para autenticar peticiones al servicio de automatización"
+
+#. module: marketing_automation_tool
+#: model:ir.model.fields,help:marketing_automation_tool.field_blog_post_translation_wizard__post_ids
+msgid "Blog posts to be sent for translation"
+msgstr "Artículos del blog a enviar para traducción"
+
+#. module: marketing_automation_tool
+#: model:ir.model.fields,help:marketing_automation_tool.field_blog_post_translation_wizard__target_lang
+msgid "Language to translate the blog posts to"
+msgstr "Idioma al que traducir los artículos del blog"
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/models/blog_post.py:0
+msgid "This article is already being translated. Please wait for the process to complete."
+msgstr "Este artículo ya está siendo traducido. Por favor espere a que el proceso termine."
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/models/blog_post.py:0
+msgid "Please configure the automation hub URL and token in Settings > General Settings."
+msgstr "Por favor configure la URL del hub de automatización y el token en Configuración > Configuración General."
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/models/blog_post.py:0
+msgid "Article sent to translation service successfully!"
+msgstr "¡Artículo enviado al servicio de traducción exitosamente!"
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/models/blog_post.py:0
+msgid "Failed to connect to translation service. Please check the configuration and try again.\\n\\nError: %s"
+msgstr "Falló la conexión al servicio de traducción. Por favor verifique la configuración e intente nuevamente.\\n\\nError: %s"
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/models/blog_post.py:0
+msgid "An unexpected error occurred. Please contact the administrator.\\n\\nError: %s"
+msgstr "Ocurrió un error inesperado. Por favor contacte al administrador.\\n\\nError: %s"
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/wizards/blog_post_translation_wizard.py:0
+msgid "Same Language Warning"
+msgstr "Advertencia de Mismo Idioma"
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/wizards/blog_post_translation_wizard.py:0
+msgid "You have selected the same language as the current system language. Please select a different target language for translation."
+msgstr "Ha seleccionado el mismo idioma que el idioma actual del sistema. Por favor seleccione un idioma destino diferente para la traducción."
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/wizards/blog_post_translation_wizard.py:0
+msgid "Please select at least one blog post to translate."
+msgstr "Por favor seleccione al menos un artículo del blog para traducir."
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/wizards/blog_post_translation_wizard.py:0
+msgid "Please select a target language for translation."
+msgstr "Por favor seleccione un idioma destino para la traducción."
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/wizards/blog_post_translation_wizard.py:0
+msgid "Target language cannot be the same as the source language. Please select a different language."
+msgstr "El idioma destino no puede ser el mismo que el idioma fuente. Por favor seleccione un idioma diferente."
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/wizards/blog_post_translation_wizard.py:0
+msgid "The following articles are already being translated:\\n%s\\n\\nPlease wait for the translation process to complete."
+msgstr "Los siguientes artículos ya están siendo traducidos:\\n%s\\n\\nPor favor espere a que el proceso de traducción termine."
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/wizards/blog_post_translation_wizard.py:0
+msgid "Successfully sent %d article(s) to translation service for %s."
+msgstr "Se enviaron exitosamente %d artículo(s) al servicio de traducción para %s."
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/wizards/blog_post_translation_wizard.py:0
+msgid "Sent %d out of %d article(s) to translation service.\\n\\nFailed articles:\\n%s"
+msgstr "Se enviaron %d de %d artículo(s) al servicio de traducción.\\n\\nArtículos fallidos:\\n%s"
+
+#. module: marketing_automation_tool
+#: code:addons/marketing_automation_tool/wizards/blog_post_translation_wizard.py:0
+msgid "Failed to send any articles to translation service:\\n%s"
+msgstr "Falló el envío de todos los artículos al servicio de traducción:\\n%s"
+
+#. module: marketing_automation_tool
+#: view:blog.post.translation.wizard:marketing_automation_tool.blog_post_translation_wizard_view_form
+msgid "Translation Service"
+msgstr "Servicio de Traducción"
+
+#. module: marketing_automation_tool
+#: view:blog.post.translation.wizard:marketing_automation_tool.blog_post_translation_wizard_view_form
+msgid "This will send the selected blog posts to the external translation service. You will be notified when the translation is complete."
+msgstr "Esto enviará los artículos del blog seleccionados al servicio de traducción externo. Será notificado cuando la traducción esté completa."
+
+#. module: marketing_automation_tool
+#: view:blog.post.translation.wizard:marketing_automation_tool.blog_post_translation_wizard_view_form
+msgid "Posts Selected"
+msgstr "Artículos Seleccionados"
+
+#. module: marketing_automation_tool
+#: view:blog.post.translation.wizard:marketing_automation_tool.blog_post_translation_wizard_view_form
+msgid "Selected Blog Posts"
+msgstr "Artículos del Blog Seleccionados"
+
+#. module: marketing_automation_tool
+#: view:blog.post.translation.wizard:marketing_automation_tool.blog_post_translation_wizard_view_form
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: marketing_automation_tool
+#: view:res.config.settings:marketing_automation_tool.res_config_settings_view_form
+msgid "Marketing Automation"
+msgstr "Automatización de Marketing"
+
+#. module: marketing_automation_tool
+#: view:res.config.settings:marketing_automation_tool.res_config_settings_view_form
+msgid "Automation Service Configuration"
+msgstr "Configuración del Servicio de Automatización"
+
+#. module: marketing_automation_tool
+#: view:res.config.settings:marketing_automation_tool.res_config_settings_view_form
+msgid "Configure the connection to your external automation service (n8n)"
+msgstr "Configure la conexión a su servicio de automatización externo (n8n)"
+
+#. module: marketing_automation_tool
+#: view:res.config.settings:marketing_automation_tool.res_config_settings_view_form
+msgid "Hub URL"
+msgstr "URL del Hub"
+
+#. module: marketing_automation_tool
+#: view:res.config.settings:marketing_automation_tool.res_config_settings_view_form
+msgid "Auth Token"
+msgstr "Token de Autenticación"
+
+#. module: marketing_automation_tool
+#: view:blog.post:marketing_automation_tool.blog_post_view_search_inherit
+msgid "In Translation"
+msgstr "En Traducción"
+
+#. module: marketing_automation_tool
+#: view:blog.post:marketing_automation_tool.blog_post_view_search_inherit
+msgid "Translation Failed"
+msgstr "Traducción Fallida"
+
+#. module: marketing_automation_tool
+#: view:blog.post:marketing_automation_tool.blog_post_view_form_inherit
+msgid "Translation"
+msgstr "Traducción"

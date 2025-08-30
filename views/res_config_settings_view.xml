@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Marketing Automation Configuration in General Settings -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.form.inherit.marketing.automation</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Marketing Automation" string="Marketing Automation" data-key="marketing_automation_tool">
+                    <h2>Marketing Automation</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane"></div>
+                            <div class="o_setting_right_pane">
+                                <label for="marketing_automation_url" string="Automation Service Configuration"/>
+                                <div class="text-muted">
+                                    Configure the connection to your external automation service (n8n)
+                                </div>
+                                <div class="content-group mt16">
+                                    <div class="row">
+                                        <label for="marketing_automation_url" class="col-3 o_light_label" string="Hub URL"/>
+                                        <field name="marketing_automation_url" placeholder="https://your-n8n-instance.com/webhook/translate"/>
+                                    </div>
+                                    <div class="row">
+                                        <label for="marketing_automation_token" class="col-3 o_light_label" string="Auth Token"/>
+                                        <field name="marketing_automation_token" placeholder="Your authentication token" password="True"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
