@@ -48,8 +48,12 @@ class BlogPost(models.Model):
         automation_url = ICPSudo.get_param('marketing_automation_tool.automation_url')
         automation_token = ICPSudo.get_param('marketing_automation_tool.automation_token')
         
-        if not automation_url or not automation_token:
-            raise UserError(_("Please configure the automation hub URL and token in Settings > General Settings."))
+        # Validate configuration parameters
+        if not automation_url or not isinstance(automation_url, str):
+            raise UserError(_("Please configure a valid automation hub URL in Settings > General Settings."))
+        
+        if not automation_token or not isinstance(automation_token, str):
+            raise UserError(_("Please configure a valid automation token in Settings > General Settings."))
         
         # Get current language (source language)
         source_lang = self.env.context.get('lang', 'en_US')
@@ -132,8 +136,8 @@ class BlogPost(models.Model):
         self.ensure_one()
         
         try:
-            # Store translations using ir.translation
-            translation_model = self.env['ir.translation']
+            # Store translations using ir.translation (suppress type checking for Odoo dynamic models)
+            translation_model = self.env['ir.translation']  # type: ignore
             
             # Fields to translate
             translatable_fields = {
@@ -149,26 +153,26 @@ class BlogPost(models.Model):
             for field_name, translated_value in translatable_fields.items():
                 if translated_value:  # Only store non-empty translations
                     # Check if translation already exists
-                    existing_translation = translation_model.search([
-                        ('name', '=', f'blog.post,{field_name}'),
-                        ('res_id', '=', self.id),
-                        ('lang', '=', target_lang),
-                        ('type', '=', 'model'),
+                    existing_translation = translation_model.search([  # type: ignore
+                        ('name', '=', f'blog.post,{field_name}'),  # type: ignore
+                        ('res_id', '=', self.id),  # type: ignore
+                        ('lang', '=', target_lang),  # type: ignore
+                        ('type', '=', 'model'),  # type: ignore
                     ])
                     
                     if existing_translation:
                         # Update existing translation
-                        existing_translation.write({'value': translated_value})
+                        existing_translation.write({'value': translated_value})  # type: ignore
                     else:
                         # Create new translation
-                        translation_model.create({
-                            'name': f'blog.post,{field_name}',
-                            'res_id': self.id,
-                            'lang': target_lang,
-                            'type': 'model',
-                            'src': getattr(self, field_name) or '',
-                            'value': translated_value,
-                            'state': 'translated',
+                        translation_model.create({  # type: ignore
+                            'name': f'blog.post,{field_name}',  # type: ignore
+                            'res_id': self.id,  # type: ignore
+                            'lang': target_lang,  # type: ignore
+                            'type': 'model',  # type: ignore
+                            'src': getattr(self, field_name) or '',  # type: ignore
+                            'value': translated_value,  # type: ignore
+                            'state': 'translated',  # type: ignore
                         })
             
             # Update translation status

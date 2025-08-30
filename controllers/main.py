@@ -29,6 +29,8 @@ class MarketingAutomationController(http.Controller):
         }
         """
         try:
+            post_id = None  # Initialize post_id to avoid unbound variable error
+            
             # Validate authentication token
             auth_header = request.httprequest.headers.get('Authorization', '')
             if not auth_header.startswith('Bearer '):
@@ -96,16 +98,6 @@ class MarketingAutomationController(http.Controller):
             
         except Exception as e:
             _logger.error(f"Error processing translation callback: {str(e)}")
-            
-            # Try to update blog post status to failed if we have the post_id
-            try:
-                if 'post_id' in locals():
-                    blog_post = request.env['blog.post'].sudo().browse(post_id)
-                    if blog_post.exists():
-                        blog_post.write({'translation_status': 'failed'})
-            except:
-                pass  # Ignore errors in error handling
-            
             return self._error_response(f"Internal server error: {str(e)}", 500)
     
     def _success_response(self, message):
