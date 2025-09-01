@@ -30,12 +30,12 @@
 posts_in_progress = records.filtered(lambda p: p.translation_status == 'in_progress')
 if posts_in_progress:
     post_names = ', '.join(posts_in_progress.mapped('name'))
-    raise UserError(_("The following articles are already being translated:\n%s\n\nPlease wait for the translation process to complete.") % post_names)
+    raise ValidationError("The following articles are already being translated:\n%s\n\nPlease wait for the translation process to complete." % post_names)
 
 # Open the translation wizard
 action = {
     'type': 'ir.actions.act_window',
-    'name': _('Send to Translate'),
+    'name': 'Send to Translate',
     'res_model': 'blog.post.translation.wizard',
     'view_mode': 'form',
     'target': 'new',
