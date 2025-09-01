@@ -26,6 +26,7 @@
     'website': 'https://soluttoconsulting.com',
     'depends': [
         'base',
+        'base_setup',
         'website',
         'website_blog',
     ],

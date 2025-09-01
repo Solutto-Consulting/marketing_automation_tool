@@ -6,8 +6,8 @@
         <field name="model">blog.post</field>
         <field name="inherit_id" ref="website_blog.view_blog_post_list"/>
         <field name="arch" type="xml">
-            <!-- Add translation status column after state -->
-            <xpath expr="//field[@name='website_published']" position="after">
+            <!-- Add translation status column after published status -->
+            <xpath expr="//field[@name='is_published']" position="after">
                 <field name="translation_status" widget="badge" 
                        decoration-info="translation_status == 'not_translated'"
                        decoration-warning="translation_status == 'in_progress'"
@@ -56,7 +56,7 @@ action = {
         <field name="arch" type="xml">
             <!-- Add translation status field in header -->
             <xpath expr="//sheet//div[@class='oe_button_box']" position="inside">
-                <div class="oe_stat_button" attrs="{'invisible': [('translation_status', '=', 'not_translated')]}">
+                <div class="oe_stat_button" invisible="translation_status == 'not_translated'">
                     <field name="translation_status" widget="badge" 
                            decoration-info="translation_status == 'not_translated'"
                            decoration-warning="translation_status == 'in_progress'"
@@ -68,14 +68,18 @@ action = {
                 </div>
             </xpath>
             
-            <!-- Add send to translate button in header -->
-            <xpath expr="//header" position="inside">
-                <button name="action_send_to_translate" 
-                        string="Send to Translate" 
-                        type="object" 
-                        class="btn-primary"
-                        groups="website.group_website_designer"
-                        attrs="{'invisible': [('translation_status', '=', 'in_progress')]}"/>
+            <!-- Add send to translate button in button box -->
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+        <button name="action_send_to_translate" 
+            string="Send to Translate" 
+            type="object" 
+            class="oe_stat_button btn-primary"
+            groups="website.group_website_designer"
+            invisible="translation_status == 'in_progress'" >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Translate</span>
+                    </div>
+                </button>
             </xpath>
         </field>
     </record>
