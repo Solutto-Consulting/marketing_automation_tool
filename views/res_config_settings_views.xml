@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Configuration Settings Form View -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sc.marketing</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="SC Marketing Automation" 
+                     string="SC Marketing Automation" data-key="sc_marketing_automation_tool">
+                    <h2>OpenAI Configuration</h2>
+                    
+                    <div class="row mt16 o_settings_container" name="openai_settings">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <label for="sc_openai_api_key" string="OpenAI API Key"/>
+                                <div class="text-muted">
+                                    Configure OpenAI API access for AI-powered blog post translations
+                                </div>
+                                
+                                <div class="content-group mt16">
+                                    <div class="row">
+                                        <label for="sc_openai_api_key" class="col-3 col-lg-3 o_light_label"/>
+                                        <field name="sc_openai_api_key" password="True" class="col-9" 
+                                               placeholder="Enter your OpenAI API key"/>
+                                    </div>
+                                    <div class="row mt8">
+                                        <label for="sc_openai_organization_id" class="col-3 col-lg-3 o_light_label"/>
+                                        <field name="sc_openai_organization_id" class="col-9" 
+                                               placeholder="Optional: Organization ID"/>
+                                    </div>
+                                    <div class="row mt8">
+                                        <label for="sc_openai_model" class="col-3 col-lg-3 o_light_label"/>
+                                        <field name="sc_openai_model" class="col-9"/>
+                                    </div>
+                                    
+                                    <div class="mt16">
+                                        <button name="action_test_openai_connection" type="object" 
+                                                string="Test OpenAI Connection" 
+                                                class="btn-secondary"
+                                                invisible="not sc_openai_api_key"
+                                                groups="base.group_system"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2>Usage Information</h2>
+                    <div class="row mt16 o_settings_container" name="usage_info">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="text-muted">
+                                <p><strong>How to use:</strong></p>
+                                <ul>
+                                    <li>Configure your OpenAI API key above</li>
+                                    <li>Go to any published blog post</li>
+                                    <li>Click the "New Translation" button</li>
+                                    <li>Select target language and submit</li>
+                                    <li>Monitor translation progress in the Translation Tasks menu</li>
+                                </ul>
+                                
+                                <p><strong>Requirements:</strong></p>
+                                <ul>
+                                    <li>Valid OpenAI API key with sufficient credits</li>
+                                    <li>Target languages configured in Odoo</li>
+                                    <li>Blog posts must be published</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

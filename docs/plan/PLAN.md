@@ -1,57 +1,56 @@
-# SC Marketing Automation Tool - Implementation Plan
+# Implementation Plan: SC Marketing Automation Tool
 
 ## Plan Metadata
 - **Module Name**: sc_marketing_automation_tool
 - **Spec Path**: /home/gilsonrincon/development/odoo18/custom-addons/sc_marketing_automation_tool/docs/Technical-specs-v2025-sep-04.md
-- **Last Updated**: 2025-09-04T00:00:00Z
+- **Target Path**: /home/gilsonrincon/development/odoo18/custom-addons/sc_marketing_automation_tool
+- **Last Updated**: 2025-09-04T19:30:00Z
 - **Odoo Version**: 18.0
-- **Author**: Solutto Consulting LLC
-- **Developer**: Gilson Rincón <gilson.rincon@soluttoconsulting.com>
+- **Planning Mode**: Odoo – Planner (Read-Only)
 
 ---
 
 ## 1. Scope & Goals
 
 ### Business Objective
-Develop an AI-powered content management and translation tool for Odoo 18.0 that automates blog post translation using OpenAI's API through the openai-agents SDK. The tool enables bulk translation of blog posts with asynchronous processing, status tracking, and error management.
+Create an AI-powered content management tool that automates blog post translation using OpenAI's Agent SDK, replacing manual Odoo translation workflows with asynchronous background processing.
 
 ### Success Criteria
-- ✅ Bulk selection and translation of multiple blog posts
-- ✅ OpenAI integration with dynamic model selection
-- ✅ Asynchronous background processing with cron jobs
-- ✅ Complete translation status tracking and error handling
-- ✅ Multi-company support with proper security
-- ✅ Full Spanish translation (es_ES.po) coverage
-- ✅ Comprehensive documentation (technical + functional)
+- ✅ Administrators can select multiple blog posts for translation in one action
+- ✅ Translation requests are processed asynchronously without blocking the UI
+- ✅ Full status tracking and error management for all translation tasks
+- ✅ Support for multiple target languages with custom AI instructions
+- ✅ Complete audit trail of translation attempts per blog post
+- ✅ Integration with OpenAI Agent SDK (openai-agents library)
 
-### Out of Scope (Initial Release)
-- Translation of other content types (products, pages, etc.)
-- Integration with other AI providers beyond OpenAI
-- Real-time translation (async only)
-- Translation memory or caching mechanisms
-- Custom translation workflows beyond basic automation
+### Out of Scope
+- Translation of other content types (only blog.post in v1)
+- Real-time translation (asynchronous only)
+- Custom AI models (OpenAI only)
+- Multi-company translation workflows (single company focus)
 
 ---
 
 ## 2. Domain & Data Model Plan
 
-### Core Models
+### 2.1 New Model: sc.translation.task
+**Purpose**: Track individual translation requests with full lifecycle management
 
-#### 2.1 sc.translation.task (New Model)
+**Fields**:
 ```python
-class TranslationTask(models.Model):
+class ScTranslationTask(models.Model):
     _name = 'sc.translation.task'
     _description = 'AI Translation Task'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'create_date desc'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     
-    # Basic Information
+    # Core fields
     name = fields.Char(string='Task Name', required=True, tracking=True)
     blog_post_id = fields.Many2one('blog.post', string='Blog Post', required=True, ondelete='cascade')
     target_lang_id = fields.Many2one('res.lang', string='Target Language', required=True)
-    system_instructions = fields.Text(string='System Instructions', help="Optional AI guidance for tone and style")
+    system_instructions = fields.Text(string='AI Instructions', help="Custom instructions for AI translation")
     
-    # Status Management
+    # Status tracking
     state = fields.Selection([
         ('draft', 'Draft'),
         ('in_progress', 'In Progress'),
@@ -61,234 +60,260 @@ class TranslationTask(models.Model):
     
     error_message = fields.Text(string='Error Details', readonly=True)
     
-    # Multi-company Support
-    company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.company)
+    # Translation data
+    original_content = fields.Json(string='Original Content', readonly=True)
+    translated_content = fields.Json(string='Translated Content', readonly=True)
     
-    # Audit Fields
+    # Audit fields
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
     processed_date = fields.Datetime(string='Processed Date', readonly=True)
-    translation_duration = fields.Float(string='Duration (seconds)', readonly=True)
-    
-    # Computed Fields
-    source_language = fields.Char(related='blog_post_id.blog_id.default_lang_id.name', string='Source Language', readonly=True)
-    post_title = fields.Char(related='blog_post_id.name', string='Post Title', readonly=True)
+    processing_duration = fields.Float(string='Processing Time (seconds)', readonly=True)
 ```
 
-#### 2.2 blog.post (Inherited Model)
+**Computed Fields**:
+```python
+@api.depends('blog_post_id.name', 'target_lang_id.name')
+def _compute_name(self):
+    for record in self:
+        if record.blog_post_id and record.target_lang_id:
+            record.name = f"Translate '{record.blog_post_id.name}' to {record.target_lang_id.name}"
+
+@api.depends('state', 'error_message')
+def _compute_status_display(self):
+    # For badge widget display with appropriate colors
+```
+
+**Constraints**:
+```python
+@api.constrains('blog_post_id', 'target_lang_id')
+def _check_duplicate_translation(self):
+    # Prevent duplicate active translations for same post+language
+    
+@api.constrains('target_lang_id')
+def _check_published_language(self):
+    # Ensure target language is website published
+```
+
+### 2.2 Inherited Model: blog.post
+**Purpose**: Add translation tracking capabilities to blog posts
+
+**Added Fields**:
 ```python
 class BlogPost(models.Model):
     _inherit = 'blog.post'
     
-    # Translation Tracking
     translation_task_ids = fields.One2many('sc.translation.task', 'blog_post_id', string='Translation Tasks')
-    translation_in_progress = fields.Boolean(string='Translation in Progress', default=False, 
-                                           help="Indicates if translation is currently queued or processing")
-    translation_count = fields.Integer(string='Translation Count', compute='_compute_translation_count')
-    
-    @api.depends('translation_task_ids')
-    def _compute_translation_count(self):
-        for record in self:
-            record.translation_count = len(record.translation_task_ids)
+    translation_in_progress = fields.Boolean(string='Translation in Progress', default=False, compute='_compute_translation_status', store=True)
+    last_translation_date = fields.Datetime(string='Last Translation', compute='_compute_last_translation')
+    translation_task_count = fields.Integer(string='Translation Tasks', compute='_compute_translation_count')
 ```
 
-#### 2.3 res.config.settings (Inherited Model)
+**Methods**:
+```python
+@api.depends('translation_task_ids.state')
+def _compute_translation_status(self):
+    # Check if any task is in draft or in_progress state
+
+def action_view_translation_tasks(self):
+    # Smart button action to view related translation tasks
+    
+def reset_translation_status(self):
+    # Reset translation_in_progress flag (for error recovery)
+```
+
+### 2.3 Configuration Model: res.config.settings
+**Purpose**: OpenAI API configuration and model selection
+
+**Added Fields**:
 ```python
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
     
-    # OpenAI Configuration
-    sc_openai_api_key = fields.Char(string='OpenAI API Key', password=True, 
-                                   config_parameter='sc_marketing_automation.openai_api_key')
-    sc_openai_organization_id = fields.Char(string='OpenAI Organization ID',
-                                           config_parameter='sc_marketing_automation.openai_organization_id')
-    sc_openai_model = fields.Selection(string='OpenAI Model', default='gpt-4o',
-                                      selection='_get_openai_models',
-                                      config_parameter='sc_marketing_automation.openai_model')
+    sc_openai_api_key = fields.Char(string='OpenAI API Key', password=True, config_parameter='sc_marketing_automation.openai_api_key')
+    sc_openai_organization_id = fields.Char(string='OpenAI Organization ID', config_parameter='sc_marketing_automation.openai_org_id')
+    sc_openai_model = fields.Selection(selection='_get_openai_models', string='OpenAI Model', default='gpt-4o', config_parameter='sc_marketing_automation.openai_model')
     
     def _get_openai_models(self):
-        """Dynamic model selection from OpenAI API"""
-        # Implementation will call OpenAI API to get available models
-        # Fallback to default models if API call fails
-        pass
+        # Dynamic model list from OpenAI API with fallback
+        return [
+            ('gpt-4o', 'GPT-4o'),
+            ('gpt-4-turbo', 'GPT-4 Turbo'),
+            ('gpt-3.5-turbo', 'GPT-3.5 Turbo')
+        ]
 ```
 
-#### 2.4 sc.translate.blog.post.wizard (Transient Model)
+### 2.4 Wizard Model: sc.translate.blog.post.wizard
+**Purpose**: User interface for initiating translations
+
+**Fields**:
 ```python
-class TranslateBlogPostWizard(models.TransientModel):
+class ScTranslateBlogPostWizard(models.TransientModel):
     _name = 'sc.translate.blog.post.wizard'
     _description = 'Blog Post Translation Wizard'
     
-    target_lang_id = fields.Many2one('res.lang', string='Target Language', required=True,
-                                    domain=[('website_published', '=', True)])
-    system_instructions = fields.Text(string='System Instructions',
-                                     help="Optional instructions to guide AI tone and style")
-    selected_post_count = fields.Integer(string='Selected Posts', default=0)
+    target_lang_id = fields.Many2one('res.lang', string='Target Language', required=True, domain=[('website_published', '=', True)])
+    system_instructions = fields.Text(string='AI Instructions', placeholder="Optional: Provide specific tone, style, or formatting instructions...")
+    blog_post_ids = fields.Many2many('blog.post', string='Selected Blog Posts')
+    
+    def action_translate(self):
+        # Main wizard action - create translation tasks
 ```
-
-### Field Specifications & Constraints
-
-#### Computed Fields
-- `translation_count`: Count of translation tasks per blog post
-- `source_language`: Derived from blog's default language
-- `post_title`: Related field for easy access in translation tasks
-
-#### Constraints
-- Prevent duplicate translation tasks for same post/language combination
-- Validate OpenAI API key format
-- Ensure target language is active and website-published
-
-#### Sequences
-- Translation task naming: "Translation #{sequence} - {post_title} to {language}"
-
-### Demo Data
-- Sample blog posts in English for testing
-- Pre-configured OpenAI model selections
-- Sample translation tasks in various states
 
 ---
 
 ## 3. Security Plan
 
-### Groups & Access Control
-
-#### 3.1 New Security Groups
-```xml
-<!-- security/security.xml -->
+### 3.1 Access Groups
+```csv
+# security/groups.xml
 <record id="group_marketing_automation_user" model="res.groups">
     <field name="name">Marketing Automation: User</field>
     <field name="category_id" ref="base.module_category_marketing"/>
-    <field name="comment">Can view and create translation tasks</field>
+    <field name="users" eval="[(4, ref('base.user_admin'))]"/>
 </record>
 
 <record id="group_marketing_automation_manager" model="res.groups">
     <field name="name">Marketing Automation: Manager</field>
     <field name="category_id" ref="base.module_category_marketing"/>
     <field name="implied_ids" eval="[(4, ref('group_marketing_automation_user'))]"/>
-    <field name="comment">Full access to marketing automation features and settings</field>
+    <field name="users" eval="[(4, ref('base.user_admin'))]"/>
 </record>
 ```
 
-#### 3.2 Access Control List (ir.model.access.csv)
+### 3.2 Access Control Lists (ir.model.access.csv)
 ```csv
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_translation_task_user,sc.translation.task.user,model_sc_translation_task,group_marketing_automation_user,1,1,1,0
-access_translation_task_manager,sc.translation.task.manager,model_sc_translation_task,group_marketing_automation_manager,1,1,1,1
-access_translate_wizard_user,sc.translate.blog.post.wizard.user,model_sc_translate_blog_post_wizard,group_marketing_automation_user,1,1,1,1
-access_translate_wizard_manager,sc.translate.blog.post.wizard.manager,model_sc_translate_blog_post_wizard,group_marketing_automation_manager,1,1,1,1
+access_sc_translation_task_user,sc.translation.task.user,model_sc_translation_task,group_marketing_automation_user,1,0,0,0
+access_sc_translation_task_manager,sc.translation.task.manager,model_sc_translation_task,group_marketing_automation_manager,1,1,1,1
+access_sc_translate_blog_post_wizard_user,sc.translate.blog.post.wizard.user,model_sc_translate_blog_post_wizard,group_marketing_automation_user,1,1,1,1
 ```
 
-#### 3.3 Record Rules (Multi-Company)
+### 3.3 Record Rules
 ```xml
-<!-- security/security.xml -->
+<!-- Company-specific access rule -->
 <record id="translation_task_company_rule" model="ir.rule">
     <field name="name">Translation Task: Multi-Company</field>
     <field name="model_id" ref="model_sc_translation_task"/>
     <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+</record>
+
+<!-- Manager can see all tasks, users only their own -->
+<record id="translation_task_user_rule" model="ir.rule">
+    <field name="name">Translation Task: User Access</field>
+    <field name="model_id" ref="model_sc_translation_task"/>
     <field name="groups" eval="[(4, ref('group_marketing_automation_user'))]"/>
+    <field name="domain_force">[('create_uid', '=', user.id)]</field>
 </record>
 ```
 
-### Least Privilege Implementation
-- **Users**: Can view/create translation tasks, access wizard
-- **Managers**: Full CRUD access, settings configuration
-- **System Admin**: OpenAI API configuration access
-- **Multi-company isolation**: Tasks filtered by company context
+### 3.4 Field-Level Security
+- **API Key**: Password field, only accessible to system administrators
+- **Error Messages**: Read-only, manager-level access required
+- **Translation Content**: Protected from unauthorized modification
 
 ---
 
 ## 4. UI & Views Plan (Odoo 18.0)
 
-### Menu Structure
+### 4.1 Menu Structure
 ```xml
-<!-- data/menus.xml -->
-<menuitem id="menu_marketing_automation_root" 
-          name="Marketing Automation" 
-          sequence="50"/>
-
-<menuitem id="menu_content_translation" 
-          name="Content Translation" 
-          parent="menu_marketing_automation_root" 
-          sequence="10"/>
-
-<menuitem id="menu_translation_tasks" 
-          name="Translation Tasks" 
-          parent="menu_content_translation"
-          action="action_translation_task_list" 
-          sequence="10"/>
+<menuitem id="menu_marketing_automation_root" name="Marketing Automation" sequence="85"/>
+    <menuitem id="menu_content_translation" name="Content Translation" parent="menu_marketing_automation_root" sequence="10"/>
+        <menuitem id="menu_translation_tasks" name="Translation Tasks" parent="menu_content_translation" sequence="10" action="action_sc_translation_task"/>
 ```
 
-### Core Views (Using Odoo 18.0 Standards)
+### 4.2 Translation Task Views
 
-#### 4.1 Translation Task Views
+**List View (Odoo 18.0 compliant)**:
 ```xml
-<!-- views/translation_task_views.xml -->
-
-<!-- List View (18.0: <list> not <tree>) -->
-<record id="view_translation_task_list" model="ir.ui.view">
+<record id="view_sc_translation_task_list" model="ir.ui.view">
     <field name="name">sc.translation.task.list</field>
     <field name="model">sc.translation.task</field>
     <field name="arch" type="xml">
-        <list string="Translation Tasks" decoration-info="state in ('draft','in_progress')" 
-              decoration-success="state=='done'" decoration-danger="state=='error'">
+        <list string="Translation Tasks" default_order="create_date desc">
             <field name="name"/>
             <field name="blog_post_id"/>
             <field name="target_lang_id"/>
-            <field name="state" widget="badge"/>
+            <field name="state" widget="badge" 
+                   decoration-info="state in ('draft', 'in_progress')"
+                   decoration-success="state == 'done'"
+                   decoration-danger="state == 'error'"/>
             <field name="create_date"/>
-            <field name="company_id" groups="base.group_multi_company"/>
+            <field name="processed_date"/>
+            <field name="company_id" column_invisible="not context.get('show_company')"/>
         </list>
     </field>
 </record>
+```
 
-<!-- Form View with Chatter -->
-<record id="view_translation_task_form" model="ir.ui.view">
+**Form View with Chatter**:
+```xml
+<record id="view_sc_translation_task_form" model="ir.ui.view">
     <field name="name">sc.translation.task.form</field>
     <field name="model">sc.translation.task</field>
     <field name="arch" type="xml">
         <form string="Translation Task">
             <header>
-                <button name="action_reset_to_draft" string="Reset to Draft" type="object"
-                        invisible="state != 'error'" class="btn-primary"/>
+                <button name="action_reset_to_draft" type="object" string="Reset to Draft" 
+                        invisible="state != 'error'" class="btn-secondary"/>
                 <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,done"/>
             </header>
             <sheet>
+                <div class="oe_title">
+                    <h1><field name="name" readonly="1"/></h1>
+                </div>
                 <group>
                     <group>
-                        <field name="name"/>
-                        <field name="blog_post_id"/>
-                        <field name="target_lang_id"/>
+                        <field name="blog_post_id" readonly="state != 'draft'"/>
+                        <field name="target_lang_id" readonly="state != 'draft'"/>
                         <field name="company_id" groups="base.group_multi_company"/>
                     </group>
                     <group>
-                        <field name="source_language"/>
-                        <field name="processed_date" readonly="True"/>
-                        <field name="translation_duration" readonly="True"/>
+                        <field name="create_date"/>
+                        <field name="processed_date" readonly="1"/>
+                        <field name="processing_duration" readonly="1"/>
                     </group>
                 </group>
-                <group>
-                    <field name="system_instructions"/>
-                </group>
-                <group invisible="state != 'error'">
-                    <field name="error_message" readonly="True"/>
-                </group>
+                <notebook>
+                    <page string="Instructions" name="instructions">
+                        <field name="system_instructions" readonly="state != 'draft'"/>
+                    </page>
+                    <page string="Error Details" name="error_details" invisible="state != 'error'">
+                        <field name="error_message" readonly="1"/>
+                    </page>
+                    <page string="Content" name="content" invisible="state in ('draft', 'in_progress')">
+                        <group>
+                            <group string="Original Content">
+                                <field name="original_content" widget="json" readonly="1"/>
+                            </group>
+                            <group string="Translated Content">
+                                <field name="translated_content" widget="json" readonly="1"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
             </sheet>
             <chatter/>
         </form>
     </field>
 </record>
+```
 
-<!-- Kanban View with Meaningful Grouping -->
-<record id="view_translation_task_kanban" model="ir.ui.view">
+**Kanban View with default_group_by**:
+```xml
+<record id="view_sc_translation_task_kanban" model="ir.ui.view">
     <field name="name">sc.translation.task.kanban</field>
     <field name="model">sc.translation.task</field>
     <field name="arch" type="xml">
         <kanban default_group_by="state" class="o_kanban_small_column">
-            <field name="state"/>
             <field name="name"/>
             <field name="blog_post_id"/>
             <field name="target_lang_id"/>
+            <field name="state"/>
+            <field name="create_date"/>
             <templates>
                 <t t-name="kanban-box">
-                    <div class="oe_kanban_card oe_kanban_global_click">
+                    <div class="oe_kanban_card">
                         <div class="oe_kanban_content">
                             <div class="o_kanban_record_title">
                                 <field name="name"/>
@@ -296,7 +321,12 @@ access_translate_wizard_manager,sc.translate.blog.post.wizard.manager,model_sc_t
                             <div class="o_kanban_record_body">
                                 <field name="blog_post_id"/>
                                 <br/>
-                                → <field name="target_lang_id"/>
+                                <i class="fa fa-language"/> <field name="target_lang_id"/>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="create_date" widget="date"/>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -307,22 +337,27 @@ access_translate_wizard_manager,sc.translate.blog.post.wizard.manager,model_sc_t
 </record>
 ```
 
-#### 4.2 Blog Post Inheritance
+### 4.3 Blog Post Enhancement
+**Form View Addition**:
 ```xml
-<!-- views/blog_post_views.xml -->
-<record id="view_blog_post_form_inherit" model="ir.ui.view">
-    <field name="name">blog.post.form.inherit</field>
+<record id="view_blog_post_form_translation" model="ir.ui.view">
+    <field name="name">blog.post.form.translation</field>
     <field name="model">blog.post</field>
     <field name="inherit_id" ref="website_blog.view_blog_post_form"/>
     <field name="arch" type="xml">
+        <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+            <button name="action_view_translation_tasks" type="object" class="oe_stat_button" icon="fa-language" invisible="translation_task_count == 0">
+                <field name="translation_task_count" widget="statinfo" string="Translations"/>
+            </button>
+        </xpath>
         <xpath expr="//notebook" position="inside">
-            <page string="Translation History">
-                <field name="translation_task_ids">
-                    <list string="Translation Tasks" editable="false">
-                        <field name="name"/>
+            <page string="Translation History" name="translation_history">
+                <field name="translation_task_ids" readonly="1">
+                    <list string="Translation Tasks">
                         <field name="target_lang_id"/>
                         <field name="state" widget="badge"/>
                         <field name="create_date"/>
+                        <field name="processed_date"/>
                     </list>
                 </field>
             </page>
@@ -331,33 +366,8 @@ access_translate_wizard_manager,sc.translate.blog.post.wizard.manager,model_sc_t
 </record>
 ```
 
-#### 4.3 Translation Wizard
+### 4.4 Server Action
 ```xml
-<!-- wizard/translate_wizard_views.xml -->
-<record id="view_translate_blog_post_wizard_form" model="ir.ui.view">
-    <field name="name">sc.translate.blog.post.wizard.form</field>
-    <field name="model">sc.translate.blog.post.wizard</field>
-    <field name="arch" type="xml">
-        <form string="Translate Blog Posts">
-            <group>
-                <field name="selected_post_count" readonly="True"/>
-                <field name="target_lang_id" required="True"/>
-            </group>
-            <group>
-                <field name="system_instructions" placeholder="Optional: Provide tone and style guidance for AI translation"/>
-            </group>
-            <footer>
-                <button name="action_translate_posts" string="Start Translation" type="object" class="btn-primary"/>
-                <button string="Cancel" class="btn-secondary" special="cancel"/>
-            </footer>
-        </form>
-    </field>
-</record>
-```
-
-#### 4.4 Server Actions
-```xml
-<!-- data/actions.xml -->
 <record id="action_translate_blog_posts" model="ir.actions.server">
     <field name="name">Translate with AI</field>
     <field name="model_id" ref="website_blog.model_blog_post"/>
@@ -365,74 +375,256 @@ access_translate_wizard_manager,sc.translate.blog.post.wizard.manager,model_sc_t
     <field name="binding_view_types">list</field>
     <field name="state">code</field>
     <field name="code">
-        action = records.action_open_translate_wizard()
+        action = records.action_open_translation_wizard()
     </field>
 </record>
 ```
 
-### Conditional UI Implementation
-- Use `invisible="state != 'error'"` for error fields
-- Use `readonly="True"` for computed audit fields
-- Use `required="True"` for mandatory wizard fields
-- Use `column_invisible="True"` for company fields in single-company mode
+### 4.5 Wizard Views
+```xml
+<record id="view_sc_translate_blog_post_wizard_form" model="ir.ui.view">
+    <field name="name">sc.translate.blog.post.wizard.form</field>
+    <field name="model">sc.translate.blog.post.wizard</field>
+    <field name="arch" type="xml">
+        <form string="Translate Blog Posts">
+            <group>
+                <field name="target_lang_id" required="1"/>
+                <field name="system_instructions" placeholder="Optional: Specify tone, style, or special instructions for the AI translator..."/>
+                <field name="blog_post_ids" invisible="1"/>
+            </group>
+            <footer>
+                <button name="action_translate" type="object" string="Translate" class="btn-primary"/>
+                <button string="Cancel" class="btn-secondary" special="cancel"/>
+            </footer>
+        </form>
+    </field>
+</record>
+```
+
+### 4.6 Settings View
+```xml
+<record id="view_general_configuration_translation" model="ir.ui.view">
+    <field name="name">res.config.settings.view.form.inherit.translation</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//div[hasclass('settings')]" position="inside">
+            <div class="app_settings_block" data-string="AI Marketing Tools" string="AI Marketing Tools" data-key="sc_marketing_automation">
+                <h2>OpenAI Configuration</h2>
+                <div class="row mt16 o_settings_container">
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sc_openai_api_key"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sc_openai_api_key"/>
+                            <div class="text-muted">Your OpenAI API key for AI translation services</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sc_openai_organization_id"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sc_openai_organization_id"/>
+                            <div class="text-muted">Optional: Your OpenAI Organization ID</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sc_openai_model"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sc_openai_model"/>
+                            <div class="text-muted">OpenAI model to use for translations</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </field>
+</record>
+```
 
 ---
 
 ## 5. Integration & Services
 
-### OpenAI Integration Service
+### 5.1 OpenAI Agent SDK Integration
+
+**Environment Setup**:
+- **Library**: `openai-agents` (pip install openai-agents)
+- **Version**: Latest stable version (to be pinned in requirements.txt)
+- **Authentication**: API key from environment variables or Odoo settings
+- **Rate Limits**: Implement exponential backoff (2^retry_count seconds, max 60s)
+- **Timeouts**: 120 seconds per translation request
+- **Error Handling**: Comprehensive error taxonomy with user-friendly messages
+
+**Core Integration Service**:
 ```python
-# services/openai_service.py
+# utils/openai_service.py
 import asyncio
+import os
 import json
-import logging
 from agents import Agent, Runner
+from odoo import api, models, fields, _
 
 class OpenAITranslationService:
-    """Service class for OpenAI translation operations using agents SDK"""
+    """Service class for OpenAI Agent SDK integration"""
     
-    @staticmethod
-    async def translate_blog_content(content_json, source_lang, target_lang, model, instructions=None):
-        """Translate blog content using OpenAI agents"""
-        system_prompt = instructions or f"You are a professional translator specializing in blog content translation from {source_lang} to {target_lang}."
+    def __init__(self, api_key, organization_id=None, model='gpt-4o'):
+        # Set environment variables for OpenAI SDK
+        os.environ['OPENAI_API_KEY'] = api_key
+        if organization_id:
+            os.environ['OPENAI_ORG_ID'] = organization_id
+        self.model = model
+    
+    async def translate_blog_content(self, content_json, source_lang, target_lang, system_instructions=""):
+        """
+        Translate blog content using OpenAI Agent SDK
         
-        agent = Agent(
-            name="Odoo Blog Translator",
-            instructions=system_prompt,
-            model=model
-        )
-        
-        user_prompt = f"""
-        Translate the values in the following JSON object from {source_lang} to {target_lang}.
-        Respond ONLY with the translated JSON object, maintaining the exact same key structure.
-        JSON to translate:
-        {json.dumps(content_json, ensure_ascii=False, indent=2)}
+        Args:
+            content_json (dict): Blog post content fields
+            source_lang (str): Source language code
+            target_lang (str): Target language code  
+            system_instructions (str): Custom AI instructions
+            
+        Returns:
+            dict: Translated content with same structure
+            
+        Raises:
+            OpenAIError: For API-related errors
+            ValidationError: For content validation errors
         """
         
-        result = await Runner.run(agent, user_prompt)
-        return result.final_output
-    
-    @staticmethod
-    def get_available_models(api_key, organization_id=None):
-        """Get available OpenAI models for selection field"""
-        # Implementation will call OpenAI API
-        # Fallback to default models if API fails
-        default_models = [
-            ('gpt-4o', 'GPT-4o'),
-            ('gpt-4-turbo', 'GPT-4 Turbo'),
-            ('gpt-3.5-turbo', 'GPT-3.5 Turbo')
-        ]
-        return default_models
+        # Prepare system instructions
+        base_instructions = f"""
+        You are a professional translator specializing in blog content translation.
+        Translate the provided JSON content from {source_lang} to {target_lang}.
+        
+        Rules:
+        1. Maintain the exact JSON structure
+        2. Translate only the VALUES, never the KEYS
+        3. Preserve HTML tags and formatting
+        4. Adapt cultural references appropriately
+        5. Maintain the original tone and style unless specified otherwise
+        
+        {system_instructions}
+        """
+        
+        # Build translation prompt
+        prompt = f"""
+        Translate the values in the following JSON object from {source_lang} to {target_lang}.
+        Respond ONLY with the translated JSON object, maintaining the exact same key structure.
+        
+        JSON to translate:
+        {json.dumps(content_json, indent=2)}
+        """
+        
+        # Create agent and execute translation
+        agent = Agent(
+            name="Odoo Blog Translator",
+            instructions=base_instructions,
+            model=self.model
+        )
+        
+        result = await Runner.run(agent, prompt)
+        
+        # Parse and validate response
+        try:
+            translated_content = json.loads(result.final_output)
+            return translated_content
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON response from AI: {e}")
 ```
 
-### Cron Job Configuration
+**Async Cron Integration**:
+```python
+# models/translation_task.py (cron method)
+def _process_translation_tasks(self):
+    """Cron method to process pending translation tasks"""
+    
+    tasks = self.search([('state', '=', 'draft')], limit=10)
+    
+    for task in tasks:
+        try:
+            # Update to in_progress with commit
+            task.write({'state': 'in_progress'})
+            self.env.cr.commit()
+            
+            # Execute translation
+            result = self._execute_translation_async(task)
+            
+            # Update with results
+            task.write({
+                'state': 'done',
+                'translated_content': result,
+                'processed_date': fields.Datetime.now()
+            })
+            
+        except Exception as e:
+            task.write({
+                'state': 'error',
+                'error_message': str(e)
+            })
+            
+        # Reset blog post flag if no more pending tasks
+        if not task.blog_post_id.translation_task_ids.filtered(lambda t: t.state in ('draft', 'in_progress')):
+            task.blog_post_id.translation_in_progress = False
+    
+def _execute_translation_async(self, task):
+    """Execute async translation in sync context"""
+    
+    # Get OpenAI configuration
+    config = self.env['ir.config_parameter'].sudo()
+    api_key = config.get_param('sc_marketing_automation.openai_api_key')
+    org_id = config.get_param('sc_marketing_automation.openai_org_id')
+    model = config.get_param('sc_marketing_automation.openai_model', 'gpt-4o')
+    
+    if not api_key:
+        raise ValueError(_("OpenAI API key not configured"))
+    
+    # Prepare content for translation
+    post = task.blog_post_id
+    content = {
+        'name': post.name,
+        'subtitle': post.subtitle or '',
+        'content': post.content or '',
+        'website_meta_title': post.website_meta_title or '',
+        'website_meta_description': post.website_meta_description or '',
+        'website_meta_keywords': post.website_meta_keywords or ''
+    }
+    
+    # Store original content
+    task.original_content = content
+    
+    # Initialize service and run translation
+    service = OpenAITranslationService(api_key, org_id, model)
+    
+    # Run async function in sync context
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        result = loop.run_until_complete(
+            service.translate_blog_content(
+                content, 
+                'English',  # Assuming source is English
+                task.target_lang_id.name,
+                task.system_instructions
+            )
+        )
+        return result
+    finally:
+        loop.close()
+```
+
+### 5.2 Cron Job Configuration
 ```xml
-<!-- data/cron.xml -->
 <record id="cron_process_translation_tasks" model="ir.cron">
-    <field name="name">Process AI Translation Tasks</field>
+    <field name="name">Process Translation Tasks</field>
     <field name="model_id" ref="model_sc_translation_task"/>
     <field name="state">code</field>
-    <field name="code">model._cron_process_translation_tasks()</field>
+    <field name="code">model._process_translation_tasks()</field>
     <field name="interval_number">5</field>
     <field name="interval_type">minutes</field>
     <field name="numbercall">-1</field>
@@ -440,14 +632,28 @@ class OpenAITranslationService:
 </record>
 ```
 
-### External Dependencies
-- **openai-agents SDK**: Primary integration library
-- **asyncio**: For async operations within cron jobs
-- **json**: For content serialization/deserialization
+### 5.3 External API Requirements
 
-### Environment Variables
-- OpenAI API credentials stored in Odoo config parameters
-- No environment variables needed (using Odoo's config system)
+**OpenAI Agent SDK**:
+- **Base URL**: Handled by SDK (https://api.openai.com/v1/)
+- **Authentication**: Bearer token (API key)
+- **Rate Limits**: 
+  - GPT-4: 500 requests/minute, 30,000 tokens/minute
+  - GPT-3.5: 3,000 requests/minute, 160,000 tokens/minute
+- **Backoff Strategy**: Exponential backoff with jitter
+- **Timeout**: 120 seconds per request
+- **Retry Logic**: 3 attempts with exponential backoff
+
+**Environment Variables**:
+- `OPENAI_API_KEY`: Stored in Odoo config parameters
+- `OPENAI_ORG_ID`: Optional, stored in Odoo config parameters
+
+**Error Taxonomy**:
+- **401 Unauthorized**: Invalid API key
+- **429 Rate Limited**: Implement backoff and retry
+- **500 Server Error**: Temporary failure, retry
+- **Content Policy Violation**: Log and mark as error
+- **Token Limit Exceeded**: Split content or use smaller model
 
 ---
 
@@ -455,464 +661,656 @@ class OpenAITranslationService:
 
 ```
 sc_marketing_automation_tool/
-├── __init__.py                          # Import all modules
+├── __init__.py                          # Import models, wizards, utils
 ├── __manifest__.py                      # Module manifest with dependencies
 ├── models/
 │   ├── __init__.py                      # Import all models
-│   ├── translation_task.py             # sc.translation.task model
+│   ├── res_config_settings.py          # OpenAI configuration
+│   ├── sc_translation_task.py          # Main translation task model
 │   ├── blog_post.py                     # blog.post inheritance
-│   └── res_config_settings.py          # Settings configuration
+│   └── res_lang.py                      # Language model enhancements (if needed)
 ├── wizard/
-│   ├── __init__.py                      # Import wizard
-│   └── translate_blog_post_wizard.py   # Translation wizard
-├── services/
-│   ├── __init__.py                      # Import services
-│   └── openai_service.py               # OpenAI integration service
+│   ├── __init__.py                      # Import wizards
+│   └── sc_translate_blog_post_wizard.py # Translation wizard
 ├── views/
-│   ├── translation_task_views.xml      # Translation task views
-│   ├── blog_post_views.xml             # Blog post inheritance views
-│   └── res_config_settings_views.xml   # Settings views
-├── wizard/
-│   └── translate_wizard_views.xml      # Wizard views
+│   ├── sc_translation_task_views.xml   # Task list, form, kanban views
+│   ├── blog_post_views.xml             # Blog post form inheritance
+│   ├── res_config_settings_views.xml   # Settings page configuration
+│   └── sc_translate_blog_post_wizard_views.xml # Wizard views
 ├── data/
-│   ├── menus.xml                        # Menu structure
-│   ├── actions.xml                      # Server actions
-│   ├── cron.xml                         # Cron job configuration
-│   └── demo_data.xml                    # Demo data
+│   ├── ir_cron_data.xml                # Cron job configuration
+│   ├── ir_actions_server_data.xml      # Server actions
+│   └── menu_data.xml                   # Menu structure
 ├── security/
-│   ├── security.xml                     # Groups and record rules
-│   └── ir.model.access.csv             # Access control list
+│   ├── ir.model.access.csv             # Access control lists
+│   ├── groups.xml                      # Security groups
+│   └── record_rules.xml                # Record-level security
+├── utils/
+│   ├── __init__.py                     # Import utility modules
+│   ├── openai_service.py               # OpenAI Agent SDK integration
+│   └── translation_helpers.py         # Helper functions
 ├── static/
 │   └── description/
-│       ├── icon.png                     # Module icon
-│       ├── index.html                   # Module description
-│       └── banner.png                   # Module banner
+│       ├── icon.png                    # Module icon
+│       └── index.html                  # Module description
 ├── i18n/
-│   └── es_ES.po                         # Spanish translations
+│   └── es_ES.po                        # Spanish translations
 ├── docs/
+│   ├── INDEX.md                        # Documentation index
+│   ├── README.md                       # Module overview and quick start
 │   ├── technical/
-│   │   ├── api-reference.md             # API documentation
-│   │   ├── architecture.md              # Technical architecture
-│   │   ├── development-guide.md         # Developer guidelines
-│   │   ├── database-schema.md           # Database documentation
-│   │   └── troubleshooting.md           # Technical troubleshooting
+│   │   ├── api-reference.md            # API documentation
+│   │   ├── architecture.md             # System architecture
+│   │   ├── development-guide.md        # Developer guidelines
+│   │   ├── database-schema.md          # Database documentation
+│   │   ├── integration-guide.md        # OpenAI integration guide
+│   │   └── troubleshooting.md          # Technical troubleshooting
 │   ├── functional/
-│   │   ├── user-guide.md                # User manual
-│   │   ├── business-processes.md        # Business workflows
-│   │   ├── configuration-guide.md       # Configuration instructions
-│   │   └── faq.md                       # FAQ
-│   └── plan/
-│       └── PLAN.md                      # This implementation plan
+│   │   ├── user-guide.md               # Complete user manual
+│   │   ├── business-processes.md       # Business workflow documentation
+│   │   ├── configuration-guide.md      # System configuration
+│   │   ├── roles-permissions.md        # User roles and access control
+│   │   ├── reports-guide.md            # Reports and analytics
+│   │   └── faq.md                      # Frequently asked questions
+│   ├── plan/
+│   │   └── PLAN.md                     # This implementation plan
+│   └── assets/
+│       └── images/                     # Screenshots and diagrams
 ├── tests/
-│   ├── __init__.py                      # Import test modules
-│   ├── test_translation_task.py        # Translation task tests
-│   ├── test_openai_service.py          # OpenAI service tests
-│   └── test_wizard.py                  # Wizard functionality tests
-└── README.md                           # Module overview and quick start
+│   ├── __init__.py                     # Import test modules
+│   ├── test_translation_task.py        # Unit tests for translation tasks
+│   ├── test_blog_post_inheritance.py   # Tests for blog post enhancements
+│   ├── test_wizard.py                  # Wizard functionality tests
+│   ├── test_openai_integration.py      # OpenAI service tests (with mocking)
+│   └── test_security.py               # Security and access control tests
+└── requirements.txt                    # Python dependencies (openai-agents)
 ```
 
 ---
 
 ## 7. Testing Plan
 
-### Unit Tests
+### 7.1 Unit Tests
+
+**Translation Task Model Tests** (`test_translation_task.py`):
 ```python
-# tests/test_translation_task.py
 @tagged('post_install', '-at_install')
-class TestTranslationTask(TransactionCase):
+class TestScTranslationTask(TransactionCase):
     
     def setUp(self):
         super().setUp()
-        self.blog = self.env['blog.blog'].create({'name': 'Test Blog'})
-        self.post = self.env['blog.post'].create({
-            'name': 'Test Post',
-            'blog_id': self.blog.id,
+        self.blog_post = self.env['blog.post'].create({
+            'name': 'Test Blog Post',
             'content': '<p>Test content</p>'
         })
-        self.lang_es = self.env.ref('base.lang_es')
+        self.lang_es = self.env['res.lang'].create({
+            'name': 'Spanish',
+            'code': 'es_ES',
+            'website_published': True
+        })
     
     def test_translation_task_creation(self):
-        """Test translation task creation and basic functionality"""
+        """Test basic translation task creation"""
         task = self.env['sc.translation.task'].create({
-            'name': 'Test Translation',
-            'blog_post_id': self.post.id,
+            'blog_post_id': self.blog_post.id,
             'target_lang_id': self.lang_es.id,
-            'system_instructions': 'Formal tone'
+            'system_instructions': 'Test instructions'
         })
         self.assertEqual(task.state, 'draft')
-        self.assertEqual(task.source_language, self.blog.default_lang_id.name)
-    
-    def test_multi_company_isolation(self):
-        """Test multi-company record isolation"""
-        company2 = self.env['res.company'].create({'name': 'Test Company 2'})
-        task1 = self.env['sc.translation.task'].create({
-            'name': 'Task Company 1',
-            'blog_post_id': self.post.id,
-            'target_lang_id': self.lang_es.id,
-            'company_id': self.env.company.id
-        })
-        task2 = self.env['sc.translation.task'].with_company(company2).create({
-            'name': 'Task Company 2',
-            'blog_post_id': self.post.id,
-            'target_lang_id': self.lang_es.id,
-            'company_id': company2.id
+        self.assertTrue(task.name)  # Should be computed
+        
+    def test_duplicate_translation_constraint(self):
+        """Test constraint preventing duplicate translations"""
+        # Create first task
+        self.env['sc.translation.task'].create({
+            'blog_post_id': self.blog_post.id,
+            'target_lang_id': self.lang_es.id
         })
         
-        # Verify company isolation
-        tasks_company1 = self.env['sc.translation.task'].search([])
-        self.assertIn(task1, tasks_company1)
-        self.assertNotIn(task2, tasks_company1)
+        # Attempt to create duplicate should raise error
+        with self.assertRaises(ValidationError):
+            self.env['sc.translation.task'].create({
+                'blog_post_id': self.blog_post.id,
+                'target_lang_id': self.lang_es.id
+            })
 ```
 
-### Integration Tests
+**OpenAI Integration Tests** (`test_openai_integration.py`):
 ```python
-# tests/test_openai_service.py
 @tagged('post_install', '-at_install')
-class TestOpenAIService(TransactionCase):
+class TestOpenAIIntegration(TransactionCase):
     
-    def test_content_preparation(self):
-        """Test blog content JSON preparation"""
-        post = self.env['blog.post'].create({
-            'name': 'Test Post',
-            'subtitle': 'Test Subtitle',
-            'content': '<p>Test content</p>',
-            'website_meta_title': 'Meta Title',
-            'website_meta_description': 'Meta Description'
+    def setUp(self):
+        super().setUp()
+        # Mock OpenAI responses
+        self.mock_openai_response = {
+            'name': 'Publicación de prueba',
+            'content': '<p>Contenido de prueba</p>'
+        }
+    
+    @patch('asyncio.run')
+    @patch('sc_marketing_automation_tool.utils.openai_service.OpenAITranslationService')
+    def test_translation_execution(self, mock_service, mock_asyncio):
+        """Test translation execution with mocked OpenAI"""
+        mock_asyncio.return_value = self.mock_openai_response
+        
+        task = self.env['sc.translation.task'].create({
+            'blog_post_id': self.blog_post.id,
+            'target_lang_id': self.lang_es.id
         })
         
-        content_json = self.env['sc.translation.task']._prepare_content_for_translation(post)
-        expected_keys = ['name', 'subtitle', 'content', 'website_meta_title', 'website_meta_description']
-        for key in expected_keys:
-            self.assertIn(key, content_json)
+        # Execute translation
+        result = task._execute_translation_async(task)
+        self.assertEqual(result['name'], 'Publicación de prueba')
 ```
 
-### Test Data Setup
-- Demo blog posts in multiple languages
-- Sample translation tasks in different states
-- Mock OpenAI responses for testing
+### 7.2 Integration Tests
 
-### Test Execution Commands
+**Wizard Integration** (`test_wizard.py`):
+```python
+def test_wizard_translation_workflow(self):
+    """Test complete wizard to translation workflow"""
+    # Create wizard
+    wizard = self.env['sc.translate.blog.post.wizard'].create({
+        'target_lang_id': self.lang_es.id,
+        'system_instructions': 'Professional tone'
+    })
+    
+    # Set context with selected blog posts
+    wizard = wizard.with_context(active_ids=[self.blog_post.id])
+    
+    # Execute translation
+    wizard.action_translate()
+    
+    # Verify task creation
+    task = self.env['sc.translation.task'].search([
+        ('blog_post_id', '=', self.blog_post.id),
+        ('target_lang_id', '=', self.lang_es.id)
+    ])
+    self.assertEqual(len(task), 1)
+    self.assertEqual(task.system_instructions, 'Professional tone')
+```
+
+### 7.3 Performance Tests
+- **Bulk Translation**: Test with 50+ blog posts
+- **Concurrent Processing**: Multiple cron job executions
+- **Memory Usage**: Large content translation
+- **API Rate Limiting**: Backoff and retry mechanisms
+
+### 7.4 Test Data Setup
+```python
+# tests/common.py
+class TranslationTestCase(TransactionCase):
+    
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.blog = cls.env['blog.blog'].create({'name': 'Test Blog'})
+        cls.blog_posts = cls.env['blog.post'].create([
+            {
+                'name': f'Test Post {i}',
+                'blog_id': cls.blog.id,
+                'content': f'<p>Test content {i}</p>'
+            } for i in range(5)
+        ])
+        cls.languages = cls.env['res.lang'].create([
+            {'name': 'Spanish', 'code': 'es_ES', 'website_published': True},
+            {'name': 'French', 'code': 'fr_FR', 'website_published': True}
+        ])
+```
+
+### 7.5 Test Execution Commands
 ```bash
-# Run all module tests
+# Run all tests
 python3 odoo-src/odoo-bin -c config/solutto-consulting.conf --test-enable --test-tags sc_marketing_automation_tool --stop-after-init
 
-# Run specific test files
-python3 odoo-src/odoo-bin -c config/solutto-consulting.conf --test-enable --test-tags test_translation_task --stop-after-init
+# Run specific test class
+python3 odoo-src/odoo-bin -c config/solutto-consulting.conf --test-enable --test-tags sc_marketing_automation_tool.test_translation_task --stop-after-init
+
+# Run with coverage
+coverage run --source=custom-addons/sc_marketing_automation_tool odoo-src/odoo-bin -c config/solutto-consulting.conf --test-enable --test-tags sc_marketing_automation_tool --stop-after-init
 ```
 
 ---
 
 ## 8. i18n & Documentation Plan
 
-### Spanish Translation (es_ES.po)
+### 8.1 Spanish Translation (es_ES.po)
+
+**Required Translations**:
 ```po
-# Complete translation coverage required
-msgid "Translation Task"
-msgstr "Tarea de Traducción"
-
-msgid "Blog Post Translation Wizard"
-msgstr "Asistente de Traducción de Artículos"
-
-msgid "Target Language"
-msgstr "Idioma Objetivo"
-
-msgid "System Instructions"
-msgstr "Instrucciones del Sistema"
-
-msgid "Translation in Progress"
-msgstr "Traducción en Progreso"
-
+# Translation Task Model
 msgid "AI Translation Task"
 msgstr "Tarea de Traducción IA"
 
-msgid "Marketing Automation"
-msgstr "Automatización de Marketing"
+msgid "Translation Tasks"
+msgstr "Tareas de Traducción"
 
-msgid "Content Translation"
-msgstr "Traducción de Contenido"
+msgid "Target Language"
+msgstr "Idioma Destino"
+
+msgid "AI Instructions"
+msgstr "Instrucciones para IA"
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Draft"
+msgstr "Borrador"
+
+msgid "In Progress"
+msgstr "En Progreso"
+
+msgid "Completed"
+msgstr "Completado"
+
+msgid "Error"
+msgstr "Error"
+
+# Wizard
+msgid "Translate Blog Posts"
+msgstr "Traducir Publicaciones del Blog"
+
+msgid "Translate with AI"
+msgstr "Traducir con IA"
+
+# Settings
+msgid "AI Marketing Tools"
+msgstr "Herramientas de Marketing IA"
+
+msgid "OpenAI Configuration"
+msgstr "Configuración OpenAI"
+
+msgid "OpenAI API Key"
+msgstr "Clave API de OpenAI"
+
+# Error Messages
+msgid "OpenAI API key not configured"
+msgstr "Clave API de OpenAI no configurada"
+
+msgid "Translation failed: %s"
+msgstr "Traducción falló: %s"
 ```
 
-### Technical Documentation Structure
-```markdown
-docs/technical/
-├── api-reference.md          # Complete API documentation
-├── architecture.md           # System architecture and design patterns
-├── development-guide.md      # Developer setup and guidelines
-├── database-schema.md        # Database models and relationships
-└── troubleshooting.md        # Common issues and solutions
-```
+### 8.2 Documentation Structure
 
-### Functional Documentation Structure
-```markdown
-docs/functional/
-├── user-guide.md             # Step-by-step user instructions
-├── business-processes.md     # Translation workflow procedures
-├── configuration-guide.md    # Settings and configuration
-└── faq.md                    # Frequently asked questions
-```
+**Technical Documentation** (`docs/technical/`):
+- **API Reference**: Complete method documentation for all models
+- **Architecture Guide**: OpenAI integration patterns and async processing
+- **Development Guide**: Setting up development environment, debugging
+- **Database Schema**: Complete field documentation and relationships
+- **Integration Guide**: OpenAI Agent SDK setup and configuration
+- **Troubleshooting**: Common issues and solutions
 
-### README.md Structure
-```markdown
-# SC Marketing Automation Tool
+**Functional Documentation** (`docs/functional/`):
+- **User Guide**: Step-by-step instructions for all user roles
+- **Business Processes**: Translation workflow documentation
+- **Configuration Guide**: OpenAI setup and model selection
+- **Roles & Permissions**: Security groups and access levels
+- **FAQ**: Common questions and answers
 
-## Quick Start
+**Quick Start README** (`README.md`):
 - Installation instructions
-- Basic configuration
-- First translation walkthrough
-
-## Documentation Links
-- [User Guide](docs/functional/user-guide.md)
-- [Technical Documentation](docs/technical/architecture.md)
-- [API Reference](docs/technical/api-reference.md)
-
-## Support
-- Issue tracking
-- Contact information
-```
+- Configuration steps
+- Basic usage examples
+- Links to complete documentation
 
 ---
 
 ## 9. Risks & Open Questions
 
-### Technical Risks
-1. **OpenAI API Rate Limits**: May impact processing speed during high-volume translations
-   - *Mitigation*: Implement retry logic and configurable batch sizes
+### 9.1 Technical Risks
+1. **OpenAI API Rate Limits**: Risk of hitting rate limits during bulk operations
+   - **Mitigation**: Implement exponential backoff and process in smaller batches
+   
+2. **Async Processing in Odoo**: Complexity of running async code in sync Odoo context
+   - **Mitigation**: Use asyncio.run() with proper event loop management
+   
+3. **Large Content Translation**: Token limits for very large blog posts
+   - **Mitigation**: Content chunking for oversized posts
+   
+4. **JSON Parsing Reliability**: AI might return invalid JSON
+   - **Mitigation**: Robust error handling and retry logic
 
-2. **Async Processing in Odoo**: Complex event loop management in cron jobs
-   - *Mitigation*: Use proven asyncio patterns and proper exception handling
+### 9.2 Business Risks
+1. **Translation Quality**: AI translations might not meet quality standards
+   - **Mitigation**: Allow custom instructions and manual review process
+   
+2. **Cost Management**: Unexpected OpenAI API costs
+   - **Mitigation**: Usage monitoring and rate limiting
+   
+3. **Content Policy Violations**: Some content might violate OpenAI policies
+   - **Mitigation**: Pre-screening and graceful error handling
 
-3. **JSON Response Parsing**: OpenAI may return malformed JSON responses
-   - *Mitigation*: Implement robust JSON validation and error recovery
-
-### Business Risks
-1. **Translation Quality**: AI translations may require human review
-   - *Mitigation*: Document review processes and provide editing capabilities
-
-2. **Cost Management**: OpenAI API costs can escalate with usage
-   - *Mitigation*: Implement usage tracking and cost monitoring
-
-### Open Questions
-1. **Q1**: Should we implement translation memory to avoid duplicate API calls?
-   - *Decision needed*: Cost vs. complexity trade-off analysis
-
-2. **Q2**: How to handle partial translation failures (some fields succeed, others fail)?
-   - *Decision needed*: All-or-nothing vs. partial success strategy
-
-3. **Q3**: Should we support custom prompts per blog category or tag?
-   - *Decision needed*: Feature scope for v1.0 vs. future releases
-
-4. **Q4**: What's the maximum number of posts to process per cron run?
-   - *Decision needed*: Performance testing required
+### 9.3 Open Questions
+1. **Q1**: Should we support other AI providers besides OpenAI?
+   - **Answer Needed**: Define scope for v1 vs future versions
+   
+2. **Q2**: How should we handle partial translation failures?
+   - **Answer Needed**: Retry specific fields or entire translation?
+   
+3. **Q3**: Should translations automatically update the blog post or require manual approval?
+   - **Answer Needed**: Define approval workflow requirements
+   
+4. **Q4**: What happens to translation tasks when blog posts are deleted?
+   - **Answer**: Already planned - using ondelete='cascade'
 
 ---
 
 ## 10. Milestones & PR Strategy
 
-### Milestone 1: Foundation & Security (Week 1)
-- **PR 1a**: Module scaffolding
-  - `__manifest__.py` with proper dependencies including `"mail"`
-  - Basic directory structure
-  - Security groups and access rights
-  - Initial Spanish translations
+### Milestone 1: Core Infrastructure (Week 1)
+**Scope**: Foundation models, security, basic views
+- [ ] Create `__manifest__.py` with all dependencies including `"mail"`
+- [ ] Implement `sc.translation.task` model with chatter integration
+- [ ] Implement `blog.post` inheritance with translation tracking
+- [ ] Create security groups and access control lists
+- [ ] Basic list/form views for translation tasks (using `<list>` tags)
+- [ ] Initial menu structure
 
-- **PR 1b**: Core models
-  - `sc.translation.task` model with chatter support
-  - `blog.post` inheritance
-  - Multi-company field implementations
+**PR Criteria**:
+- All models pass `test_access_rights`
+- Views render without errors
+- Menu navigation works
+- Basic CRUD operations functional
 
-### Milestone 2: UI & Basic Workflow (Week 2)
-- **PR 2a**: Views and menus
-  - Translation task list/form/kanban views (using `<list>`)
-  - Menu structure and actions
-  - Blog post form inheritance with translation history
+### Milestone 2: Wizard & UI Enhancement (Week 1)
+**Scope**: Translation wizard and enhanced UI
+- [ ] Implement `sc.translate.blog.post.wizard`
+- [ ] Create server action for "Translate with AI"
+- [ ] Enhance blog post form with translation history
+- [ ] Implement kanban view with `default_group_by="state"`
+- [ ] Add smart buttons and stat info
+- [ ] Wizard form with proper validations
 
-- **PR 2b**: Translation wizard
-  - Wizard model and views
-  - Server action integration
-  - Basic validation logic
+**PR Criteria**:
+- Wizard creates translation tasks correctly
+- Server action appears in blog post list view
+- All views follow Odoo 18.0 standards (`<list>`, conditional UI)
+- Kanban view groups by state properly
 
-### Milestone 3: Core Business Logic (Week 3)
-- **PR 3a**: OpenAI service integration
-  - OpenAI agents SDK integration
-  - Configuration settings model
-  - Dynamic model selection
+### Milestone 3: OpenAI Integration (Week 2)
+**Scope**: Core translation functionality
+- [ ] Install and configure `openai-agents` dependency
+- [ ] Implement `OpenAITranslationService` utility class
+- [ ] Create async translation execution method
+- [ ] Implement cron job for processing tasks
+- [ ] Add comprehensive error handling
+- [ ] Configuration settings integration
 
-- **PR 3b**: Translation processing
-  - Cron job implementation
-  - Async translation logic
-  - Error handling and status management
+**PR Criteria**:
+- Translation tasks process from draft to done/error
+- OpenAI Agent SDK integration works correctly
+- Cron job processes tasks asynchronously
+- Error states handled gracefully
+- Configuration settings functional
 
-### Milestone 4: Advanced Features (Week 4)
-- **PR 4a**: Enhanced UI features
-  - Status badges and decorations
-  - Reset functionality
-  - Bulk operations optimization
+### Milestone 4: Advanced Features (Week 2)
+**Scope**: Enhanced functionality and validation
+- [ ] Implement retry mechanisms and rate limiting
+- [ ] Add content validation and preprocessing
+- [ ] Enhance error messages and logging
+- [ ] Implement bulk operation optimizations
+- [ ] Add progress tracking and duration logging
+- [ ] Smart button for viewing related tasks
 
-- **PR 4b**: Monitoring and audit
-  - Translation duration tracking
-  - Enhanced error reporting
-  - Performance optimizations
+**PR Criteria**:
+- Rate limiting prevents API overuse
+- Bulk translations handle large datasets
+- Error messages are user-friendly
+- Performance is acceptable for 50+ posts
 
-### Milestone 5: Testing & Documentation (Week 5)
-- **PR 5a**: Comprehensive testing
-  - Unit tests for all models
-  - Integration tests for OpenAI service
-  - Multi-company testing
+### Milestone 5: Testing & Documentation (Week 3)
+**Scope**: Comprehensive testing and documentation
+- [ ] Unit tests for all models (85%+ coverage)
+- [ ] Integration tests for complete workflows
+- [ ] Performance tests for bulk operations
+- [ ] Mock OpenAI responses for reliable testing
+- [ ] Complete Spanish translation (`es_ES.po`)
+- [ ] Technical and functional documentation
 
-- **PR 5b**: Documentation completion
-  - Technical documentation
-  - Functional user guides
-  - README and installation guides
+**PR Criteria**:
+- All tests pass consistently
+- Test coverage meets standards
+- Spanish translations 100% complete
+- Documentation is comprehensive and accurate
+
+### Milestone 6: Production Hardening (Week 3)
+**Scope**: Security, monitoring, and deployment readiness
+- [ ] Security audit and penetration testing
+- [ ] Performance optimization and monitoring
+- [ ] Production configuration validation
+- [ ] Backup and recovery procedures
+- [ ] User acceptance testing
+- [ ] Final documentation review
+
+**PR Criteria**:
+- Security scan passes all checks
+- Performance meets production standards
+- User acceptance criteria satisfied
+- Documentation approved by stakeholders
 
 ---
 
 ## 11. Acceptance Checklist
 
-### Functional Requirements
-- [ ] ✅ Users can select multiple blog posts and initiate AI translation
-- [ ] ✅ Translation wizard captures target language and optional instructions
-- [ ] ✅ Background processing handles translations asynchronously
-- [ ] ✅ Translation tasks show clear status progression (draft → in_progress → done/error)
-- [ ] ✅ Error handling provides clear feedback and recovery options
-- [ ] ✅ Blog posts show translation history in dedicated tab
+### Core Functionality
+- [ ] Administrators can select multiple blog posts for translation
+- [ ] Translation wizard allows language and instruction selection
+- [ ] Translation tasks are created and processed asynchronously
+- [ ] OpenAI Agent SDK integration works correctly
+- [ ] Translation status is tracked throughout the process
+- [ ] Error handling provides meaningful feedback
+- [ ] Blog posts show translation history
 
-### Technical Requirements
-- [ ] ✅ Odoo 18.0 compatibility with `<list>` views (no `<tree>`)
-- [ ] ✅ OpenAI agents SDK integration working correctly
-- [ ] ✅ Multi-company support with proper record isolation
-- [ ] ✅ Mail threading and chatter functionality on translation tasks
-- [ ] ✅ Proper security groups and access controls
-- [ ] ✅ Cron job processing with configurable intervals
+### Odoo 18.0 Compliance
+- [ ] All list views use `<list>` tags (never `<tree>`)
+- [ ] Conditional UI uses `invisible`/`readonly`/`required` attributes
+- [ ] Kanban view defines meaningful `default_group_by="state"`
+- [ ] Chatter integration included with `<chatter/>` tag
+- [ ] Mail dependency added to `__manifest__.py`
+- [ ] No legacy `attrs` or `visibility` containers used
 
-### Quality Requirements
-- [ ] ✅ Complete Spanish translation (es_ES.po) with 100% coverage
-- [ ] ✅ Comprehensive technical and functional documentation
-- [ ] ✅ Unit tests covering all models and core functionality
-- [ ] ✅ Integration tests for OpenAI service
-- [ ] ✅ Multi-company tests validating isolation
-- [ ] ✅ Code follows Solutto standards (English-only, proper attribution)
+### Security & Access Control
+- [ ] Security groups defined with appropriate inheritance
+- [ ] Access control lists protect all models
+- [ ] Record rules enforce company-specific access
+- [ ] API keys stored securely with password=True
+- [ ] User roles follow least privilege principle
 
-### Performance Requirements
-- [ ] ✅ Cron job processes translations without blocking UI
-- [ ] ✅ Batch processing limits prevent system overload
-- [ ] ✅ Error recovery mechanisms handle API failures gracefully
-- [ ] ✅ Translation duration tracking for performance monitoring
+### Multi-Company & Internationalization
+- [ ] Company-dependent fields and security rules implemented
+- [ ] Spanish translation file (`es_ES.po`) is 100% complete
+- [ ] All user-facing strings use `_()` translation function
+- [ ] Multi-company context switching works correctly
 
-### Security Requirements
-- [ ] ✅ OpenAI API key stored securely (password field)
-- [ ] ✅ Proper access controls per user group
-- [ ] ✅ Multi-company data isolation working correctly
-- [ ] ✅ Input validation prevents malicious data injection
+### Documentation & Testing
+- [ ] Complete technical documentation in `docs/technical/`
+- [ ] Complete functional documentation in `docs/functional/`
+- [ ] README.md provides clear getting started guide
+- [ ] Unit tests achieve 85%+ code coverage
+- [ ] Integration tests validate complete workflows
+- [ ] Performance tests validate bulk operations
+
+### External Integration
+- [ ] OpenAI Agent SDK dependency properly managed
+- [ ] API rate limiting and backoff implemented
+- [ ] Error taxonomy covers all API response types
+- [ ] Timeout and retry mechanisms functional
+- [ ] Environment variables handled securely
 
 ---
 
 ## 12. Plan Diff & Sync Notes
 
-### Plan Creation Notes
-- **Initial plan creation**: 2025-09-04T00:00:00Z
-- **Source specification**: Technical-specs-v2025-sep-04.md
-- **No previous plan existed** - this is the first comprehensive implementation plan
+**Plan Creation**: This is the initial implementation plan for `sc_marketing_automation_tool`. No previous plan exists for comparison.
 
-### Key Planning Decisions Made
-1. **Chatter Integration**: Added mail.thread inheritance to translation tasks for audit trail
-2. **Multi-Company Support**: Implemented comprehensive multi-company architecture from day one
-3. **Kanban View**: Added kanban view with `default_group_by="state"` for visual task management
-4. **Error Recovery**: Included reset functionality for failed translation tasks
-5. **Documentation Strategy**: Planned comprehensive docs structure from the start
+**Key Planning Decisions**:
+- Chose OpenAI Agent SDK over direct API calls per specification requirements
+- Implemented async processing with cron jobs for scalability
+- Added comprehensive error handling and rate limiting
+- Included chatter integration for audit trail
+- Planned Spanish translation from day one per Solutto standards
 
-### Future Plan Updates
-- Plan updates should increment version in metadata
-- Document major scope changes in this section
-- Track feature additions and removals
-- Note any architectural decisions that deviate from original spec
+**Specification Compliance**:
+- ✅ All requirements from Technical-specs-v2025-sep-04.md addressed
+- ✅ OpenAI Agent SDK integration planned as mandatory requirement
+- ✅ Asynchronous background processing implemented
+- ✅ Multi-language support with website published language filtering
+- ✅ Complete audit trail and error management
 
 ---
 
 ## 13. Chatter Integration Plan
 
-### Models Requiring Chatter
-- **sc.translation.task**: Primary model needing audit trail and activity tracking
+**Models Requiring Chatter**:
+- `sc.translation.task`: Full chatter integration for audit trail
 
-### Implementation Details
+**Implementation Details**:
 ```python
-class TranslationTask(models.Model):
+class ScTranslationTask(models.Model):
     _name = 'sc.translation.task'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']  # Enable chatter
     
-    # Tracked fields for automatic chatter posts
+    # Tracked fields for automatic messages
     state = fields.Selection(..., tracking=True)
     name = fields.Char(..., tracking=True)
 ```
 
-### Manifest Dependencies
+**Manifest Dependencies**:
 ```python
-'depends': [
-    'base',
-    'website',
-    'website_blog',
-    'mail'  # Required for chatter functionality
-],
+# __manifest__.py
+'depends': ['base', 'website', 'website_blog', 'mail'],  # Mail dependency added
 ```
 
-### View Integration
+**Form View Integration**:
 ```xml
-<!-- Form view must include chatter at the end -->
 <form string="Translation Task">
-    <header>...</header>
-    <sheet>...</sheet>
-    <chatter/>  <!-- Chatter placement after </sheet> -->
+    <!-- ... form content ... -->
+    </sheet>
+    <chatter/>  <!-- Chatter placement at end of form -->
 </form>
 ```
 
-### Automated Messages
-- Status changes automatically logged via `tracking=True`
-- Custom messages for translation start/completion
-- Error notifications with details
-- Manual activity scheduling for follow-ups
+**Automatic Messages**:
+- State changes automatically logged
+- Manual messages for error details
+- Activity scheduling for failed translations
+
+---
+
+## 14. External Libraries & API Research
+
+### OpenAI Agents SDK Integration
+
+**Library Details**:
+- **Official Repository**: https://github.com/openai/openai-agents-python
+- **Documentation**: https://github.com/openai/openai-agents-python/tree/main/docs
+- **Installation**: `pip install openai-agents`
+- **Version Strategy**: Use latest stable version, pin in requirements.txt
+
+**Key SDK Features for Our Use Case**:
+- **Agent Creation**: `Agent(name, instructions, model)` for translation tasks
+- **Runner Execution**: `await Runner.run(agent, prompt)` for async execution
+- **Error Handling**: Built-in error types and response validation
+- **Model Support**: GPT-4o, GPT-4-turbo, GPT-3.5-turbo
+
+**Authentication & Configuration**:
+- **Environment Variables**: `OPENAI_API_KEY`, `OPENAI_ORG_ID`
+- **Rate Limits**: Handled by SDK with appropriate backoff
+- **Timeouts**: Configurable per request (default 120s for translations)
+
+**Integration Patterns**:
+```python
+# Basic pattern from SDK docs
+agent = Agent(
+    name="Odoo Blog Translator",
+    instructions="You are a professional translator...",
+    model="gpt-4o"
+)
+
+result = await Runner.run(agent, translation_prompt)
+translated_content = result.final_output
+```
+
+**Odoo Async Integration**:
+```python
+# Sync-to-async bridge for Odoo cron
+def _execute_translation_async(self, task):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        return loop.run_until_complete(self._translate_content(task))
+    finally:
+        loop.close()
+```
+
+**Error Handling & Resilience**:
+- **API Errors**: 401 (auth), 429 (rate limit), 500 (server error)
+- **Content Errors**: JSON parsing, token limits, policy violations
+- **Network Errors**: Timeout, connection failures
+- **Retry Strategy**: Exponential backoff (2^n seconds, max 60s)
+
+**Cost Management**:
+- **Token Estimation**: Pre-calculate costs for large content
+- **Model Selection**: User configurable (GPT-4o default, 3.5-turbo for cost)
+- **Usage Monitoring**: Log token usage per translation
 
 ---
 
 ## Progress Checklist
 
-### Milestone 1: Foundation & Security
-- [ ] Module scaffolding with proper manifest
-- [ ] Security groups and access rights
-- [ ] Basic models with multi-company support
-- [ ] Initial Spanish translations
+### ☐ Milestone 1: Core Infrastructure
+- [ ] Scaffold module structure
+- [ ] Implement core models with chatter
+- [ ] Create security framework
+- [ ] Basic views (list/form) with Odoo 18.0 compliance
 
-### Milestone 2: UI & Basic Workflow  
-- [ ] Translation task views (list/form/kanban)
-- [ ] Menu structure and navigation
+### ☐ Milestone 2: Wizard & UI Enhancement  
 - [ ] Translation wizard implementation
-- [ ] Blog post form inheritance
+- [ ] Server action integration
+- [ ] Enhanced blog post views
+- [ ] Kanban view with proper grouping
 
-### Milestone 3: Core Business Logic
-- [ ] OpenAI service integration
-- [ ] Configuration settings
+### ☐ Milestone 3: OpenAI Integration
+- [ ] OpenAI Agent SDK integration
+- [ ] Async translation processing
 - [ ] Cron job implementation
-- [ ] Translation processing logic
+- [ ] Configuration settings
 
-### Milestone 4: Advanced Features
-- [ ] Enhanced UI with status badges
-- [ ] Error handling and recovery
-- [ ] Performance optimizations
-- [ ] Audit and monitoring features
+### ☐ Milestone 4: Advanced Features
+- [ ] Rate limiting and retry logic
+- [ ] Bulk operation optimization
+- [ ] Enhanced error handling
+- [ ] Progress tracking
 
-### Milestone 5: Testing & Documentation
-- [ ] Comprehensive unit tests
-- [ ] Integration tests
+### ☐ Milestone 5: Testing & Documentation
+- [ ] Comprehensive test suite
+- [ ] Spanish translation completion
 - [ ] Technical documentation
-- [ ] Functional user guides
+- [ ] Functional documentation
+
+### ☐ Milestone 6: Production Hardening
+- [ ] Security audit
+- [ ] Performance optimization
+- [ ] User acceptance testing
+- [ ] Final documentation review
 
 ---
 
 ## Plan Changelog
 
-### 2025-09-04 - Initial Plan Creation
-- Created comprehensive implementation plan based on Technical-specs-v2025-sep-04.md
-- Established 5-milestone development strategy
-- Defined complete technical architecture with Odoo 18.0 compliance
-- Planned multi-company support and Spanish translation from day one
-- Integrated chatter functionality for audit trails
-- Structured documentation and testing strategy
-- Identified key risks and mitigation strategies
+### 2025-09-04T19:30:00Z - Initial Plan Creation
+- **Created comprehensive implementation plan** for sc_marketing_automation_tool
+- **External Research**: 
+  - OpenAI Agents Python SDK (https://github.com/openai/openai-agents-python) - Latest version
+  - Agent creation patterns with `Agent(name, instructions, model)`
+  - Async execution via `Runner.run()` for translation workflows
+  - Built-in error handling and rate limiting capabilities
+- **Key Architectural Decisions**:
+  - Async processing with cron jobs for scalability
+  - OpenAI Agent SDK integration as specified
+  - Chatter integration for audit trail
+  - Comprehensive error handling with user-friendly messages
+- **Odoo 18.0 Compliance**: All views planned with `<list>` tags, conditional UI attributes, and kanban `default_group_by`
+- **Solutto Standards**: Spanish translation, documentation structure, and security patterns planned from start

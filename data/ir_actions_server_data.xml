@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Server Action: Process Translation Tasks -->
+    <record id="action_process_translation_tasks" model="ir.actions.server">
+        <field name="name">Process Translation Tasks</field>
+        <field name="model_id" ref="model_sc_translation_task"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="model_sc_translation_task"/>
+        <field name="binding_view_types">list</field>
+        <field name="groups_id" eval="[(6, 0, [ref('group_marketing_automation_manager')])]"/>
+        <field name="code">
+# Process selected translation tasks
+if records:
+    processed_count = 0
+    for task in records.filtered(lambda t: t.state == 'draft'):
+        try:
+            task.process_translation()
+            processed_count += 1
+        except Exception as e:
+            task.write({
+                'state': 'error',
+                'error_message': str(e),
+            })
+            task.message_post(
+                body=f"Translation processing failed: {str(e)}",
+                message_type='notification'
+            )
+    
+    # Show notification
+    if processed_count > 0:
+        env.user.notify_success(
+            message=f"Successfully started processing {processed_count} translation task(s)."
+        )
+    else:
+        env.user.notify_warning(
+            message="No tasks were processed. Please check task states and try again."
+        )
+</field>
+    </record>
+    
+    <!-- Server Action: Reset Translation Tasks -->
+    <record id="action_reset_translation_tasks" model="ir.actions.server">
+        <field name="name">Reset to Draft</field>
+        <field name="model_id" ref="model_sc_translation_task"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="model_sc_translation_task"/>
+        <field name="binding_view_types">list</field>
+        <field name="groups_id" eval="[(6, 0, [ref('group_marketing_automation_manager')])]"/>
+        <field name="code">
+# Reset selected translation tasks to draft state
+if records:
+    reset_count = 0
+    for task in records.filtered(lambda t: t.state in ('error', 'done')):
+        task.write({
+            'state': 'draft',
+            'error_message': False,
+            'processed_date': False,
+            'translated_content': False,
+            'translated_subtitle': False,
+            'translated_meta_title': False,
+            'translated_meta_description': False,
+        })
+        task.message_post(
+            body="Task reset to draft state",
+            message_type='notification'
+        )
+        reset_count += 1
+    
+    # Show notification
+    if reset_count > 0:
+        env.user.notify_success(
+            message=f"Successfully reset {reset_count} translation task(s) to draft state."
+        )
+    else:
+        env.user.notify_warning(
+            message="No tasks were reset. Only error or completed tasks can be reset."
+        )
+</field>
+    </record>
+    
+    <!-- Server Action: Bulk Blog Translation -->
+    <record id="action_bulk_translate_blog_posts" model="ir.actions.server">
+        <field name="name">Create Translation Tasks</field>
+        <field name="model_id" ref="website_blog.model_blog_post"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="website_blog.model_blog_post"/>
+        <field name="binding_view_types">list</field>
+        <field name="groups_id" eval="[(6, 0, [ref('group_marketing_automation_user')])]"/>
+        <field name="code">
+# Open the translation wizard for selected blog posts
+if records:
+    # Filter only published blog posts
+    publishable_posts = records.filtered(lambda p: p.website_published)
+    
+    if not publishable_posts:
+        env.user.notify_warning(
+            message="Please select published blog posts for translation."
+        )
+    else:
+        # Create and open wizard with selected posts
+        wizard = env['sc.translate.blog.post.wizard'].create({
+            'blog_post_ids': [(6, 0, publishable_posts.ids)],
+        })
+        
+        action = {
+            'type': 'ir.actions.act_window',
+            'name': 'Translate Blog Posts',
+            'res_model': 'sc.translate.blog.post.wizard',
+            'res_id': wizard.id,
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_blog_post_ids': publishable_posts.ids,
+            }
+        }
+</field>
+    </record>
+    
+    <!-- Server Action: Clean Old Translation Tasks -->
+    <record id="action_clean_old_translation_tasks" model="ir.actions.server">
+        <field name="name">Clean Old Translation Tasks</field>
+        <field name="model_id" ref="model_sc_translation_task"/>
+        <field name="state">code</field>
+        <field name="code">
+# Clean up old translation tasks (older than 30 days and completed/error)
+import datetime
+
+cutoff_date = fields.Datetime.now() - datetime.timedelta(days=30)
+
+old_tasks = env['sc.translation.task'].search([
+    ('create_date', '&lt;', cutoff_date),
+    ('state', 'in', ['done', 'error']),
+])
+
+if old_tasks:
+    count = len(old_tasks)
+    old_tasks.unlink()
+    _logger.info(f"Cleaned up {count} old translation tasks")
+else:
+    _logger.info("No old translation tasks to clean up")
+</field>
+    </record>
+</odoo>
