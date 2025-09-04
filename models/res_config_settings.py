@@ -66,7 +66,7 @@ class ResConfigSettings(models.TransientModel):
                 'sc_marketing_automation.openai_org_id'
             )
             if org_id:
-                headers['OpenAI-Organization'] = org_id
+                headers['OpenAI-Organization'] = str(org_id)
             
             response = requests.get(
                 'https://api.openai.com/v1/models',

@@ -5,7 +5,7 @@ import asyncio
 import json
 import os
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 _logger = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ _logger = logging.getLogger(__name__)
 class OpenAITranslationService:
     """Service class for OpenAI Agent SDK integration"""
     
-    def __init__(self, api_key: str, organization_id: str = None, model: str = 'gpt-4o'):
+    def __init__(self, api_key: str, organization_id: Optional[str] = None, model: str = 'gpt-4o'):
         """Initialize OpenAI service with credentials and model"""
         # Set environment variables for OpenAI SDK
         os.environ['OPENAI_API_KEY'] = api_key

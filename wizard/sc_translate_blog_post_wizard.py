@@ -15,7 +15,7 @@ class ScTranslateBlogPostWizard(models.TransientModel):
         'res.lang',
         string='Target Language',
         required=True,
-        domain=[('website_published', '=', True)],
+        domain=[('active', '=', True)],
         help="Select the target language for translation"
     )
     
@@ -87,12 +87,12 @@ class ScTranslateBlogPostWizard(models.TransientModel):
     
     @api.constrains('target_lang_id')
     def _check_target_language(self):
-        """Validate target language is website published"""
+        """Validate target language is active"""
         for wizard in self:
-            if wizard.target_lang_id and not wizard.target_lang_id.website_published:
+            if wizard.target_lang_id and not wizard.target_lang_id.active:
                 raise ValidationError(_(
-                    "Selected language '%s' is not published on the website. "
-                    "Please select a published language."
+                    "Selected language '%s' is not active. "
+                    "Please select an active language."
                 ) % wizard.target_lang_id.name)
     
     def action_translate(self):

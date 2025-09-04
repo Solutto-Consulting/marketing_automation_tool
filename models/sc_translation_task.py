@@ -149,11 +149,11 @@ class ScTranslationTask(models.Model):
     
     @api.constrains('target_lang_id')
     def _check_published_language(self):
-        """Ensure target language is website published"""
+        """Ensure target language is active"""
         for record in self:
-            if not record.target_lang_id.website_published:
+            if not record.target_lang_id.active:
                 raise ValidationError(_(
-                    "Target language '%s' must be website published to be used for translation."
+                    "Target language '%s' must be active to be used for translation."
                 ) % record.target_lang_id.name)
     
     def action_reset_to_draft(self):
@@ -315,8 +315,12 @@ class ScTranslationTask(models.Model):
         except ImportError:
             raise UserError(_("OpenAI Agents SDK not installed. Please install 'openai-agents' package."))
         
-        # Initialize service and run translation
-        service = OpenAITranslationService(api_key, org_id, model)
+        # Initialize service and run translation (ensure proper type conversion)
+        service = OpenAITranslationService(
+            api_key=str(api_key) if api_key else '',
+            organization_id=str(org_id) if org_id else None,
+            model=str(model) if model else 'gpt-4o'
+        )
         
         # Run async function in sync context
         loop = asyncio.new_event_loop()
