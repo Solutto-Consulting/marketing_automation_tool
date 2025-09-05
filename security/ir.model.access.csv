@@ -1,5 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_sc_translation_task_user,sc.translation.task.user,model_sc_translation_task,group_marketing_automation_user,1,0,0,0
-access_sc_translation_task_manager,sc.translation.task.manager,model_sc_translation_task,group_marketing_automation_manager,1,1,1,1
-access_sc_translate_blog_post_wizard_user,sc.translate.blog.post.wizard.user,model_sc_translate_blog_post_wizard,group_marketing_automation_user,1,1,1,1
-access_sc_translate_blog_post_wizard_manager,sc.translate.blog.post.wizard.manager,model_sc_translate_blog_post_wizard,group_marketing_automation_manager,1,1,1,1
