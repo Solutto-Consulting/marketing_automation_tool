@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [18.0.1.1.0] - 2025-09-10
+
+### Fixed
+- **CRITICAL**: Resolved translation content corruption issue where original English content was being overwritten
+- **Translation Method**: Replaced unreliable `update_field_translations()` approach with proven `with_context(lang=target_lang).write()` method
+- **Content Integrity**: Implemented mandatory content preservation verification in all translation operations
+- **Error Recovery**: Added automatic restoration of corrupted content when translation errors are detected
+
+### Enhanced
+- **HTML Structure Validation**: Comprehensive validation for blog post content to ensure HTML consistency across languages
+- **Translation Verification**: New verification methods to confirm translation integrity and content preservation
+- **Blog Post Specialist Methods**: Dedicated translation methods specifically designed for complex HTML content (blog posts, CMS content)
+- **Error Handling**: Enhanced error patterns with clear recovery steps and diagnostic information
+
+### Added
+- **Production-Ready Translation Pattern**: Field-tested and verified translation approach that works reliably for ALL field types
+- **Content Preservation Verification**: Automatic verification that original English content is never overwritten
+- **HTML Tag Validation**: Structure validation for critical HTML tags (div, p, h1-h6, ul, ol, li) to maintain formatting
+- **Translation Testing Protocol**: Comprehensive testing guidelines for fresh content, content preservation, and clean database scenarios
+
+### Removed
+- **Non-functional "Restore Original Content" Button**: Removed misleading button that only showed notifications without actual restoration functionality
+- **Deprecated Translation Methods**: Eliminated unreliable `update_field_translations()` usage that caused SQL transaction errors
+- **Excessive Debug Dependencies**: Cleaned up temporary files and debugging artifacts for production readiness
+
+### Technical Improvements
+- **Unified Context Write Approach**: Single, reliable method for all translatable field types (simple text, HTML content, SEO metadata)
+- **Auto-Recovery Mechanisms**: Automatic detection and restoration of content corruption during translation operations
+- **Field-Type Awareness**: Proper handling of different translation field types (`translate=True` vs `translate=html_translate`)
+- **SQL Transaction Stability**: Eliminated transaction conflicts that caused translation failures in Odoo 18.0
+
+### Documentation Updates
+- **Translation Guidelines**: Updated development guidelines with proven best practices for Odoo 18.0 translation system
+- **Error Recovery Patterns**: Documented common translation issues and their solutions
+- **Production Readiness Checklist**: Clear requirements for deploying translation functionality
+- **Testing Protocols**: Comprehensive testing guidelines for translation integrity
+
+### Performance Improvements
+- **Reduced Error Rates**: Eliminated content corruption issues that required manual intervention
+- **Simplified Codebase**: Removed complex, unreliable methods in favor of proven, straightforward approaches
+- **Better Error Reporting**: More accurate error messages with actionable recovery steps
+
 ## [18.0.1.0.0] - 2025-09-09
 
 ### Added

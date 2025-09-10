@@ -84,8 +84,21 @@ result = await Runner.run(agent, prompt)
 2. **Task Creation**: Create translation tasks in 'draft' state
 3. **Cron Processing**: Background cron job processes draft tasks
 4. **AI Translation**: OpenAI API performs translation
-5. **Content Update**: Blog post content updated with translation
+5. **Content Update**: Blog post content updated with translation using proven context write method
 6. **Status Update**: Task marked as 'done' or 'error'
+
+### Translation System (v18.0.1.1.0+)
+
+**CRITICAL**: As of version 18.0.1.1.0, the module uses a completely rewritten translation system that eliminates content corruption issues.
+
+**Key Features:**
+- **Unified Context Write Approach**: Uses `with_context(lang=target_lang).write()` for ALL field types
+- **Content Preservation**: Mandatory verification that original English content is never overwritten
+- **HTML Structure Validation**: Ensures translated content maintains proper HTML structure
+- **Auto-Recovery**: Automatic restoration of corrupted content when errors are detected
+- **Production-Ready**: Field-tested approach that works reliably without SQL transaction errors
+
+**For detailed implementation guidelines, see**: [`translation-system-guide.md`](./translation-system-guide.md)
 
 ### Error Handling
 
@@ -93,6 +106,8 @@ result = await Runner.run(agent, prompt)
 - Invalid JSON responses from AI
 - Rate limiting and timeout handling
 - Task retry mechanisms
+- **Content corruption prevention and auto-recovery** (v18.0.1.1.0+)
+- **SQL transaction error recovery** (v18.0.1.1.0+)
 
 ## Security
 

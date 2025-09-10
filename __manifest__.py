@@ -1,6 +1,6 @@
 {
     'name': 'Content Management Tool for Odoo',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'category': 'Marketing',
     'summary': 'AI-powered content translation and marketing automation tools',
     'description': """
@@ -12,11 +12,19 @@ by integrating Artificial Intelligence for content translation processes.
 
 Key Features:
 * OpenAI integration with centralized configuration
-* Bulk blog post translation with AI
+* Bulk blog post translation with AI using proven, corruption-free methods
 * User-friendly translation wizard
 * Asynchronous background processing
 * Translation task logging and status management
 * Error handling and task reset capabilities
+* HTML structure validation for complex content
+* Content preservation verification and auto-recovery
+
+Technical Improvements (v18.0.1.1.0):
+* CRITICAL FIX: Eliminated content corruption issues in translation system
+* Unified context write approach for all translatable field types
+* Production-ready translation methods with zero data loss
+* Enhanced error recovery and diagnostic capabilities
 
 Technical Requirements:
 * External Python library: openai-agents
