@@ -43,11 +43,6 @@
                             class="btn-info"
                             invisible="state == 'draft'"
                             help="Check if HTML structure is consistent between original and translated content"/>
-                    <button name="action_restore_original_content" 
-                            string="Restore Original Content" 
-                            type="object" 
-                            class="btn-warning"
-                            confirm="This will restore the original English content. Any previous translations may be lost. Continue?"/>
                     <button name="action_reset_to_draft" 
                             string="Reset to Draft" 
                             type="object" 

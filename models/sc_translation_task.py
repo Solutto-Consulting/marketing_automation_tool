@@ -432,51 +432,6 @@ class ScTranslationTask(models.Model):
                 }
             }
     
-    def action_restore_original_content(self):
-        """Restore original English content to the blog post"""
-        self.ensure_one()
-        
-        # Simple restoration approach - this will reset to the current English version
-        # If no English content exists, this method won't help, but won't break either
-        try:
-            # Get current English content
-            current_english = self.blog_post_id.with_context(lang='en_US').content
-            
-            if current_english:
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': 'English Content Available',
-                        'message': f'English content exists for blog post "{self.blog_post_id.name}". If you need to restore from backup, please do so manually.',
-                        'type': 'info',
-                        'sticky': False,
-                    }
-                }
-            else:
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': 'No English Content',
-                        'message': 'No English content found. Please add English content manually to this blog post.',
-                        'type': 'warning',
-                        'sticky': True,
-                    }
-                }
-                
-        except Exception as e:
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': 'Check Error',
-                    'message': f'Error checking content: {str(e)}',
-                    'type': 'danger',
-                    'sticky': True,
-                }
-            }
-
     @api.model
     def cron_process_translation_tasks(self):
         """Process pending translation tasks (called by cron)"""
