@@ -86,26 +86,15 @@ class ScTranslateBlogPostWizard(models.TransientModel):
             # Mark blog post as in progress
             blog_post.write({'translation_in_progress': True})
         
-        # Prepare result message
-        messages = []
+        # Handle the result and close the wizard
         if created_tasks:
-            messages.append(_("Created %d translation task(s).") % len(created_tasks))
-        
-        if skipped_posts:
-            messages.append(_("Skipped posts: %s") % ", ".join(skipped_posts))
-        
-        # Show notification
-        if messages:
-            message = " ".join(messages)
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Translation Tasks Created'),
-                    'message': message,
-                    'type': 'success' if created_tasks else 'warning',
-                }
-            }
+            # Success case - just close the wizard
+            # The user can see the tasks in the Translation Tasks menu
+            return {'type': 'ir.actions.act_window_close'}
+        elif skipped_posts:
+            # Show warning about skipped posts
+            message = _("All selected posts were skipped: %s") % ", ".join(skipped_posts)
+            raise UserError(message)
         else:
             raise UserError(_("No translation tasks were created."))
     
