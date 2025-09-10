@@ -7,15 +7,15 @@
 
 La **Herramienta de Gestión de Contenido para Odoo** mejora y automatiza las actividades de marketing dentro del ecosistema Odoo mediante la integración de Inteligencia Artificial para procesos de traducción de contenido. Este módulo proporciona a los administradores herramientas poderosas para optimizar los flujos de trabajo de traducción de artículos de blog utilizando los modelos de lenguaje avanzados de OpenAI.
 
-## Características Principales
+## Características Principales (v18.0.1.0.0)
 
-- **Integración con OpenAI**: Configuración centralizada para credenciales de API de OpenAI y selección de modelos
-- **Traducción Masiva de Blogs**: Acción de servidor en artículos de blog para traducción simultánea de múltiples artículos
-- **Traducción Potenciada por IA**: Aprovecha los modelos de lenguaje de OpenAI para traducción de contenido de alta calidad
-- **Asistente Intuitivo**: Interfaz fácil de usar para seleccionar idiomas objetivo y proporcionar instrucciones a la IA
-- **Procesamiento Asíncrono**: Procesamiento de traducción en segundo plano para evitar bloqueos de la interfaz
+- **Integración OpenAI**: Configuración centralizada para credenciales de API OpenAI y selección de modelos
+- **Traducción Masiva de Blogs**: Acción de servidor en publicaciones de blog para traducción simultánea de múltiples artículos  
+- **Traducción Impulsada por IA**: Aprovecha los modelos de lenguaje de OpenAI para traducción de contenido de alta calidad
+- **Asistente Fácil de Usar**: Interfaz intuitiva para seleccionar idiomas objetivo y proporcionar instrucciones de IA
+- **Procesamiento Asíncrono**: Procesamiento de traducción en segundo plano para evitar bloqueo de UI
 - **Gestión de Tareas**: Seguimiento integral y gestión de estado para solicitudes de traducción
-- **Manejo de Errores**: Gestión robusta de errores con capacidades de reinicio de tareas
+- **Manejo de Errores**: Gestión robusta de errores con capacidades de reinicio manual de tareas
 - **Soporte Multi-idioma**: Internacionalización incorporada con soporte de traducción al español
 
 ## Especificaciones Técnicas
@@ -67,16 +67,47 @@ La **Herramienta de Gestión de Contenido para Odoo** mejora y automatiza las ac
    - Vea el estado, gestione errores y reinicie tareas fallidas
    - Rastree el historial de traducción para cada artículo de blog
 
+## Características de la Versión v18.0.1.0.0
+
+### ✅ Funcionalidades Incluidas (Septiembre 2025)
+- **Integración OpenAI Completa**: SDK openai-agents con configuración segura
+- **Selección Dinámica de Modelos**: Carga automática desde API OpenAI con respaldos
+- **Asistente de Traducción**: Interfaz modal con instrucciones del sistema personalizables
+- **Procesamiento Asíncrono**: Trabajos cron cada 5 minutos para tareas en segundo plano
+- **Gestión Integral de Tareas**: Estados de seguimiento con capacidades de reinicio manual
+- **Vistas Kanban**: Agrupación por estado (cumplimiento Odoo 18.0)
+- **Integración Chatter**: Seguimiento de cambios en tareas de traducción
+- **Controles de Seguridad**: Grupos de marketing con acceso basado en roles
+- **Soporte i18n**: Traducción completa al español
+- **Documentación Completa**: Guías funcionales y técnicas bilingües
+
+### 🔧 Aspectos Técnicos Destacados
+- **Cumplimiento Odoo 18.0**: Vistas `<list>` modernas, atributos condicionales apropiados
+- **Anclajes Estables**: Herencia de configuración usando selectores xpath estables 
+- **Gestión de Credenciales**: Almacenamiento seguro con campos de contraseña
+- **Validación de Entrada**: Filtros de dominio apropiados para idiomas publicados
+
+### ⚠️ Limitaciones de v18.0.1.0.0
+- Procesamiento limitado a 10 tareas por ciclo cron (cada 5 minutos)
+- Sin reintento automático para fallas de API
+- Reinicio manual requerido para recuperación de errores
+- Reporte básico de errores sin diagnósticos avanzados
+
+**Nota**: Características avanzadas disponibles en versiones posteriores (18.0.1.1.0+).
+
 ## Documentación
 
 ### Navegación de Idiomas
 - **Documentación en Inglés**: [README.md](README.md)
 - **Documentación en Español**: Este archivo (README.es.md)
 
-### Guías Detalladas
-- **Documentación Funcional**: [docs/functional/](docs/functional/)
-- **Documentación Técnica**: [docs/technical/](docs/technical/)
+### Guías Detalladas (v18.0.1.0.0)
+- **Guía Funcional EN**: [docs/functional/guide.en.md](docs/functional/guide.en.md)
+- **Guía Funcional ES**: [docs/functional/guide.es.md](docs/functional/guide.es.md)
+- **Guía Técnica EN**: [docs/technical/guide.en.md](docs/technical/guide.en.md)
+- **Guía Técnica ES**: [docs/technical/guide.es.md](docs/technical/guide.es.md)
 - **Plan de Implementación**: [docs/plan/PLAN.md](docs/plan/PLAN.md)
+- **Registro de Cambios**: [docs/CHANGELOG.md](docs/CHANGELOG.md)
 
 ## Información del Desarrollador
 

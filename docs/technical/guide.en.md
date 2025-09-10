@@ -1,0 +1,662 @@
+# Technical Guide: Content Management Tool for Odoo v18.0.1.0.0
+
+## Table of Contents
+1. [Architecture Overview](#architecture-overview)
+2. [Module Structure](#module-structure)
+3. [Data Models](#data-models)
+4. [Integration Points](#integration-points)
+5. [API Implementation](#api-implementation)
+6. [Security Framework](#security-framework)
+7. [Configuration Management](#configuration-management)
+8. [Background Processing](#background-processing)
+9. [Error Handling](#error-handling)
+10. [Version-Specific Implementation](#version-specific-implementation)
+11. [Development Guidelines](#development-guidelines)
+12. [Testing Framework](#testing-framework)
+
+---
+
+## Architecture Overview
+
+The Content Management Tool for Odoo v18.0.1.0.0 implements a modular architecture for AI-powered content translation, built on Odoo 18.0 standards and integrated with OpenAI's language models.
+
+### System Components
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   User Interface │    │  Business Logic │    │  External APIs  │
+│                 │    │                 │    │                 │
+│ • Blog Post List│    │ • Translation   │    │ • OpenAI API    │
+│ • Translation   │◄──►│   Tasks         │◄──►│ • Model Listing │
+│   Wizard        │    │ • Task Manager  │    │ • Translation   │
+│ • Task Views    │    │ • Cron Jobs     │    │   Execution     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌─────────────────┐
+                    │   Data Layer    │
+                    │                 │
+                    │ • sc.translation│
+                    │   .task         │
+                    │ • blog.post     │
+                    │   (extended)    │
+                    │ • res.config    │
+                    │   .settings     │
+                    └─────────────────┘
+```
+
+### Key Design Principles (v18.0.1.0.0)
+- **Odoo 18.0 Compliance**: Modern view syntax and conditional attributes
+- **Asynchronous Processing**: Non-blocking translation execution
+- **Error Recovery**: Manual task reset capabilities
+- **Security First**: Encrypted credential storage and access controls
+- **Extensibility**: Foundation for future automation features
+
+---
+
+## Module Structure
+
+### File Organization
+```
+sc_marketing_automation_tool/
+├── __init__.py                    # Module initialization
+├── __manifest__.py                # Module manifest (v18.0.1.0.0)
+├── models/
+│   ├── __init__.py
+│   ├── res_config_settings.py     # OpenAI configuration
+│   ├── sc_translation_task.py     # Translation task model
+│   └── blog_post.py               # Blog post extensions
+├── wizard/
+│   ├── __init__.py
+│   └── sc_translate_blog_post_wizard.py  # Translation wizard
+├── views/
+│   ├── res_config_settings_views.xml     # Configuration UI
+│   ├── sc_translation_task_views.xml     # Task management views
+│   ├── blog_post_views.xml               # Blog post enhancements
+│   └── sc_translate_blog_post_wizard_views.xml  # Wizard UI
+├── security/
+│   ├── ir.model.access.csv        # Model access controls
+│   └── security.xml               # Groups and record rules
+├── data/
+│   ├── ir_actions_server.xml      # Server actions
+│   ├── ir_cron.xml                # Scheduled jobs
+│   └── menu.xml                   # Menu structure
+├── i18n/
+│   └── es_ES.po                   # Spanish translations
+├── docs/                          # Documentation
+└── requirements.txt               # External dependencies
+```
+
+### Dependencies Matrix
+| Dependency | Type | Purpose | Version Constraint |
+|------------|------|---------|-------------------|
+| base | Odoo Core | Foundation models | 18.0+ |
+| website | Odoo Core | Website integration | 18.0+ |
+| website_blog | Odoo Core | Blog post model | 18.0+ |
+| mail | Odoo Core | Chatter integration | 18.0+ |
+| openai-agents | External | OpenAI SDK | 0.2.9+ |
+
+---
+
+## Data Models
+
+### sc.translation.task
+
+**Purpose**: Tracks individual translation requests and their execution status.
+
+```python
+class SCTranslationTask(models.Model):
+    _name = 'sc.translation.task'
+    _description = 'AI Translation Task'
+    _inherit = ['mail.thread']  # Chatter integration
+    _order = 'create_date desc'
+
+    # Core Fields
+    name = fields.Char(string='Task Name', required=True)
+    blog_post_id = fields.Many2one('blog.post', required=True, ondelete='cascade')
+    target_lang_id = fields.Many2one('res.lang', required=True)
+    system_instructions = fields.Text(string='System Instructions')
+    
+    # Status Management
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('in_progress', 'In Progress'), 
+        ('done', 'Done'),
+        ('error', 'Error')
+    ], default='draft', required=True, tracking=True)
+    
+    error_message = fields.Text(string='Error Details')
+```
+
+**Key Methods**:
+- `action_reset_to_draft()`: Reset failed tasks for retry
+- `_get_translation_data()`: Extract blog post content for translation
+- `_update_blog_post_translations()`: Apply translated content (v18.0.1.0.0 implementation)
+
+### blog.post (Extended)
+
+**Purpose**: Enhanced blog post model with translation tracking capabilities.
+
+```python
+class BlogPost(models.Model):
+    _inherit = 'blog.post'
+    
+    # Translation Tracking
+    translation_task_ids = fields.One2many(
+        'sc.translation.task', 'blog_post_id',
+        string='Translation Tasks'
+    )
+    translation_in_progress = fields.Boolean(
+        string='Translation in Progress', 
+        default=False,
+        help="Indicates if translation tasks are queued or running"
+    )
+    
+    # Computed Fields
+    translation_count = fields.Integer(
+        string='Translation Count',
+        compute='_compute_translation_count'
+    )
+```
+
+### res.config.settings (Extended)
+
+**Purpose**: Centralized OpenAI configuration management.
+
+```python
+class ResConfigSettings(models.TransientModel):
+    _inherit = 'res.config.settings'
+    
+    # OpenAI Configuration
+    sc_openai_api_key = fields.Char(
+        string='OpenAI API Key',
+        config_parameter='sc_marketing_automation_tool.openai_api_key',
+        password=True
+    )
+    sc_openai_organization_id = fields.Char(
+        string='OpenAI Organization ID',
+        config_parameter='sc_marketing_automation_tool.openai_organization_id'
+    )
+    sc_openai_model = fields.Selection(
+        selection='_get_openai_models',
+        string='OpenAI Model',
+        config_parameter='sc_marketing_automation_tool.openai_model',
+        default='gpt-4o'
+    )
+```
+
+---
+
+## Integration Points
+
+### OpenAI Agents SDK Integration
+
+**Version Support**: openai-agents 0.2.9+
+
+```python
+# Core Integration Pattern (v18.0.1.0.0)
+import asyncio
+from agents import Agent, Runner
+
+async def perform_ai_translation(model_name, system_instructions, prompt):
+    """
+    Execute AI translation using OpenAI Agents SDK.
+    
+    Args:
+        model_name (str): OpenAI model identifier
+        system_instructions (str): AI behavior guidance
+        prompt (str): Translation request content
+        
+    Returns:
+        str: Translated content as JSON string
+    """
+    agent = Agent(
+        name="Odoo Blog Translator",
+        instructions=system_instructions or "Translate content accurately while preserving formatting and structure.",
+        model=model_name
+    )
+    
+    result = await Runner.run(agent, prompt)
+    return result.final_output
+```
+
+### Environment Configuration
+
+**Required Environment Variables**:
+```bash
+# OpenAI API Configuration
+OPENAI_API_KEY=sk-...                    # From Odoo configuration
+OPENAI_ORGANIZATION=org-...              # From Odoo configuration (optional)
+
+# Odoo Configuration
+ODOO_DATABASE=your_database_name
+ODOO_CONF_FILE=/path/to/odoo.conf
+```
+
+---
+
+## API Implementation
+
+### Dynamic Model Selection
+
+**Endpoint**: OpenAI v1/models API  
+**Purpose**: Populate available models in configuration dropdown
+
+```python
+def _get_openai_models(self):
+    """
+    Fetch available OpenAI models from API.
+    
+    Returns:
+        list: Tuples of (model_id, model_name) for Selection field
+    """
+    try:
+        api_key = self.env['ir.config_parameter'].sudo().get_param(
+            'sc_marketing_automation_tool.openai_api_key'
+        )
+        
+        if not api_key:
+            return self._get_fallback_models()
+            
+        # API call implementation
+        headers = {
+            'Authorization': f'Bearer {api_key}',
+            'Content-Type': 'application/json'
+        }
+        
+        response = requests.get(
+            'https://api.openai.com/v1/models',
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            models = response.json().get('data', [])
+            gpt_models = [
+                (model['id'], model['id']) 
+                for model in models 
+                if model['id'].startswith('gpt-')
+            ]
+            return sorted(gpt_models)
+            
+    except Exception as e:
+        _logger.warning(f"Failed to fetch OpenAI models: {e}")
+        
+    return self._get_fallback_models()
+
+def _get_fallback_models(self):
+    """Fallback models when API is unavailable."""
+    return [
+        ('gpt-4o', 'gpt-4o'),
+        ('gpt-4-turbo', 'gpt-4-turbo'),
+        ('gpt-3.5-turbo', 'gpt-3.5-turbo'),
+    ]
+```
+
+### Translation Data Structure
+
+**JSON Schema for Translation Requests**:
+```json
+{
+    "name": "Blog post title",
+    "subtitle": "Blog post subtitle", 
+    "content": "<p>Blog post HTML content</p>",
+    "website_meta_title": "SEO title",
+    "website_meta_description": "SEO description",
+    "website_meta_keywords": "keyword1, keyword2"
+}
+```
+
+---
+
+## Security Framework
+
+### Access Control Groups
+
+```xml
+<!-- security/security.xml -->
+<record id="group_marketing_manager" model="res.groups">
+    <field name="name">Marketing Manager</field>
+    <field name="category_id" ref="base.module_category_marketing"/>
+</record>
+
+<record id="group_marketing_user" model="res.groups">
+    <field name="name">Marketing User</field>
+    <field name="category_id" ref="base.module_category_marketing"/>
+    <field name="implied_ids" eval="[(4, ref('group_marketing_manager'))]"/>
+</record>
+```
+
+### Model Access Control
+
+```csv
+# security/ir.model.access.csv
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_sc_translation_task_manager,sc.translation.task.manager,model_sc_translation_task,group_marketing_manager,1,1,1,1
+access_sc_translation_task_user,sc.translation.task.user,model_sc_translation_task,group_marketing_user,1,0,1,0
+```
+
+### Record Rules
+
+```xml
+<!-- Multi-company security (if applicable) -->
+<record id="rule_translation_task_company" model="ir.rule">
+    <field name="name">Translation Task Company Rule</field>
+    <field name="model_id" ref="model_sc_translation_task"/>
+    <field name="domain_force">
+        ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+    </field>
+</record>
+```
+
+---
+
+## Configuration Management
+
+### Settings View Implementation
+
+**Reference Pattern**: Based on core Odoo settings inheritance
+
+```xml
+<!-- views/res_config_settings_views.xml -->
+<record id="res_config_settings_view_form_inherit_sc" model="ir.ui.view">
+    <field name="name">res.config.settings.form.inherit.sc</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//setting[@id='partner_autocomplete']" position="after">
+            <setting id="sc_ai_marketing_tools" string="AI Marketing Tools">
+                <div class="content-group">
+                    <div class="mt16">
+                        <field name="sc_openai_api_key" password="True"/>
+                        <label for="sc_openai_api_key" class="o_light_label"/>
+                    </div>
+                    <div class="mt16">
+                        <field name="sc_openai_organization_id"/>
+                        <label for="sc_openai_organization_id" class="o_light_label"/>
+                    </div>
+                    <div class="mt16">
+                        <field name="sc_openai_model"/>
+                        <label for="sc_openai_model" class="o_light_label"/>
+                    </div>
+                </div>
+            </setting>
+        </xpath>
+    </field>
+</record>
+```
+
+**Core Reference Used**:
+- **File**: `/home/gilsonrincon/development/odoo18/odoo-src/addons/base_setup/views/res_config_settings_views.xml`
+- **Anchor**: `//setting[@id='partner_autocomplete']` (stable selector)
+- **Position**: `after` (safe insertion point)
+
+---
+
+## Background Processing
+
+### Cron Job Configuration
+
+```xml
+<!-- data/ir_cron.xml -->
+<record id="ir_cron_process_translation_tasks" model="ir.cron">
+    <field name="name">Process Translation Tasks</field>
+    <field name="model_id" ref="model_sc_translation_task"/>
+    <field name="state">code</field>
+    <field name="code">model._cron_process_translation_tasks()</field>
+    <field name="interval_number">5</field>
+    <field name="interval_type">minutes</field>
+    <field name="numbercall">-1</field>
+    <field name="active">True</field>
+</record>
+```
+
+### Processing Logic (v18.0.1.0.0)
+
+```python
+@api.model
+def _cron_process_translation_tasks(self):
+    """
+    Background processor for translation tasks.
+    Processes up to 10 draft tasks per execution.
+    """
+    tasks = self.search([('state', '=', 'draft')], limit=10)
+    
+    for task in tasks:
+        try:
+            # Update status to prevent duplicate processing
+            task.state = 'in_progress'
+            self.env.cr.commit()
+            
+            # Get configuration
+            config = self._get_openai_config()
+            if not config:
+                task._handle_error("OpenAI configuration not found")
+                continue
+                
+            # Prepare translation data
+            translation_data = task._get_translation_data()
+            prompt = task._build_translation_prompt(translation_data)
+            
+            # Execute AI translation
+            translated_content = asyncio.run(
+                perform_ai_translation(
+                    config['model'],
+                    task.system_instructions,
+                    prompt
+                )
+            )
+            
+            # Apply translation
+            task._update_blog_post_translations(translated_content)
+            task.state = 'done'
+            
+        except Exception as e:
+            task._handle_error(str(e))
+            
+        finally:
+            self.env.cr.commit()
+```
+
+---
+
+## Error Handling
+
+### Error Categories (v18.0.1.0.0)
+
+| Error Type | Handling Strategy | Recovery Method |
+|------------|------------------|-----------------|
+| API Configuration | Immediate failure | Fix configuration, reset task |
+| API Rate Limits | Graceful delay | Wait and retry manually |
+| Content Too Large | Size validation | Reduce content, retry |
+| Network Timeout | Exception handling | Check connectivity, retry |
+| JSON Parse Error | Format validation | Review AI output, retry |
+
+### Error Recovery Pattern
+
+```python
+def _handle_error(self, error_message):
+    """
+    Standard error handling for translation tasks.
+    
+    Args:
+        error_message (str): Description of the error
+    """
+    self.write({
+        'state': 'error',
+        'error_message': error_message
+    })
+    
+    # Reset blog post status
+    self.blog_post_id.translation_in_progress = False
+    
+    # Log error for debugging
+    _logger.error(
+        f"Translation task {self.id} failed: {error_message}"
+    )
+```
+
+---
+
+## Version-Specific Implementation
+
+### Odoo 18.0 Standards Compliance
+
+**List Views**:
+```xml
+<!-- ✅ CORRECT: Use <list> for Odoo 18.0 -->
+<field name="arch" type="xml">
+    <list string="Translation Tasks">
+        <field name="name"/>
+        <field name="blog_post_id"/>
+        <field name="target_lang_id"/>
+        <field name="state" widget="badge" 
+               decoration-info="state in ('draft', 'in_progress')"
+               decoration-success="state == 'done'"
+               decoration-danger="state == 'error'"/>
+    </list>
+</field>
+```
+
+**Conditional Attributes**:
+```xml
+<!-- ✅ CORRECT: Modern conditional syntax -->
+<button name="action_reset_to_draft" 
+        string="Reset to Draft"
+        type="object"
+        invisible="state != 'error'"
+        class="btn-secondary"/>
+```
+
+**Kanban Views**:
+```xml
+<!-- ✅ MANDATORY: default_group_by for Kanban -->
+<kanban default_group_by="state" class="o_kanban_small_column">
+    <field name="state"/>
+    <templates>
+        <t t-name="kanban-box">
+            <div class="oe_kanban_card">
+                <div class="oe_kanban_content">
+                    <div><strong><field name="name"/></strong></div>
+                    <div><field name="blog_post_id"/></div>
+                    <div><field name="target_lang_id"/></div>
+                </div>
+            </div>
+        </t>
+    </templates>
+</kanban>
+```
+
+### Chatter Integration
+
+```xml
+<!-- Blog Post form with chatter -->
+<form string="Blog Post">
+    <sheet>
+        <!-- Form content -->
+    </sheet>
+    <!-- ✅ REQUIRED: Chatter at end of form when using mail.thread -->
+    <chatter/>
+</form>
+```
+
+---
+
+## Development Guidelines
+
+### Code Standards
+
+1. **Python Standards**:
+   - Follow PEP 8 style guidelines
+   - Use type hints where applicable
+   - Implement proper exception handling
+   - Add comprehensive docstrings
+
+2. **XML Standards**:
+   - Use modern Odoo 18.0 syntax
+   - Implement stable xpath selectors
+   - Follow consistent naming conventions
+   - Include proper field labels and help text
+
+3. **JavaScript Standards**:
+   - Not applicable for v18.0.1.0.0 (server-side only)
+
+### Testing Guidelines (v18.0.1.0.0)
+
+**Note**: Unit testing implementation is planned for future versions.
+
+```python
+# Future testing structure
+class TestTranslationTask(common.TransactionCase):
+    def setUp(self):
+        super(TestTranslationTask, self).setUp()
+        self.translation_task = self.env['sc.translation.task']
+        
+    def test_task_creation(self):
+        """Test translation task creation logic."""
+        # Implementation pending
+        pass
+        
+    def test_cron_processing(self):
+        """Test background processing with mocked API calls."""
+        # Implementation pending
+        pass
+```
+
+---
+
+## Testing Framework
+
+### Manual Testing Checklist (v18.0.1.0.0)
+
+#### Configuration Testing
+- [ ] OpenAI API key validation
+- [ ] Dynamic model loading
+- [ ] Fallback model selection
+- [ ] Organization ID handling
+
+#### Translation Workflow Testing  
+- [ ] Blog post selection
+- [ ] Wizard functionality
+- [ ] Task creation
+- [ ] Background processing
+- [ ] Error handling
+- [ ] Task reset functionality
+
+#### UI/UX Testing
+- [ ] Settings page integration
+- [ ] Task list views
+- [ ] Kanban view grouping
+- [ ] Form view layout
+- [ ] Chatter integration
+
+#### Security Testing
+- [ ] Access control enforcement
+- [ ] Password field masking
+- [ ] Multi-company isolation
+- [ ] Permission boundaries
+
+---
+
+## External References
+
+### Core Implementation References
+- **Base Settings Pattern**: `/home/gilsonrincon/development/odoo18/odoo-src/addons/base_setup/views/res_config_settings_views.xml`
+- **Anchor Used**: `//setting[@id='partner_autocomplete']` (stable selector)
+- **Mail Integration**: Standard Odoo `mail.thread` and `mail.activity.mixin` patterns
+
+### Official Documentation
+- **OpenAI Agents SDK**: https://github.com/openai/openai-agents-python
+- **SDK Documentation**: https://github.com/openai/openai-agents-python/blob/main/docs/quickstart.md
+- **API Reference**: https://platform.openai.com/docs/api-reference
+- **Odoo 18.0 Developer Guide**: https://www.odoo.com/documentation/18.0/developer/
+
+### Version Dependencies
+- **openai-agents**: 0.2.9+ (pinned in requirements.txt)
+- **Python**: 3.9+ (required by openai-agents)
+- **Odoo**: 18.0 Community or Enterprise
+
+---
+
+*Technical Documentation Version: 18.0.1.0.0 | Last Updated: September 2025*
