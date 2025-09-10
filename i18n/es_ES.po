@@ -1,0 +1,240 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sc_marketing_automation_tool
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-09 00:00:00+0000\n"
+"PO-Revision-Date: 2025-09-09 00:00:00+0000\n"
+"Last-Translator: Solutto Consulting LLC\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_res_config_settings__sc_openai_api_key
+msgid "OpenAI API Key"
+msgstr "Clave API de OpenAI"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_res_config_settings__sc_openai_api_key
+msgid "Your OpenAI API key for accessing AI services"
+msgstr "Su clave API de OpenAI para acceder a los servicios de IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_res_config_settings__sc_openai_organization_id
+msgid "OpenAI Organization ID"
+msgstr "ID de Organización de OpenAI"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_res_config_settings__sc_openai_organization_id
+msgid "Your OpenAI Organization ID (optional but recommended)"
+msgstr "Su ID de Organización de OpenAI (opcional pero recomendado)"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_res_config_settings__sc_openai_model
+msgid "OpenAI Model"
+msgstr "Modelo de OpenAI"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_res_config_settings__sc_openai_model
+msgid "Select the OpenAI model to use for translations"
+msgstr "Seleccione el modelo de OpenAI a usar para las traducciones"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model,name:sc_marketing_automation_tool.model_sc_translation_task
+msgid "AI Translation Task"
+msgstr "Tarea de Traducción con IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translation_task__name
+msgid "Task Name"
+msgstr "Nombre de la Tarea"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translation_task__name
+msgid "Descriptive name for the translation task"
+msgstr "Nombre descriptivo para la tarea de traducción"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translation_task__blog_post_id
+msgid "Blog Post"
+msgstr "Artículo del Blog"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translation_task__blog_post_id
+msgid "The blog post to be translated"
+msgstr "El artículo del blog a traducir"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translation_task__target_lang_id
+msgid "Target Language"
+msgstr "Idioma Destino"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translation_task__target_lang_id
+msgid "The target language for the translation"
+msgstr "El idioma destino para la traducción"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translation_task__system_instructions
+msgid "System Instructions"
+msgstr "Instrucciones del Sistema"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translation_task__system_instructions
+msgid "Optional instructions provided to guide the AI model's tone and style"
+msgstr "Instrucciones opcionales para guiar el tono y estilo del modelo de IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translation_task__state
+msgid "Status"
+msgstr "Estado"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translation_task__error_message
+msgid "Error Message"
+msgstr "Mensaje de Error"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translation_task__error_message
+msgid "Stores error details if the task fails"
+msgstr "Almacena los detalles del error si falla la tarea"
+
+#. module: sc_marketing_automation_tool
+#: selection:sc.translation.task,state:0
+msgid "Draft"
+msgstr "Borrador"
+
+#. module: sc_marketing_automation_tool
+#: selection:sc.translation.task,state:0
+msgid "In Progress"
+msgstr "En Progreso"
+
+#. module: sc_marketing_automation_tool
+#: selection:sc.translation.task,state:0
+msgid "Done"
+msgstr "Completado"
+
+#. module: sc_marketing_automation_tool
+#: selection:sc.translation.task,state:0
+msgid "Error"
+msgstr "Error"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.ui.menu,name:sc_marketing_automation_tool.menu_marketing_automation_root
+msgid "Marketing Automation"
+msgstr "Automatización de Marketing"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.ui.menu,name:sc_marketing_automation_tool.menu_content_translation
+msgid "Content Translation"
+msgstr "Traducción de Contenido"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.ui.menu,name:sc_marketing_automation_tool.menu_translation_tasks
+#: model:ir.actions.act_window,name:sc_marketing_automation_tool.sc_translation_task_action
+msgid "Translation Tasks"
+msgstr "Tareas de Traducción"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.actions.server,name:sc_marketing_automation_tool.action_translate_blog_posts
+#: model:ir.actions.act_window,name:sc_marketing_automation_tool.sc_translate_blog_post_wizard_action
+msgid "Translate with AI"
+msgstr "Traducir con IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translate_blog_post_wizard__target_lang_id
+msgid "Target Language"
+msgstr "Idioma Destino"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translate_blog_post_wizard__target_lang_id
+msgid "Select the target language for translation"
+msgstr "Seleccione el idioma destino para la traducción"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translate_blog_post_wizard__system_instructions
+msgid "AI Instructions"
+msgstr "Instrucciones para la IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translate_blog_post_wizard__system_instructions
+msgid "Optional instructions to guide the AI's tone and style for the translation"
+msgstr "Instrucciones opcionales para guiar el tono y estilo de la IA para la traducción"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "No blog posts selected for translation."
+msgstr "No se seleccionaron artículos de blog para traducir."
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "Please select a target language."
+msgstr "Por favor seleccione un idioma destino."
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "OpenAI API key not configured. Please configure it in Settings > General Settings > AI Marketing Tools."
+msgstr "Clave API de OpenAI no configurada. Por favor configúrela en Configuración > Configuración General > Herramientas de IA para Marketing."
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "Created %d translation task(s)."
+msgstr "Se crearon %d tarea(s) de traducción."
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "Skipped posts: %s"
+msgstr "Artículos omitidos: %s"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "Translation Tasks Created"
+msgstr "Tareas de Traducción Creadas"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "No translation tasks were created."
+msgstr "No se crearon tareas de traducción."
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_blog_post__translation_task_ids
+msgid "Translation Tasks"
+msgstr "Tareas de Traducción"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_blog_post__translation_task_ids
+msgid "All translation tasks associated with this blog post"
+msgstr "Todas las tareas de traducción asociadas con este artículo del blog"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_blog_post__translation_in_progress
+msgid "Translation in Progress"
+msgstr "Traducción en Progreso"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_blog_post__translation_in_progress
+msgid "Indicates if a translation for this post is currently queued or in progress"
+msgstr "Indica si una traducción para este artículo está actualmente en cola o en progreso"
+
+#. module: sc_marketing_automation_tool
+#: model:res.groups,name:sc_marketing_automation_tool.group_marketing_manager
+msgid "Marketing Manager"
+msgstr "Gerente de Marketing"
+
+#. module: sc_marketing_automation_tool
+#: model:res.groups,name:sc_marketing_automation_tool.group_marketing_user
+msgid "Marketing User"
+msgstr "Usuario de Marketing"

@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sc_translation_task_manager,sc.translation.task manager,model_sc_translation_task,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
+access_sc_translation_task_user,sc.translation.task user,model_sc_translation_task,sc_marketing_automation_tool.group_marketing_user,1,0,1,0
+access_sc_translation_task_admin,sc.translation.task admin,model_sc_translation_task,base.group_system,1,1,1,1
+access_openai_utils_manager,openai.utils manager,model_openai_utils,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
+access_openai_utils_user,openai.utils user,model_openai_utils,sc_marketing_automation_tool.group_marketing_user,1,0,0,0
+access_openai_utils_admin,openai.utils admin,model_openai_utils,base.group_system,1,1,1,1
+access_sc_translate_blog_post_wizard_manager,sc.translate.blog.post.wizard manager,model_sc_translate_blog_post_wizard,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
+access_sc_translate_blog_post_wizard_user,sc.translate.blog.post.wizard user,model_sc_translate_blog_post_wizard,sc_marketing_automation_tool.group_marketing_user,1,1,1,0
+access_sc_translate_blog_post_wizard_admin,sc.translate.blog.post.wizard admin,model_sc_translate_blog_post_wizard,base.group_system,1,1,1,1

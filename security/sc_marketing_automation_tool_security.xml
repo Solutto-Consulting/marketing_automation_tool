@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Marketing Automation Groups -->
+    <record id="group_marketing_user" model="res.groups">
+        <field name="name">Marketing User</field>
+        <field name="category_id" ref="base.module_category_marketing"/>
+        <field name="comment">Basic access to marketing automation tools with read and create permissions</field>
+    </record>
+    
+    <record id="group_marketing_manager" model="res.groups">
+        <field name="name">Marketing Manager</field>
+        <field name="category_id" ref="base.module_category_marketing"/>
+        <field name="implied_ids" eval="[(4, ref('group_marketing_user'))]"/>
+        <field name="comment">Full access to marketing automation tools including AI translation management</field>
+    </record>
+</odoo>

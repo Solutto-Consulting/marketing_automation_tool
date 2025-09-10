@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Blog Post Form View Extension -->
+    <record id="blog_post_view_form_inherit" model="ir.ui.view">
+        <field name="name">blog.post.view.form.inherit.translation.history</field>
+        <field name="model">blog.post</field>
+        <field name="inherit_id" ref="website_blog.view_blog_post_form"/>
+        <field name="arch" type="xml">
+            <!-- Add Translation History page to notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Translation History" name="translation_history">
+                    <div class="alert alert-info" role="alert" invisible="translation_task_count > 0">
+                        <p><strong>No translation tasks found.</strong></p>
+                        <p>To create AI translations for this blog post, go to the blog post list view, 
+                           select posts, and use Action > "Translate with AI".</p>
+                    </div>
+                    <field name="translation_task_ids" readonly="1">
+                        <list string="Translation Tasks">
+                            <field name="name"/>
+                            <field name="target_language_name"/>
+                            <field name="state" widget="badge" 
+                                   decoration-info="state in ('draft', 'in_progress')"
+                                   decoration-success="state == 'done'"
+                                   decoration-danger="state == 'error'"/>
+                            <field name="create_date"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+            
+            <!-- Add fields for computation -->
+            <xpath expr="//sheet" position="inside">
+                <field name="translation_in_progress" invisible="1"/>
+                <field name="translation_task_count" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

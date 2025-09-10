@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Marketing Automation Root Menu -->
+    <record id="menu_marketing_automation_root" model="ir.ui.menu">
+        <field name="name">Marketing Automation</field>
+        <field name="sequence" eval="60"/>
+        <field name="web_icon">sc_marketing_automation_tool,static/description/icon.png</field>
+    </record>
+
+    <!-- Content Translation Sub-menu -->
+    <record id="menu_content_translation" model="ir.ui.menu">
+        <field name="name">Content Translation</field>
+        <field name="parent_id" ref="menu_marketing_automation_root"/>
+        <field name="sequence" eval="10"/>
+    </record>
+
+    <!-- Translation Tasks Menu -->
+    <record id="menu_translation_tasks" model="ir.ui.menu">
+        <field name="name">Translation Tasks</field>
+        <field name="parent_id" ref="menu_content_translation"/>
+        <field name="action" ref="sc_translation_task_action"/>
+        <field name="sequence" eval="10"/>
+    </record>
+</odoo>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sc.marketing.automation.tool</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="90"/>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Using stable anchor from base_setup: partner_autocomplete setting -->
+            <xpath expr="//setting[@id='partner_autocomplete']" position="after">
+                <setting id="ai_marketing_tools" string="AI Marketing Tools" 
+                         help="Configure AI-powered marketing automation tools">
+                    <div class="content-group">
+                        <div class="mt16">
+                            <label for="sc_openai_api_key" class="o_light_label"/>
+                            <field name="sc_openai_api_key" placeholder="sk-..."/>
+                            <div class="text-muted">
+                                Your OpenAI API key for accessing AI translation services.
+                                <a href="https://platform.openai.com/api-keys" target="_blank" class="oe_link">
+                                    Get your API key here
+                                </a>
+                            </div>
+                        </div>
+                        <div class="mt16">
+                            <label for="sc_openai_organization_id" class="o_light_label"/>
+                            <field name="sc_openai_organization_id" placeholder="org-..."/>
+                            <div class="text-muted">
+                                Your OpenAI Organization ID (optional but recommended).
+                            </div>
+                        </div>
+                        <div class="mt16">
+                            <label for="sc_openai_model" class="o_light_label"/>
+                            <field name="sc_openai_model"/>
+                            <div class="text-muted">
+                                Select the OpenAI model to use for content translations.
+                            </div>
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>
