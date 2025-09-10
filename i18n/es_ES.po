@@ -26,6 +26,36 @@ msgid "Your OpenAI API key for accessing AI services"
 msgstr "Su clave API de OpenAI para acceder a los servicios de IA"
 
 #. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "AI Marketing Tools"
+msgstr "Herramientas de IA para Marketing"
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Your OpenAI API key for accessing AI translation services."
+msgstr "Su clave API de OpenAI para acceder a los servicios de traducción con IA."
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Get your API key here"
+msgstr "Obtenga su clave API aquí"
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Your OpenAI Organization ID (optional but recommended)."
+msgstr "Su ID de Organización de OpenAI (opcional pero recomendado)."
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Select the OpenAI model to use for content translations."
+msgstr "Seleccione el modelo de OpenAI a usar para las traducciones de contenido."
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Model list is loaded dynamically from your OpenAI account."
+msgstr "La lista de modelos se carga dinámicamente desde su cuenta de OpenAI."
+
+#. module: sc_marketing_automation_tool
 #: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_res_config_settings__sc_openai_organization_id
 msgid "OpenAI Organization ID"
 msgstr "ID de Organización de OpenAI"
