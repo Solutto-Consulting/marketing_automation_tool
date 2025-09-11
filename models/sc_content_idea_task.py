@@ -158,7 +158,7 @@ class ScContentIdeaTask(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('Generated Ideas'),
             'res_model': 'sc.content.idea',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('task_id', '=', self.id)],
             'context': {'default_task_id': self.id}
         }
