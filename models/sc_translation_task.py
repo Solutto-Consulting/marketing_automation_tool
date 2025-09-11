@@ -1,6 +1,6 @@
 import logging
 import json
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
@@ -564,66 +564,6 @@ class ScTranslationTask(models.Model):
             results.append(f"  {trans.name}: {len(trans.value) if trans.value else 0} chars")
         
         return "\n".join(results)
-
-    def action_retranslate_blog_post(self):
-        """
-        Action to retranslate a blog post that may have failed translation.
-        This method forces a fresh translation using the correct method.
-        """
-        self.ensure_one()
-        
-        if not self.blog_post_id:
-            raise UserError(_("No blog post associated with this translation task"))
-        
-        if self.state not in ['done', 'error']:
-            raise UserError(_("Can only retranslate completed or failed tasks"))
-        
-        try:
-            # Reset task to draft and re-execute
-            self.write({
-                'state': 'draft',
-                'error_message': False,
-            })
-            
-            # Clear any bad translations (restore original content context)
-            blog_post = self.blog_post_id
-            target_lang_code = self.target_lang_id.code
-            
-            # Clear the corrupted translation first
-            _logger.info(f"Clearing corrupted translation for blog post {blog_post.id} in {target_lang_code}")
-            
-            # Re-execute the translation
-            self.action_execute_translation()
-            
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Retranslation Started'),
-                    'message': _('The blog post retranslation has been queued for processing.'),
-                    'type': 'success',
-                    'sticky': False,
-                }
-            }
-            
-        except Exception as e:
-            _logger.error(f"Retranslation failed: {str(e)}")
-            self.write({
-                'state': 'error',
-                'error_message': f"Retranslation failed: {str(e)}"
-            })
-            
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Retranslation Failed'),
-                    'message': f"Retranslation failed: {str(e)}",
-                    'type': 'danger',
-                    'sticky': True,
-                }
-            }
-            raise UserError(_("Retranslation failed: %s") % str(e))
 
     def action_validate_html_structure(self):
         """Validate HTML structure consistency between original and translated content"""

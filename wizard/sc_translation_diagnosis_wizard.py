@@ -12,6 +12,6 @@ class TranslationDiagnosisWizard(models.TransientModel):
     def action_retranslate(self):
         """Apply fix translation from diagnosis wizard"""
         if self.task_id:
-            return self.task_id.action_retranslate_blog_post()
+            return self.task_id.action_emergency_fix_translation()
         else:
             return {'type': 'ir.actions.act_window_close'}
