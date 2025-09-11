@@ -93,16 +93,30 @@ class ScContentIdeaTask(models.Model):
     def _compute_generated_ideas_count(self):
         """Compute the number of generated ideas"""
         for record in self:
-            record.generated_ideas_count = len(record.generated_ideas_ids)
+            try:
+                # Safe access to the One2many field
+                if record.generated_ideas_ids:
+                    record.generated_ideas_count = len(record.generated_ideas_ids)
+                else:
+                    record.generated_ideas_count = 0
+            except Exception as e:
+                # Log the error and set a safe default
+                _logger.warning(f"Error computing generated ideas count for task {record.id}: {e}")
+                record.generated_ideas_count = 0
     
     @api.depends('started_at', 'completed_at')
     def _compute_duration(self):
         """Compute task execution duration"""
         for record in self:
-            if record.started_at and record.completed_at:
-                delta = record.completed_at - record.started_at
-                record.duration = delta.total_seconds() / 60.0  # Convert to minutes
-            else:
+            try:
+                if record.started_at and record.completed_at:
+                    delta = record.completed_at - record.started_at
+                    record.duration = delta.total_seconds() / 60.0  # Convert to minutes
+                else:
+                    record.duration = 0.0
+            except Exception as e:
+                # Log the error and set a safe default
+                _logger.warning(f"Error computing duration for task {record.id}: {e}")
                 record.duration = 0.0
     
     @api.constrains('requested_ideas')

@@ -84,8 +84,8 @@ class ScContentGenerationTask(models.Model):
         'res.lang',
         string="Language",
         required=True,
-        default=lambda self: self.env.ref('base.lang_en'),
-        help="The language for the generated article"
+        default='_get_default_website_language',
+        help="The language for the generated article (uses website default language)"
     )
     
     state = fields.Selection([
@@ -179,6 +179,29 @@ class ScContentGenerationTask(models.Model):
                     "• A Content Idea, OR\n"
                     "• Custom Topic AND Custom Instructions"
                 ))
+    
+    @api.model
+    def _get_default_website_language(self):
+        """Get the default language from the website configuration"""
+        try:
+            # Get the current website or the first website
+            website = self.env['website'].get_current_website()
+            if not website:
+                website = self.env['website'].search([], limit=1)
+            
+            # Return the website's default language if available
+            if website and website.default_lang_id:
+                return website.default_lang_id.id
+        except Exception as e:
+            _logger.warning(f"Could not get website default language: {e}")
+        
+        # Fallback to English if website not found or error
+        try:
+            return self.env.ref('base.lang_en').id
+        except Exception:
+            # Ultimate fallback - first available language
+            lang = self.env['res.lang'].search([], limit=1)
+            return lang.id if lang else False
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -438,11 +461,10 @@ class ScContentGenerationTask(models.Model):
             })
         
         # Set language if specified
-        if self.target_lang_id and self.target_lang_id.code != 'en_US':
-            blog_post_values['lang'] = self.target_lang_id.code
+        lang_code = self.target_lang_id.code if self.target_lang_id else 'en_US'
         
-        # Create the blog post
-        blog_post = self.env['blog.post'].create(blog_post_values)
+        # Create the blog post in the specified language context
+        blog_post = self.env['blog.post'].with_context(lang=lang_code).create(blog_post_values)
         
         # Log creation
         _logger.info(f"Created blog post {blog_post.id} for task {self.id}")

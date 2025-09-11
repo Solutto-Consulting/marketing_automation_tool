@@ -356,3 +356,9 @@ msgstr "Utilidades de Lectura de Contenido Web"
 #: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_content_generation_task__agent_config_id
 msgid "The AI agent configuration used for this task"
 msgstr "La configuración del agente de IA utilizada para esta tarea"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_content_generation_task__target_lang_id
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_generate_content_wizard__target_lang_id
+msgid "The language for the generated article (uses website default language)"
+msgstr "El idioma para el artículo generado (usa el idioma predeterminado del sitio web)"

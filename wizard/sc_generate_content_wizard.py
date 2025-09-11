@@ -86,6 +86,14 @@ class ScGenerateContentWizard(models.TransientModel):
         help="Generate SEO meta tags for the blog post"
     )
     
+    target_lang_id = fields.Many2one(
+        'res.lang',
+        string="Language",
+        required=True,
+        default='_get_default_website_language',
+        help="The language for the generated article (uses website default language)"
+    )
+    
     state = fields.Selection([
         ('draft', 'Draft'),
         ('processing', 'Processing'),
@@ -153,6 +161,32 @@ class ScGenerateContentWizard(models.TransientModel):
                 ('gpt-4-turbo', 'GPT-4 Turbo'),
                 ('gpt-3.5-turbo', 'GPT-3.5 Turbo'),
             ]
+
+    @api.model
+    def _get_default_website_language(self):
+        """Get the default language from the website configuration"""
+        try:
+            # Get the current website or the first website
+            website = self.env['website'].get_current_website()
+            if not website:
+                website = self.env['website'].search([], limit=1)
+            
+            # Return the website's default language if available
+            if website and website.default_lang_id:
+                return website.default_lang_id.id
+        except Exception as e:
+            # Log warning but don't fail
+            import logging
+            _logger = logging.getLogger(__name__)
+            _logger.warning(f"Could not get website default language: {e}")
+        
+        # Fallback to English if website not found or error
+        try:
+            return self.env.ref('base.lang_en').id
+        except Exception:
+            # Ultimate fallback - first available language
+            lang = self.env['res.lang'].search([], limit=1)
+            return lang.id if lang else False
 
     @api.model
     def default_get(self, fields_list):
@@ -241,6 +275,7 @@ class ScGenerateContentWizard(models.TransientModel):
         task_values = {
             'name': task_name,
             'target_blog_id': self.blog_id.id,
+            'target_lang_id': self.target_lang_id.id,
             'target_word_count': self.target_word_count,
             'agent_config_id': self.agent_config_id.id,
             'user_prompt': self.custom_agent_instructions or '',
