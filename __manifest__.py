@@ -1,6 +1,6 @@
 {
     'name': 'Content Management Tool for Odoo',
-    'version': '18.0.1.1.0',
+    'version': '18.0.1.0.0',
     'category': 'Marketing',
     'summary': 'AI-powered content translation and marketing automation tools',
     'description': """
