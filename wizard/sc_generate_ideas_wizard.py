@@ -14,13 +14,6 @@ class ScGenerateIdeasWizard(models.TransientModel):
         readonly=True
     )
     
-    blog_id = fields.Many2one(
-        'blog.blog',
-        string="Target Blog",
-        required=True,
-        help="The blog where generated content ideas will be associated"
-    )
-    
     query = fields.Text(
         string="Search Query",
         required=True,

@@ -16,10 +16,20 @@ class ScGenerateContentWizard(models.TransientModel):
 
     content_idea_id = fields.Many2one(
         'sc.content.idea',
-        string="Content Idea",
-        required=True,
+        string="Content Idea (Optional)",
         domain="[('state', '=', 'approved')]",
-        help="Select the content idea to use as source for blog generation"
+        help="Select the content idea to use as source for blog generation (optional)"
+    )
+    
+    # Alternative content input (when not using a content idea)
+    custom_topic = fields.Char(
+        string="Custom Topic",
+        help="Topic or title for the blog post (used when not selecting a content idea)"
+    )
+    
+    custom_instructions = fields.Text(
+        string="Content Instructions",
+        help="Detailed instructions for content generation (used when not selecting a content idea)"
     )
     
     blog_id = fields.Many2one(
@@ -151,12 +161,38 @@ class ScGenerateContentWizard(models.TransientModel):
             if record.target_word_count > 5000:
                 raise ValidationError(_("Maximum target word count is 5000"))
     
+    @api.constrains('content_idea_id', 'custom_topic', 'custom_instructions')
+    def _check_content_source(self):
+        """Validate that either content idea or custom content is provided"""
+        for record in self:
+            has_content_idea = bool(record.content_idea_id)
+            has_custom_content = bool(record.custom_topic and record.custom_instructions)
+            
+            if not has_content_idea and not has_custom_content:
+                raise ValidationError(_(
+                    "Please provide either:\n"
+                    "• A Content Idea, OR\n"
+                    "• Custom Topic AND Content Instructions"
+                ))
+            
+            if has_content_idea and has_custom_content:
+                raise ValidationError(_(
+                    "Please choose only one option:\n"
+                    "• Content Idea, OR\n"
+                    "• Custom Topic + Instructions"
+                ))
+    
     def action_generate_content(self):
         """Create a content generation task and queue it for processing"""
         self.ensure_one()
         
-        if not self.content_idea_id:
-            raise ValidationError(_("Please select a content idea"))
+        # Determine content source and task name
+        if self.content_idea_id:
+            task_name = _("Blog Generation: %s") % self.content_idea_id.name
+            content_source = "content_idea"
+        else:
+            task_name = _("Blog Generation: %s") % self.custom_topic
+            content_source = "custom"
         
         # Update wizard state
         self.write({
@@ -164,16 +200,28 @@ class ScGenerateContentWizard(models.TransientModel):
             'processing_log': _("Content generation task created and queued for processing...")
         })
         
-        # Create the generation task
-        task = self.env['sc.content.generation.task'].create({
-            'name': _("Blog Generation: %s") % self.content_idea_id.name,
-            'content_idea_id': self.content_idea_id.id,
-            'user_prompt': self.agent_instructions or '',
+        # Prepare task values
+        task_values = {
+            'name': task_name,
             'target_blog_id': self.blog_id.id,
+            'target_word_count': self.target_word_count,
             'agent_model': self.agent_model,
             'agent_instructions': self.agent_instructions or '',
-            'state': 'draft',  # Will be picked up by cron job
-        })
+            'auto_publish': self.auto_publish,
+            'generate_meta_tags': self.generate_meta_tags,
+            'state': 'draft',
+        }
+        
+        # Add content source specific fields
+        if self.content_idea_id:
+            task_values['content_idea_id'] = self.content_idea_id.id
+        else:
+            # For custom content, we'll store the topic and instructions
+            task_values['custom_topic'] = self.custom_topic
+            task_values['custom_instructions'] = self.custom_instructions
+        
+        # Create the generation task
+        task = self.env['sc.content.generation.task'].create(task_values)
         
         # Log the task creation
         task.message_post(

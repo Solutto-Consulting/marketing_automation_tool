@@ -31,6 +31,8 @@
                     <header>
                         <button name="action_start_processing" type="object" string="Queue for Processing" 
                                 class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="action_execute_immediately" type="object" string="Execute Now" 
+                                class="btn-success" invisible="state != 'draft'"/>
                         <button name="action_retry" type="object" string="Retry" 
                                 class="btn-secondary" invisible="state not in ('error', 'done')"/>
                         <button name="action_view_ideas" type="object" string="View Generated Ideas" 
@@ -121,9 +123,7 @@
                     <field name="state"/>
                     <field name="requested_ideas"/>
                     <field name="generated_ideas_count"/>
-                    <field name="search_query"/>
                     <field name="error_message"/>
-                    <field name="duration"/>
                     <templates>
                         <t t-name="kanban-box">
                             <div class="oe_kanban_card oe_kanban_global_click">
@@ -132,34 +132,21 @@
                                         <field name="name"/>
                                     </div>
                                     <div class="o_kanban_record_subtitle text-muted">
-                                        <t t-if="record.requested_ideas.raw_value">
-                                            Requested: <field name="requested_ideas"/> ideas
-                                        </t>
+                                        <i class="fa fa-lightbulb-o"/> <field name="requested_ideas"/> ideas requested
                                         <t t-if="record.generated_ideas_count.raw_value > 0">
-                                            | Generated: <field name="generated_ideas_count"/>
+                                            | <field name="generated_ideas_count"/> generated
                                         </t>
-                                    </div>
-                                    <div class="mt8">
-                                        <field name="search_query" widget="text" readonly="1"/>
                                     </div>
                                     <div class="mt8" t-if="record.error_message.raw_value">
-                                        <span class="text-danger">
-                                            <i class="fa fa-exclamation-triangle"/> Error: 
-                                            <field name="error_message"/>
+                                        <span class="text-danger small">
+                                            <i class="fa fa-exclamation-triangle"/> <field name="error_message"/>
                                         </span>
                                     </div>
                                     <div class="o_kanban_record_bottom mt16">
-                                        <div class="oe_kanban_bottom_left">
-                                            <t t-if="record.duration.raw_value > 0">
-                                                <span class="text-muted">
-                                                    <i class="fa fa-clock-o"/> <field name="duration"/> min
-                                                </span>
-                                            </t>
-                                        </div>
                                         <div class="oe_kanban_bottom_right">
                                             <t t-if="record.state.raw_value == 'draft'">
-                                                <button name="action_start_processing" type="object" 
-                                                        class="btn btn-sm btn-primary">Start</button>
+                                                <button name="action_execute_immediately" type="object" 
+                                                        class="btn btn-sm btn-success">Execute Now</button>
                                             </t>
                                             <t t-if="record.state.raw_value == 'error'">
                                                 <button name="action_retry" type="object" 
@@ -167,7 +154,7 @@
                                             </t>
                                             <t t-if="record.generated_ideas_count.raw_value > 0">
                                                 <button name="action_view_ideas" type="object" 
-                                                        class="btn btn-sm btn-success">View Ideas</button>
+                                                        class="btn btn-sm btn-primary">View Ideas</button>
                                             </t>
                                         </div>
                                     </div>

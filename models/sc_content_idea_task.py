@@ -193,3 +193,115 @@ class ScContentIdeaTask(models.Model):
             'completed_at': fields.Datetime.now(),
         })
         self.message_post(body=_("Task failed: %s") % error_message)
+    
+    @api.model
+    def _cron_process_pending_tasks(self):
+        """Cron job method to process pending content idea tasks"""
+        try:
+            # Find draft tasks ready for processing
+            pending_tasks = self.search([('state', '=', 'draft')], limit=5)
+            
+            if not pending_tasks:
+                _logger.info("No pending content idea tasks found")
+                return
+            
+            _logger.info(f"Processing {len(pending_tasks)} content idea tasks")
+            
+            for task in pending_tasks:
+                try:
+                    task._process_task()
+                except Exception as e:
+                    _logger.error(f"Failed to process task {task.id}: {str(e)}")
+                    task._mark_error(str(e))
+                    
+        except Exception as e:
+            _logger.error(f"Error in content idea task cron job: {str(e)}")
+    
+    def _process_task(self):
+        """Process individual content idea task"""
+        self.ensure_one()
+        
+        if self.state != 'draft':
+            return
+        
+        try:
+            # Mark as in progress
+            self._mark_in_progress()
+            
+            # Get AI agent configuration
+            agent_config = self.env['sc.ai.agent.config'].search([('active', '=', True)], limit=1)
+            if not agent_config:
+                raise Exception(_("No active AI agent configuration found"))
+            
+            # Process placeholders in search query
+            processed_query = self._process_placeholders(self.search_query)
+            
+            # Store agent configuration used
+            self.write({
+                'agent_model': agent_config.model,
+                'agent_instructions': agent_config.instructions,
+            })
+            
+            # Perform content research using OpenAI utils
+            openai_utils = self.env['openai.utils']
+            ideas_data = openai_utils.research_content_ideas(
+                agent_config.model,
+                agent_config.instructions,
+                processed_query,
+                self.requested_ideas
+            )
+            
+            # Create content idea records
+            idea_records = []
+            for idea_data in ideas_data:
+                idea_record = self.env['sc.content.idea'].create({
+                    'task_id': self.id,
+                    'name': idea_data.get('name', 'Untitled Idea'),
+                    'url': idea_data.get('url', ''),
+                    'publish_date': idea_data.get('publish_date'),
+                    'summary': idea_data.get('summary', ''),
+                })
+                idea_records.append(idea_record)
+            
+            # Mark as completed
+            self._mark_done()
+            
+        except Exception as e:
+            error_msg = str(e)
+            _logger.error(f"Content idea task {self.id} failed: {error_msg}")
+            self._mark_error(error_msg)
+    
+    def action_execute_immediately(self):
+        """Execute content research task immediately"""
+        for task in self.filtered(lambda t: t.state == 'draft'):
+            try:
+                # Process the task
+                task._process_task()
+                
+                # Return success notification
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Task Executed Successfully'),
+                        'message': _('Content research task "%s" has been executed. Generated %d ideas.') % (task.name, task.generated_ideas_count),
+                        'type': 'success',
+                        'sticky': False,
+                    }
+                }
+                
+            except Exception as e:
+                # Log error and show notification
+                error_msg = str(e)
+                _logger.error("Content idea task %s failed: %s", task.id, error_msg)
+                
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Task Execution Failed'),
+                        'message': _('Content research task failed: %s') % error_msg,
+                        'type': 'danger',
+                        'sticky': True,
+                    }
+                }

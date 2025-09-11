@@ -22,17 +22,24 @@
                         </div>
                         
                         <group>
-                            <group string="Content Generation">
-                                <field name="content_idea_id" required="1" 
+                            <group string="Content Source">
+                                <field name="content_idea_id" 
                                        domain="[('state', '=', 'approved')]"/>
+                                <separator string="OR Custom Content" invisible="content_idea_id"/>
+                                <field name="custom_topic" 
+                                       placeholder="e.g., 'How to improve SEO rankings'"
+                                       invisible="content_idea_id"/>
+                                <field name="custom_instructions" 
+                                       placeholder="Detailed instructions for content generation..."
+                                       invisible="content_idea_id"/>
+                            </group>
+                            <group string="Generation Settings">
                                 <field name="blog_id" required="1" 
                                        domain="[('active', '=', True)]"/>
                                 <field name="target_word_count" required="1"/>
-                            </group>
-                            <group string="Agent Configuration">
                                 <field name="agent_model" required="1"/>
                                 <field name="agent_instructions" 
-                                       placeholder="Custom instructions for the content generation agent..."/>
+                                       placeholder="Additional instructions for the agent..."/>
                             </group>
                         </group>
                         

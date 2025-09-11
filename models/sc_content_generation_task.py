@@ -21,14 +21,42 @@ class ScContentGenerationTask(models.Model):
     content_idea_id = fields.Many2one(
         'sc.content.idea',
         string="Source Idea",
-        required=True,
         ondelete='cascade',
-        help="The content idea used as source for generation"
+        help="The content idea used as source for generation (optional)"
+    )
+    
+    # Alternative content input (when not using a content idea)
+    custom_topic = fields.Char(
+        string="Custom Topic",
+        help="Topic or title for the blog post (used when not selecting a content idea)"
+    )
+    
+    custom_instructions = fields.Text(
+        string="Custom Instructions",
+        help="Detailed instructions for content generation (used when not selecting a content idea)"
     )
     
     user_prompt = fields.Text(
         string="Additional Instructions",
         help="Additional instructions from the user for content generation"
+    )
+    
+    target_word_count = fields.Integer(
+        string="Target Word Count",
+        default=800,
+        help="Approximate word count for the generated blog post"
+    )
+    
+    auto_publish = fields.Boolean(
+        string="Auto-publish after generation",
+        default=False,
+        help="Automatically publish the blog post after generation"
+    )
+    
+    generate_meta_tags = fields.Boolean(
+        string="Generate SEO meta tags",
+        default=True,
+        help="Generate SEO meta tags for the blog post"
     )
     
     generated_blog_post_id = fields.Many2one(
@@ -130,13 +158,32 @@ class ScContentGenerationTask(models.Model):
             else:
                 record.duration = 0.0
     
+    @api.constrains('content_idea_id', 'custom_topic', 'custom_instructions')
+    def _check_content_source(self):
+        """Validate that either content idea or custom content is provided"""
+        for record in self:
+            has_content_idea = bool(record.content_idea_id)
+            has_custom_content = bool(record.custom_topic and record.custom_instructions)
+            
+            if not has_content_idea and not has_custom_content:
+                raise ValidationError(_(
+                    "Please provide either:\n"
+                    "• A Content Idea, OR\n"
+                    "• Custom Topic AND Custom Instructions"
+                ))
+    
     @api.model_create_multi
     def create(self, vals_list):
         """Override create to auto-generate task name"""
         for vals in vals_list:
-            if not vals.get('name') and vals.get('content_idea_id'):
-                idea = self.env['sc.content.idea'].browse(vals['content_idea_id'])
-                vals['name'] = _("Blog post generation for: %s") % (idea.name or 'Untitled')
+            if not vals.get('name'):
+                if vals.get('content_idea_id'):
+                    idea = self.env['sc.content.idea'].browse(vals['content_idea_id'])
+                    vals['name'] = _("Blog post generation for: %s") % (idea.name or 'Untitled')
+                elif vals.get('custom_topic'):
+                    vals['name'] = _("Blog post generation: %s") % vals['custom_topic']
+                else:
+                    vals['name'] = _("Blog post generation task")
         return super().create(vals_list)
     
     def action_start_processing(self):

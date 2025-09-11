@@ -23,8 +23,6 @@
                         
                         <group>
                             <group string="Research Parameters">
-                                <field name="blog_id" required="1" 
-                                       domain="[('active', '=', True)]"/>
                                 <field name="query" required="1" 
                                        placeholder="e.g., 'digital marketing trends 2024'"/>
                                 <field name="num_ideas" required="1"/>

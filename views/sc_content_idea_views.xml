@@ -92,12 +92,9 @@
             <field name="arch" type="xml">
                 <kanban default_group_by="state" class="o_kanban_small_column">
                     <field name="name"/>
-                    <field name="url"/>
                     <field name="domain_name"/>
-                    <field name="summary"/>
                     <field name="word_count"/>
                     <field name="state"/>
-                    <field name="task_id"/>
                     <templates>
                         <t t-name="kanban-box">
                             <div class="oe_kanban_card oe_kanban_global_click">
@@ -109,22 +106,16 @@
                                         <i class="fa fa-globe"/> <field name="domain_name"/>
                                         <span class="float-end"><field name="word_count"/> words</span>
                                     </div>
-                                    <div class="mt8">
-                                        <field name="summary" widget="text" readonly="1"/>
-                                    </div>
                                     <div class="o_kanban_record_bottom mt16">
-                                        <div class="oe_kanban_bottom_left">
-                                            <span class="badge badge-pill me-1">
-                                                <field name="task_id"/>
-                                            </span>
-                                            <span class="badge badge-pill" t-attf-class="badge-#{record.state.raw_value}">
-                                                <field name="state"/>
-                                            </span>
-                                        </div>
                                         <div class="oe_kanban_bottom_right">
-                                            <button name="action_generate_content" type="object" 
-                                                    class="btn btn-sm btn-primary" 
-                                                    invisible="state != 'approved'">Generate Content</button>
+                                            <t t-if="record.state.raw_value == 'approved'">
+                                                <button name="action_generate_content" type="object" 
+                                                        class="btn btn-sm btn-primary">Generate Content</button>
+                                            </t>
+                                            <t t-if="record.state.raw_value == 'draft'">
+                                                <button name="action_approve" type="object" 
+                                                        class="btn btn-sm btn-success">Approve</button>
+                                            </t>
                                         </div>
                                     </div>
                                 </div>

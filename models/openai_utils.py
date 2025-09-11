@@ -282,6 +282,48 @@ Return ONLY the JSON array, no additional text or explanation.
         except Exception as e:
             _logger.error("Content research failed: %s", str(e))
             raise Exception(f"Content research failed: {str(e)}")
+    
+    @api.model
+    def research_content_ideas(self, model_name, system_instructions, search_query, num_ideas=5):
+        """
+        Synchronous wrapper for content research
+        
+        Args:
+            model_name (str): The OpenAI model to use
+            system_instructions (str): Instructions for the research agent
+            search_query (str): The search query for finding content ideas
+            num_ideas (int): Number of ideas to generate
+            
+        Returns:
+            list: List of content ideas with structure [{'name': str, 'url': str, 'publish_date': str, 'summary': str}]
+        """
+        try:
+            # Get API configuration from Odoo settings
+            api_key = self.env['ir.config_parameter'].sudo().get_param('sc_marketing_automation_tool.openai_api_key')
+            org_id = self.env['ir.config_parameter'].sudo().get_param('sc_marketing_automation_tool.openai_organization_id')
+            
+            if not api_key:
+                raise Exception("OpenAI API key not configured. Please configure it in Settings > General Settings > AI Marketing Tools.")
+            
+            # Set environment variables for OpenAI Agents SDK
+            os.environ['OPENAI_API_KEY'] = api_key
+            if org_id:
+                os.environ['OPENAI_ORGANIZATION'] = org_id
+            
+            # Run the async method synchronously
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                result = loop.run_until_complete(
+                    self.perform_content_research(model_name, system_instructions, search_query, num_ideas)
+                )
+                return result
+            finally:
+                loop.close()
+                
+        except Exception as e:
+            _logger.error("Content research synchronous wrapper failed: %s", str(e))
+            raise
 
     @api.model
     async def perform_content_generation(self, model_name, system_instructions, content_idea, user_prompt=""):
