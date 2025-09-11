@@ -98,14 +98,66 @@ class ScContentIdea(models.Model):
                 record.domain_name = ""
     
     def action_view_source(self):
-        """Open the source URL in a new browser tab"""
+        """Open the source URL in a new window"""
         self.ensure_one()
-        if self.url:
-            return {
-                'type': 'ir.actions.act_url',
-                'url': self.url,
-                'target': 'new',
-            }
+        if not self.url:
+            raise ValidationError(_("No source URL available"))
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': self.url,
+            'target': 'new',
+        }
+    
+    def action_extract_full_content(self):
+        """Extract and preview full content from source URL"""
+        self.ensure_one()
+        if not self.url:
+            raise ValidationError(_("No source URL available"))
+        
+        try:
+            web_reader = self.env['web.content.reader']
+            result = web_reader.extract_article_content(self.url)
+            
+            if result['success']:
+                # Return a wizard to display the extracted content
+                wizard = self.env['sc.content.preview.wizard'].create({
+                    'content_idea_id': self.id,
+                    'extracted_title': result['title'],
+                    'extracted_content': result['content'][:2000] + ('...' if len(result['content']) > 2000 else ''),
+                    'word_count': result['word_count'],
+                    'reading_time': result['reading_time'],
+                    'meta_description': result['meta_description'],
+                    'extraction_success': True,
+                })
+                
+                return {
+                    'type': 'ir.actions.act_window',
+                    'name': _('Content Preview'),
+                    'res_model': 'sc.content.preview.wizard',
+                    'res_id': wizard.id,
+                    'view_mode': 'form',
+                    'target': 'new',
+                }
+            else:
+                # Show error in wizard
+                wizard = self.env['sc.content.preview.wizard'].create({
+                    'content_idea_id': self.id,
+                    'extraction_error': result['error'],
+                    'extraction_success': False,
+                })
+                
+                return {
+                    'type': 'ir.actions.act_window',
+                    'name': _('Content Extraction Error'),
+                    'res_model': 'sc.content.preview.wizard',
+                    'res_id': wizard.id,
+                    'view_mode': 'form',
+                    'target': 'new',
+                }
+                
+        except Exception as e:
+            raise ValidationError(_("Failed to extract content: %s") % str(e))
     
     def action_generate_content(self):
         """Open wizard to generate blog content from this idea"""

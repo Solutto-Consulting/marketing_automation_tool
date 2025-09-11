@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Content Preview Wizard Form View -->
+        <record id="sc_content_preview_wizard_view_form" model="ir.ui.view">
+            <field name="name">sc.content.preview.wizard.form</field>
+            <field name="model">sc.content.preview.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Content Preview">
+                    <header>
+                        <button name="action_generate_content_with_full_source" type="object" 
+                                string="Generate Content with Full Source" class="btn-primary"
+                                invisible="not extraction_success"/>
+                        <button name="action_close" type="object" string="Close" class="btn-secondary"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <span invisible="extraction_success">Content Extraction Failed</span>
+                                <span invisible="not extraction_success">Content Preview</span>
+                            </h1>
+                        </div>
+                        
+                        <!-- Success Case -->
+                        <div invisible="not extraction_success">
+                            <group>
+                                <group string="Article Information">
+                                    <field name="extracted_title" readonly="1"/>
+                                    <field name="word_count" readonly="1"/>
+                                    <field name="reading_time" readonly="1"/>
+                                </group>
+                                <group string="Source">
+                                    <field name="content_idea_id" readonly="1"/>
+                                </group>
+                            </group>
+                            
+                            <group string="Meta Description" invisible="not meta_description">
+                                <field name="meta_description" readonly="1" nolabel="1"/>
+                            </group>
+                            
+                            <group string="Content Preview (First 2000 characters)">
+                                <field name="extracted_content" readonly="1" nolabel="1" 
+                                       widget="text" options="{'mode': 'readonly'}"/>
+                            </group>
+                            
+                            <div class="alert alert-info" role="alert">
+                                <p><strong>ℹ️ Content Successfully Extracted</strong></p>
+                                <p>The AI agent will now have access to the full article content (<field name="word_count" readonly="1" nolabel="1"/> words) 
+                                   to create a comprehensive and well-informed blog post.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Error Case -->
+                        <div invisible="extraction_success">
+                            <group string="Source">
+                                <field name="content_idea_id" readonly="1"/>
+                            </group>
+                            
+                            <div class="alert alert-danger" role="alert">
+                                <p><strong>❌ Content Extraction Failed</strong></p>
+                                <p>The system was unable to extract the full content from the source URL. 
+                                   The AI agent will use only the summary information available.</p>
+                            </div>
+                            
+                            <group string="Error Details" invisible="not extraction_error">
+                                <field name="extraction_error" readonly="1" nolabel="1"/>
+                            </group>
+                        </div>
+                        
+                        <!-- Hidden fields -->
+                        <field name="extraction_success" invisible="1"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

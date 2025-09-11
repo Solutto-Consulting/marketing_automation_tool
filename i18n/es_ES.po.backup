@@ -1,0 +1,968 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sc_marketing_automation_tool
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-11 08:00:00+0000\n"
+"PO-Revision-Date: 2025-09-11 08:00:00+0000\n"
+"Last-Translator: Solutto Consulting LLC\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_res_config_settings__sc_openai_api_key
+msgid "OpenAI API Key"
+msgstr "Clave API de OpenAI"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_res_config_settings__sc_openai_api_key
+msgid "Your OpenAI API key for accessing AI services"
+msgstr "Su clave API de OpenAI para acceder a los servicios de IA"
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "AI Marketing Tools"
+msgstr "Herramientas de IA para Marketing"
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Your OpenAI API key for accessing AI translation services."
+msgstr "Su clave API de OpenAI para acceder a los servicios de traducción con IA."
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Get your API key here"
+msgstr "Obtenga su clave API aquí"
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Your OpenAI Organization ID (optional but recommended)."
+msgstr "Su ID de Organización de OpenAI (opcional pero recomendado)."
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Select the OpenAI model to use for content translations."
+msgstr "Seleccione el modelo de OpenAI a usar para las traducciones de contenido."
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Model list is loaded dynamically from your OpenAI account."
+msgstr "La lista de modelos se carga dinámicamente desde su cuenta de OpenAI."
+
+# AI Agent Configuration Translations (v18.0.1.0.1)
+
+#. module: sc_marketing_automation_tool
+#: model:ir.ui.menu,name:sc_marketing_automation_tool.menu_ai_agent_configurations
+msgid "AI Agent Configurations"
+msgstr "Configuraciones de Agentes de IA"
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "AI Agent Management"
+msgstr "Gestión de Agentes de IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_res_config_settings__sc_enable_agent_config
+msgid "Enable AI Agent Configurations"
+msgstr "Habilitar Configuraciones de Agentes de IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_res_config_settings__sc_enable_agent_config
+msgid "Enable advanced AI agent configuration management"
+msgstr "Habilitar gestión avanzada de configuración de agentes de IA"
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Enable comprehensive AI agent configuration system with custom instructions, models, and templates."
+msgstr "Habilitar sistema integral de configuración de agentes de IA con instrucciones personalizadas, modelos y plantillas."
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Advanced AI Agent Configuration is Active!"
+msgstr "¡La Configuración Avanzada de Agentes de IA está Activa!"
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Configure your AI agents with detailed instructions, custom models, and specialized templates."
+msgstr "Configure sus agentes de IA con instrucciones detalladas, modelos personalizados y plantillas especializadas."
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Manage AI Agent Configurations"
+msgstr "Gestionar Configuraciones de Agentes de IA"
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "Legacy Agent Models"
+msgstr "Modelos de Agentes Heredados"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_ai_agent_config__name
+msgid "Agent Name"
+msgstr "Nombre del Agente"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_ai_agent_config__agent_type
+msgid "Agent Type"
+msgstr "Tipo de Agente"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_ai_agent_config__agent_type
+msgid "Type of AI agent"
+msgstr "Tipo de agente de IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_ai_agent_config__model
+msgid "OpenAI Model"
+msgstr "Modelo de OpenAI"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_ai_agent_config__instructions
+msgid "System Instructions"
+msgstr "Instrucciones del Sistema"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_ai_agent_config__default_query
+msgid "Default Query Template"
+msgstr "Plantilla de Consulta Predeterminada"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_ai_agent_config__is_default
+msgid "Default Agent"
+msgstr "Agente Predeterminado"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_ai_agent_config__active
+msgid "Active"
+msgstr "Activo"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_ai_agent_config__sequence
+msgid "Sequence"
+msgstr "Secuencia"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_ai_agent_config__last_used
+msgid "Last Used"
+msgstr "Último Uso"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_ai_agent_config__usage_count
+msgid "Usage Count"
+msgstr "Contador de Uso"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_ai_agent_config__created_by
+msgid "Created By"
+msgstr "Creado Por"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_ai_agent_config__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_list
+msgid "AI Agent Configurations"
+msgstr "Configuraciones de Agentes de IA"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_form
+msgid "AI Agent Configuration"
+msgstr "Configuración de Agente de IA"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_form
+msgid "Set as Default"
+msgstr "Establecer como Predeterminado"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_form
+msgid "Duplicate"
+msgstr "Duplicar"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_form
+msgid "Times Used"
+msgstr "Veces Utilizado"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_form
+msgid "Instructions"
+msgstr "Instrucciones"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_form
+msgid "Default Query"
+msgstr "Consulta Predeterminada"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_form
+msgid "Notes"
+msgstr "Notas"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_form
+msgid "Enter detailed system instructions for this AI agent..."
+msgstr "Ingrese instrucciones detalladas del sistema para este agente de IA..."
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_form
+msgid "Enter default query template (use {today} for date placeholders)..."
+msgstr "Ingrese plantilla de consulta predeterminada (use {today} para marcadores de fecha)..."
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_form
+msgid "Additional notes about this agent configuration..."
+msgstr "Notas adicionales sobre esta configuración de agente..."
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_search
+msgid "Research Agents"
+msgstr "Agentes de Investigación"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_search
+msgid "Generation Agents"
+msgstr "Agentes de Generación"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_search
+msgid "Default Agents"
+msgstr "Agentes Predeterminados"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_search
+msgid "Inactive"
+msgstr "Inactivo"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_search
+msgid "Group By"
+msgstr "Agrupar Por"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_search
+msgid "Default Status"
+msgstr "Estado Predeterminado"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.actions.act_window,name:sc_marketing_automation_tool.action_sc_ai_agent_config
+msgid "AI Agent Configurations"
+msgstr "Configuraciones de Agentes de IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.actions.act_window,help:sc_marketing_automation_tool.action_sc_ai_agent_config
+msgid "Create your first AI agent configuration"
+msgstr "Cree su primera configuración de agente de IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.actions.act_window,help:sc_marketing_automation_tool.action_sc_ai_agent_config
+msgid "AI agents power the content research and generation features of this module. Configure different agents with specific instructions, models, and behaviors to optimize your content automation workflow."
+msgstr "Los agentes de IA impulsan las funciones de investigación y generación de contenido de este módulo. Configure diferentes agentes con instrucciones específicas, modelos y comportamientos para optimizar su flujo de trabajo de automatización de contenido."
+
+# Agent Type Selection Values
+
+#. module: sc_marketing_automation_tool
+#: model:sc.ai.agent.config,agent_type:sc_marketing_automation_tool.default_research_agent
+msgid "research"
+msgstr "investigación"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.ai.agent.config,agent_type:sc_marketing_automation_tool.default_generation_agent
+msgid "generation"
+msgstr "generación"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.ai.agent.config,agent_type:sc_marketing_automation_tool.default_technical_agent
+msgid "technical"
+msgstr "técnico"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.ai.agent.config,agent_type:sc_marketing_automation_tool.default_social_media_agent
+msgid "social_media"
+msgstr "redes_sociales"
+
+# Legacy Settings Help Text
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "OpenAI model for content research (legacy setting - upgrade to advanced agent management)."
+msgstr "Modelo de OpenAI para investigación de contenido (configuración heredada - actualice a gestión avanzada de agentes)."
+
+#. module: sc_marketing_automation_tool
+#: view:res.config.settings:sc_marketing_automation_tool.res_config_settings_view_form
+msgid "OpenAI model for content generation (legacy setting - upgrade to advanced agent management)."
+msgstr "Modelo de OpenAI para generación de contenido (configuración heredada - actualice a gestión avanzada de agentes)."
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_res_config_settings__sc_research_agent_model
+msgid "Research Agent Model"
+msgstr "Modelo de Agente de Investigación"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_res_config_settings__sc_generation_agent_model
+msgid "Generation Agent Model"
+msgstr "Modelo de Agente de Generación"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_res_config_settings__sc_technical_agent_model
+msgid "Technical Agent Model"
+msgstr "Modelo de Agente Técnico"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_res_config_settings__sc_social_media_agent_model
+msgid "Social Media Agent Model"
+msgstr "Modelo de Agente de Redes Sociales"
+
+# Kanban View Translations
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_kanban
+msgid "Default Agent"
+msgstr "Agente Predeterminado"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_kanban
+msgid "Times Used:"
+msgstr "Veces Utilizado:"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_kanban
+msgid "Last Used:"
+msgstr "Último Uso:"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.ai.agent.config:sc_marketing_automation_tool.sc_ai_agent_config_view_kanban
+msgid "Never"
+msgstr "Nunca"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_res_config_settings__sc_openai_organization_id
+msgid "OpenAI Organization ID"
+msgstr "ID de Organización de OpenAI"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_res_config_settings__sc_openai_organization_id
+msgid "Your OpenAI Organization ID (optional but recommended)"
+msgstr "Su ID de Organización de OpenAI (opcional pero recomendado)"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_res_config_settings__sc_openai_model
+msgid "OpenAI Model"
+msgstr "Modelo de OpenAI"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_res_config_settings__sc_openai_model
+msgid "Select the OpenAI model to use for translations"
+msgstr "Seleccione el modelo de OpenAI a usar para las traducciones"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model,name:sc_marketing_automation_tool.model_sc_translation_task
+msgid "AI Translation Task"
+msgstr "Tarea de Traducción con IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translation_task__name
+msgid "Task Name"
+msgstr "Nombre de la Tarea"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translation_task__name
+msgid "Descriptive name for the translation task"
+msgstr "Nombre descriptivo para la tarea de traducción"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translation_task__blog_post_id
+msgid "Blog Post"
+msgstr "Artículo del Blog"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translation_task__blog_post_id
+msgid "The blog post to be translated"
+msgstr "El artículo del blog a traducir"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translation_task__target_lang_id
+msgid "Target Language"
+msgstr "Idioma Destino"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translation_task__target_lang_id
+msgid "The target language for the translation"
+msgstr "El idioma destino para la traducción"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translation_task__system_instructions
+msgid "System Instructions"
+msgstr "Instrucciones del Sistema"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translation_task__system_instructions
+msgid "Optional instructions provided to guide the AI model's tone and style"
+msgstr "Instrucciones opcionales para guiar el tono y estilo del modelo de IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translation_task__state
+msgid "Status"
+msgstr "Estado"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translation_task__error_message
+msgid "Error Message"
+msgstr "Mensaje de Error"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translation_task__error_message
+msgid "Stores error details if the task fails"
+msgstr "Almacena los detalles del error si falla la tarea"
+
+#. module: sc_marketing_automation_tool
+#: selection:sc.translation.task,state:0
+msgid "Draft"
+msgstr "Borrador"
+
+#. module: sc_marketing_automation_tool
+#: selection:sc.translation.task,state:0
+msgid "In Progress"
+msgstr "En Progreso"
+
+#. module: sc_marketing_automation_tool
+#: selection:sc.translation.task,state:0
+msgid "Done"
+msgstr "Completado"
+
+#. module: sc_marketing_automation_tool
+#: selection:sc.translation.task,state:0
+msgid "Error"
+msgstr "Error"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.ui.menu,name:sc_marketing_automation_tool.menu_marketing_automation_root
+msgid "Marketing Automation"
+msgstr "Automatización de Marketing"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.ui.menu,name:sc_marketing_automation_tool.menu_content_translation
+msgid "Content Translation"
+msgstr "Traducción de Contenido"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.ui.menu,name:sc_marketing_automation_tool.menu_translation_tasks
+#: model:ir.actions.act_window,name:sc_marketing_automation_tool.sc_translation_task_action
+msgid "Translation Tasks"
+msgstr "Tareas de Traducción"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.actions.server,name:sc_marketing_automation_tool.action_translate_blog_posts
+#: model:ir.actions.act_window,name:sc_marketing_automation_tool.sc_translate_blog_post_wizard_action
+msgid "Translate with AI"
+msgstr "Traducir con IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translate_blog_post_wizard__target_lang_id
+msgid "Target Language"
+msgstr "Idioma Destino"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translate_blog_post_wizard__target_lang_id
+msgid "Select the target language for translation"
+msgstr "Seleccione el idioma destino para la traducción"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_translate_blog_post_wizard__system_instructions
+msgid "AI Instructions"
+msgstr "Instrucciones para la IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_translate_blog_post_wizard__system_instructions
+msgid "Optional instructions to guide the AI's tone and style for the translation"
+msgstr "Instrucciones opcionales para guiar el tono y estilo de la IA para la traducción"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "No blog posts selected for translation."
+msgstr "No se seleccionaron artículos de blog para traducir."
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "Please select a target language."
+msgstr "Por favor seleccione un idioma destino."
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "OpenAI API key not configured. Please configure it in Settings > General Settings > AI Marketing Tools."
+msgstr "Clave API de OpenAI no configurada. Por favor configúrela en Configuración > Configuración General > Herramientas de IA para Marketing."
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "Created %d translation task(s)."
+msgstr "Se crearon %d tarea(s) de traducción."
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "Skipped posts: %s"
+msgstr "Artículos omitidos: %s"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "Translation Tasks Created"
+msgstr "Tareas de Traducción Creadas"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_translate_blog_post_wizard.py:0
+#, python-format
+msgid "No translation tasks were created."
+msgstr "No se crearon tareas de traducción."
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_blog_post__translation_task_ids
+msgid "Translation Tasks"
+msgstr "Tareas de Traducción"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_blog_post__translation_task_ids
+msgid "All translation tasks associated with this blog post"
+msgstr "Todas las tareas de traducción asociadas con este artículo del blog"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_blog_post__translation_in_progress
+msgid "Translation in Progress"
+msgstr "Traducción en Progreso"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_blog_post__translation_in_progress
+msgid "Indicates if a translation for this post is currently queued or in progress"
+msgstr "Indica si una traducción para este artículo está actualmente en cola o en progreso"
+
+#. module: sc_marketing_automation_tool
+#: model:res.groups,name:sc_marketing_automation_tool.group_marketing_manager
+msgid "Marketing Manager"
+msgstr "Gerente de Marketing"
+
+#. module: sc_marketing_automation_tool
+#: model:res.groups,name:sc_marketing_automation_tool.group_marketing_user
+msgid "Marketing User"
+msgstr "Usuario de Marketing"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.content.idea.task,name:sc_marketing_automation_tool.sc_content_idea_task_execute_immediately
+msgid "Execute Now"
+msgstr "Ejecutar Ahora"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.content.idea.task,message:sc_marketing_automation_tool.sc_content_idea_task_executed_successfully
+msgid "Task Executed Successfully"
+msgstr "Tarea Ejecutada Exitosamente"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.content.idea.task,message:sc_marketing_automation_tool.sc_content_idea_task_execution_failed
+msgid "Task Execution Failed"
+msgstr "Falló la Ejecución de la Tarea"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.content.idea.task,message:sc_marketing_automation_tool.sc_content_idea_task_executed_message
+msgid "Content research task \"%s\" has been executed. Generated %d ideas."
+msgstr "La tarea de investigación de contenido \"%s\" ha sido ejecutada. Se generaron %d ideas."
+
+#. module: sc_marketing_automation_tool
+#: model:sc.content.idea.task,message:sc_marketing_automation_tool.sc_content_idea_task_failed_message
+msgid "Content research task failed: %s"
+msgstr "Falló la tarea de investigación de contenido: %s"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.content.idea.task,message:sc_marketing_automation_tool.sc_content_idea_task_no_agent_config
+msgid "No active AI agent configuration found"
+msgstr "No se encontró configuración de agente de IA activo"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.generate.content.wizard,field_description:sc_marketing_automation_tool.field_sc_generate_content_wizard__custom_topic
+msgid "Custom Topic"
+msgstr "Tema Personalizado"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.generate.content.wizard,help:sc_marketing_automation_tool.field_sc_generate_content_wizard__custom_topic
+msgid "Topic or title for the blog post (used when not selecting a content idea)"
+msgstr "Tema o título para el artículo del blog (usado cuando no se selecciona una idea de contenido)"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.generate.content.wizard,field_description:sc_marketing_automation_tool.field_sc_generate_content_wizard__custom_instructions
+msgid "Content Instructions"
+msgstr "Instrucciones de Contenido"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.generate.content.wizard,help:sc_marketing_automation_tool.field_sc_generate_content_wizard__custom_instructions
+msgid "Detailed instructions for content generation (used when not selecting a content idea)"
+msgstr "Instrucciones detalladas para la generación de contenido (usado cuando no se selecciona una idea de contenido)"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.generate.content.wizard,field_description:sc_marketing_automation_tool.field_sc_generate_content_wizard__content_idea_id
+msgid "Content Idea (Optional)"
+msgstr "Idea de Contenido (Opcional)"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.generate.content.wizard,help:sc_marketing_automation_tool.field_sc_generate_content_wizard__content_idea_id
+msgid "Select the content idea to use as source for blog generation (optional)"
+msgstr "Seleccione la idea de contenido para usar como fuente para la generación del blog (opcional)"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.generate.content.wizard:sc_marketing_automation_tool.sc_generate_content_wizard_view_form
+msgid "Content Source"
+msgstr "Fuente de Contenido"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.generate.content.wizard:sc_marketing_automation_tool.sc_generate_content_wizard_view_form
+msgid "OR Custom Content"
+msgstr "O Contenido Personalizado"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.generate.content.wizard:sc_marketing_automation_tool.sc_generate_content_wizard_view_form
+msgid "Generation Settings"
+msgstr "Configuración de Generación"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.content.generation.task,validation_error:sc_marketing_automation_tool.validation_content_source
+msgid "Please provide either:\n• A Content Idea, OR\n• Custom Topic AND Custom Instructions"
+msgstr "Por favor proporcione:\n• Una Idea de Contenido, O\n• Tema Personalizado Y Instrucciones Personalizadas"
+
+#. module: sc_marketing_automation_tool
+#: model:sc.generate.content.wizard,validation_error:sc_marketing_automation_tool.validation_content_source_wizard
+msgid "Please choose only one option:\n• Content Idea, OR\n• Custom Topic + Instructions"
+msgstr "Por favor elija solo una opción:\n• Idea de Contenido, O\n• Tema Personalizado + Instrucciones"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Content generation started"
+msgstr "Generación de contenido iniciada"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Content generation completed successfully"
+msgstr "Generación de contenido completada exitosamente"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Content generation failed: %s"
+msgstr "Falló la generación de contenido: %s"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "No active AI agent configuration found"
+msgstr "No se encontró configuración activa del agente de IA"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Generated content missing required fields: %s"
+msgstr "Contenido generado sin campos requeridos: %s"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Task Executed Successfully"
+msgstr "Tarea Ejecutada Exitosamente"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Content generation task \"%s\" has been executed. Blog post created successfully."
+msgstr "La tarea de generación de contenido \"%s\" ha sido ejecutada. Artículo del blog creado exitosamente."
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Task Execution Failed"
+msgstr "Fallo en la Ejecución de la Tarea"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Content generation task failed: %s"
+msgstr "Falló la tarea de generación de contenido: %s"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.generation.task:sc_marketing_automation_tool.sc_content_generation_task_view_form
+msgid "Execute Now"
+msgstr "Ejecutar Ahora"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_idea.py:0
+msgid "No source URL available"
+msgstr "No hay URL de origen disponible"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_idea.py:0
+msgid "Failed to extract content: %s"
+msgstr "Error al extraer contenido: %s"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_idea.py:0
+msgid "Content Preview"
+msgstr "Vista Previa del Contenido"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_idea.py:0
+msgid "Content Extraction Error"
+msgstr "Error de Extracción de Contenido"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Blog post generation for: %s"
+msgstr "Generación de artículo del blog para: %s"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Blog post generation: %s"
+msgstr "Generación de artículo del blog: %s"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Blog post generation task"
+msgstr "Tarea de generación de artículo del blog"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Only draft tasks can be started"
+msgstr "Solo las tareas en borrador pueden iniciarse"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Task queued for processing"
+msgstr "Tarea en cola para procesamiento"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Only error or done tasks can be retried"
+msgstr "Solo las tareas con error o completadas pueden reintentarse"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Task reset for retry"
+msgstr "Tarea reiniciada para reintento"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "No blog post has been generated yet"
+msgstr "Aún no se ha generado ningún artículo del blog"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "No AI agent configuration available"
+msgstr "No hay configuración de agente de IA disponible"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Generated content missing required fields: %s"
+msgstr "Al contenido generado le faltan campos requeridos: %s"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/models/sc_content_generation_task.py:0
+msgid "Generated Blog Post"
+msgstr "Artículo del Blog Generado"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_generate_content_wizard.py:0
+msgid "Target word count must be at least 100"
+msgstr "El conteo de palabras objetivo debe ser al menos 100"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_generate_content_wizard.py:0
+msgid "Maximum target word count is 5000"
+msgstr "El conteo máximo de palabras objetivo es 5000"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_generate_content_wizard.py:0
+msgid "Please select an AI Agent Configuration"
+msgstr "Por favor seleccione una Configuración de Agente de IA"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_generate_content_wizard.py:0
+msgid "Blog Generation: %s"
+msgstr "Generación de Blog: %s"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_generate_content_wizard.py:0
+msgid "Content generation task created and queued for processing..."
+msgstr "Tarea de generación de contenido creada y puesta en cola para procesamiento..."
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_generate_content_wizard.py:0
+msgid "Content generation task created via wizard. Queued for processing by generation agent."
+msgstr "Tarea de generación de contenido creada mediante asistente. En cola para procesamiento por el agente de generación."
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_generate_content_wizard.py:0
+msgid "Task created successfully. Task ID: %s"
+msgstr "Tarea creada exitosamente. ID de Tarea: %s"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_generate_content_wizard.py:0
+msgid "Content Generation Task"
+msgstr "Tarea de Generación de Contenido"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_content_preview_wizard.py:0
+msgid "Cannot generate content: extraction failed"
+msgstr "No se puede generar contenido: falló la extracción"
+
+#. module: sc_marketing_automation_tool
+#: code:addons/sc_marketing_automation_tool/wizard/sc_content_preview_wizard.py:0
+msgid "Use the full article content for comprehensive analysis and create an engaging blog post."
+msgstr "Utilice el contenido completo del artículo para un análisis exhaustivo y cree un artículo de blog atractivo."
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.idea:sc_marketing_automation_tool.sc_content_idea_view_form
+msgid "Preview Full Content"
+msgstr "Vista Previa del Contenido Completo"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.preview.wizard:sc_marketing_automation_tool.sc_content_preview_wizard_view_form
+msgid "Content Preview"
+msgstr "Vista Previa del Contenido"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.preview.wizard:sc_marketing_automation_tool.sc_content_preview_wizard_view_form
+msgid "Generate Content with Full Source"
+msgstr "Generar Contenido con Fuente Completa"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.preview.wizard:sc_marketing_automation_tool.sc_content_preview_wizard_view_form
+msgid "Close"
+msgstr "Cerrar"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.preview.wizard:sc_marketing_automation_tool.sc_content_preview_wizard_view_form
+msgid "Article Information"
+msgstr "Información del Artículo"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.preview.wizard:sc_marketing_automation_tool.sc_content_preview_wizard_view_form
+msgid "Source"
+msgstr "Fuente"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.preview.wizard:sc_marketing_automation_tool.sc_content_preview_wizard_view_form
+msgid "Meta Description"
+msgstr "Meta Descripción"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.preview.wizard:sc_marketing_automation_tool.sc_content_preview_wizard_view_form
+msgid "Content Preview (First 2000 characters)"
+msgstr "Vista Previa del Contenido (Primeros 2000 caracteres)"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.preview.wizard:sc_marketing_automation_tool.sc_content_preview_wizard_view_form
+msgid "Error Details"
+msgstr "Detalles del Error"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.preview.wizard:sc_marketing_automation_tool.sc_content_preview_wizard_view_form
+msgid "Content Extraction Failed"
+msgstr "Falló la Extracción de Contenido"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.preview.wizard:sc_marketing_automation_tool.sc_content_preview_wizard_view_form
+msgid "Content Successfully Extracted"
+msgstr "Contenido Extraído Exitosamente"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_generate_content_wizard__agent_config_id
+msgid "AI Agent Configuration"
+msgstr "Configuración del Agente de IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_generate_content_wizard__agent_model
+msgid "Agent Model"
+msgstr "Modelo del Agente"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_generate_content_wizard__agent_instructions
+msgid "Agent Instructions"
+msgstr "Instrucciones del Agente"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_generate_content_wizard__custom_agent_instructions
+msgid "Additional Instructions"
+msgstr "Instrucciones Adicionales"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_generate_content_wizard__agent_config_id
+msgid "Select the AI agent configuration to use for content generation"
+msgstr "Seleccione la configuración del agente de IA para usar en la generación de contenido"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_generate_content_wizard__agent_model
+msgid "OpenAI model from selected agent configuration"
+msgstr "Modelo de OpenAI de la configuración del agente seleccionado"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_generate_content_wizard__agent_instructions
+msgid "Instructions from selected agent configuration"
+msgstr "Instrucciones de la configuración del agente seleccionado"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_generate_content_wizard__custom_agent_instructions
+msgid "Additional custom instructions for this specific generation task"
+msgstr "Instrucciones personalizadas adicionales para esta tarea específica de generación"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_content_generation_task__agent_config_id
+msgid "AI Agent Configuration"
+msgstr "Configuración del Agente de IA"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_content_generation_task__agent_config_id
+msgid "The AI agent configuration used for this task"
+msgstr "La configuración del agente de IA utilizada para esta tarea"
+
+#. module: sc_marketing_automation_tool
+#: view:sc.content.generation.task:sc_marketing_automation_tool.sc_content_generation_task_view_form
+msgid "Agent Configuration"
+msgstr "Configuración del Agente"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model,name:sc_marketing_automation_tool.model_web_content_reader
+msgid "Web Content Reading Utilities"
+msgstr "Utilidades de Lectura de Contenido Web"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model,name:sc_marketing_automation_tool.model_sc_content_preview_wizard
+msgid "Content Preview Wizard"
+msgstr "Asistente de Vista Previa de Contenido"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_content_preview_wizard__extracted_title
+msgid "Extracted Title"
+msgstr "Título Extraído"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_content_preview_wizard__extracted_content
+msgid "Extracted Content (Preview)"
+msgstr "Contenido Extraído (Vista Previa)"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_content_preview_wizard__word_count
+msgid "Word Count"
+msgstr "Conteo de Palabras"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_content_preview_wizard__reading_time
+msgid "Reading Time (minutes)"
+msgstr "Tiempo de Lectura (minutos)"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,field_description:sc_marketing_automation_tool.field_sc_content_preview_wizard__extraction_error
+msgid "Extraction Error"
+msgstr "Error de Extracción"
+
+#. module: sc_marketing_automation_tool
+#: model:ir.model.fields,help:sc_marketing_automation_tool.field_sc_content_preview_wizard__extracted_content
+msgid "First 2000 characters of the extracted content"
+msgstr "Primeros 2000 caracteres del contenido extraído"

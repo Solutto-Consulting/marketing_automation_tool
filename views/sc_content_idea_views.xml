@@ -31,6 +31,8 @@
                                 invisible="state != 'draft'"/>
                         <button name="action_view_source" type="object" string="View Source" class="oe_highlight" 
                                 invisible="not url"/>
+                        <button name="action_extract_full_content" type="object" string="Preview Full Content" 
+                                class="btn-info" invisible="not url"/>
                         <button name="action_generate_content" type="object" string="Generate Blog Content" 
                                 class="btn-primary" invisible="state != 'approved'"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>

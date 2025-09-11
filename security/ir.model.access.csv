@@ -26,6 +26,12 @@ access_sc_generate_ideas_wizard_admin,sc.generate.ideas.wizard admin,model_sc_ge
 access_sc_generate_content_wizard_manager,sc.generate.content.wizard manager,model_sc_generate_content_wizard,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
 access_sc_generate_content_wizard_user,sc.generate.content.wizard user,model_sc_generate_content_wizard,sc_marketing_automation_tool.group_marketing_user,1,1,1,0
 access_sc_generate_content_wizard_admin,sc.generate.content.wizard admin,model_sc_generate_content_wizard,base.group_system,1,1,1,1
+access_sc_content_preview_wizard_manager,sc.content.preview.wizard manager,model_sc_content_preview_wizard,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
+access_sc_content_preview_wizard_user,sc.content.preview.wizard user,model_sc_content_preview_wizard,sc_marketing_automation_tool.group_marketing_user,1,1,1,0
+access_sc_content_preview_wizard_admin,sc.content.preview.wizard admin,model_sc_content_preview_wizard,base.group_system,1,1,1,1
+access_web_content_reader_manager,web.content.reader manager,model_web_content_reader,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
+access_web_content_reader_user,web.content.reader user,model_web_content_reader,sc_marketing_automation_tool.group_marketing_user,1,0,0,0
+access_web_content_reader_admin,web.content.reader admin,model_web_content_reader,base.group_system,1,1,1,1
 access_sc_ai_agent_config_manager,sc.ai.agent.config manager,model_sc_ai_agent_config,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
 access_sc_ai_agent_config_user,sc.ai.agent.config user,model_sc_ai_agent_config,sc_marketing_automation_tool.group_marketing_user,1,0,0,0
 access_sc_ai_agent_config_admin,sc.ai.agent.config admin,model_sc_ai_agent_config,base.group_system,1,1,1,1

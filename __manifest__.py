@@ -71,6 +71,7 @@ Technical Requirements:
         'wizard/sc_translate_blog_post_wizard_views.xml',
         'views/sc_generate_ideas_wizard_views.xml',
         'views/sc_generate_content_wizard_views.xml',
+        'views/sc_content_preview_wizard_views.xml',
         # Data that depends on views/actions (load after views)
         'data/sc_ai_agent_config_data.xml',
         # Menus must load LAST (after all actions are defined)

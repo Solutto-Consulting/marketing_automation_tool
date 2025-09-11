@@ -515,3 +515,60 @@ Return ONLY the JSON object, no additional text or explanation.
                 'error': str(e),
                 'message': f"Failed to fetch usage data: {str(e)}"
             }
+
+    @api.model
+    def generate_content(self, model_name, system_instructions, content_source, user_prompt=""):
+        """
+        Synchronous wrapper for content generation
+        
+        Args:
+            model_name (str): The OpenAI model to use
+            system_instructions (str): Instructions for the generation agent
+            content_source (dict): Content source with name, url, summary fields
+            user_prompt (str): Additional user instructions
+            
+        Returns:
+            dict: Generated content with structure {'title': str, 'content': str, 'meta_description': str, 'keywords': str}
+        """
+        try:
+            # Get API configuration from Odoo settings
+            api_key = self.env['ir.config_parameter'].sudo().get_param('sc_marketing_automation_tool.openai_api_key')
+            org_id = self.env['ir.config_parameter'].sudo().get_param('sc_marketing_automation_tool.openai_organization_id')
+            
+            if not api_key:
+                raise Exception("OpenAI API key not configured in settings")
+            
+            # Configure environment variables for agents SDK
+            import os
+            os.environ['OPENAI_API_KEY'] = str(api_key)
+            if org_id:
+                os.environ['OPENAI_ORGANIZATION'] = str(org_id)
+            
+            # Run the async function synchronously
+            import asyncio
+            
+            # Get or create event loop
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # If loop is already running, we need to run in a new thread
+                    import concurrent.futures
+                    with concurrent.futures.ThreadPoolExecutor() as executor:
+                        future = executor.submit(
+                            asyncio.run,
+                            self.perform_content_generation(model_name, system_instructions, content_source, user_prompt)
+                        )
+                        return future.result()
+                else:
+                    return loop.run_until_complete(
+                        self.perform_content_generation(model_name, system_instructions, content_source, user_prompt)
+                    )
+            except RuntimeError:
+                # No event loop in current thread, create new one
+                return asyncio.run(
+                    self.perform_content_generation(model_name, system_instructions, content_source, user_prompt)
+                )
+                
+        except Exception as e:
+            _logger.error("Content generation failed: %s", str(e))
+            raise Exception(f"Content generation failed: {str(e)}")

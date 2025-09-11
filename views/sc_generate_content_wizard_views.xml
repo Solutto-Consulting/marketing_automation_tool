@@ -37,9 +37,12 @@
                                 <field name="blog_id" required="1" 
                                        domain="[('active', '=', True)]"/>
                                 <field name="target_word_count" required="1"/>
-                                <field name="agent_model" required="1"/>
-                                <field name="agent_instructions" 
-                                       placeholder="Additional instructions for the agent..."/>
+                                <field name="agent_config_id" required="1" 
+                                       domain="[('active', '=', True)]"/>
+                                <field name="agent_model" readonly="1"/>
+                                <field name="agent_instructions" readonly="1"/>
+                                <field name="custom_agent_instructions" 
+                                       placeholder="Additional custom instructions for this generation..."/>
                             </group>
                         </group>
                         

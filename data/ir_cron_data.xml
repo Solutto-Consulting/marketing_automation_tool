@@ -52,5 +52,18 @@
             <field name="active">True</field>
             <field name="priority">15</field>
         </record>
+
+        <!-- Cron job to clean old completed generation tasks -->
+        <record id="cron_cleanup_old_generation_tasks" model="ir.cron">
+            <field name="name">Cleanup Old Completed Generation Tasks</field>
+            <field name="model_id" ref="model_sc_content_generation_task"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_cleanup_old_tasks()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="nextcall" eval="(datetime.now().replace(hour=2, minute=30, second=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="active">True</field>
+            <field name="priority">15</field>
+        </record>
     </data>
 </odoo>

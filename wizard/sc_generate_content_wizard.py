@@ -46,16 +46,32 @@ class ScGenerateContentWizard(models.TransientModel):
         help="Approximate word count for the generated blog post"
     )
     
-    agent_model = fields.Char(
+    # Agent configuration
+    agent_config_id = fields.Many2one(
+        'sc.ai.agent.config',
+        string="AI Agent Configuration",
+        domain=[('active', '=', True)],
+        help="Select the AI agent configuration to use for content generation"
+    )
+    
+    agent_model = fields.Selection(
+        selection='_get_openai_models',
         string="Agent Model",
-        default="gpt-4o-mini",
-        required=True,
-        help="OpenAI model to use for content generation"
+        related='agent_config_id.model',
+        readonly=True,
+        help="OpenAI model from selected agent configuration"
     )
     
     agent_instructions = fields.Text(
         string="Agent Instructions",
-        help="Custom instructions for the content generation agent"
+        related='agent_config_id.instructions',
+        readonly=True,
+        help="Instructions from selected agent configuration"
+    )
+    
+    custom_agent_instructions = fields.Text(
+        string="Additional Instructions",
+        help="Additional custom instructions for this specific generation task"
     )
     
     auto_publish = fields.Boolean(
@@ -125,6 +141,20 @@ class ScGenerateContentWizard(models.TransientModel):
     )
     
     @api.model
+    def _get_openai_models(self):
+        """Get available OpenAI models from settings"""
+        try:
+            config_settings = self.env['res.config.settings']
+            return config_settings._get_openai_models()
+        except:
+            # Fallback models if settings not available
+            return [
+                ('gpt-4o', 'GPT-4o'),
+                ('gpt-4-turbo', 'GPT-4 Turbo'),
+                ('gpt-3.5-turbo', 'GPT-3.5 Turbo'),
+            ]
+
+    @api.model
     def default_get(self, fields_list):
         """Set default values from configuration"""
         defaults = super().default_get(fields_list)
@@ -160,6 +190,13 @@ class ScGenerateContentWizard(models.TransientModel):
                 raise ValidationError(_("Target word count must be at least 100"))
             if record.target_word_count > 5000:
                 raise ValidationError(_("Maximum target word count is 5000"))
+    
+    @api.constrains('agent_config_id')
+    def _check_agent_config(self):
+        """Validate agent configuration selection"""
+        for record in self:
+            if not record.agent_config_id:
+                raise ValidationError(_("Please select an AI Agent Configuration"))
     
     @api.constrains('content_idea_id', 'custom_topic', 'custom_instructions')
     def _check_content_source(self):
@@ -205,8 +242,8 @@ class ScGenerateContentWizard(models.TransientModel):
             'name': task_name,
             'target_blog_id': self.blog_id.id,
             'target_word_count': self.target_word_count,
-            'agent_model': self.agent_model,
-            'agent_instructions': self.agent_instructions or '',
+            'agent_config_id': self.agent_config_id.id,
+            'user_prompt': self.custom_agent_instructions or '',
             'auto_publish': self.auto_publish,
             'generate_meta_tags': self.generate_meta_tags,
             'state': 'draft',
