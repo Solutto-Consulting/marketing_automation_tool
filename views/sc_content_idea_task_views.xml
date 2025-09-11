@@ -183,7 +183,7 @@
         <record id="action_sc_content_idea_task" model="ir.actions.act_window">
             <field name="name">Content Research Tasks</field>
             <field name="res_model">sc.content.idea.task</field>
-            <field name="view_mode">kanban,tree,form</field>
+            <field name="view_mode">kanban,list,form</field>
             <field name="context">{'search_default_recent': 1}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">

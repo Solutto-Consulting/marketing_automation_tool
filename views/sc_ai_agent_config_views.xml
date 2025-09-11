@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI Agent Configuration List View -->
+    <record id="sc_ai_agent_config_view_list" model="ir.ui.view">
+        <field name="name">sc.ai.agent.config.list</field>
+        <field name="model">sc.ai.agent.config</field>
+        <field name="arch" type="xml">
+            <list string="AI Agent Configurations" editable="top">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="agent_type"/>
+                <field name="model"/>
+                <field name="is_default"/>
+                <field name="usage_count"/>
+                <field name="last_used"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- AI Agent Configuration Form View -->
+    <record id="sc_ai_agent_config_view_form" model="ir.ui.view">
+        <field name="name">sc.ai.agent.config.form</field>
+        <field name="model">sc.ai.agent.config</field>
+        <field name="arch" type="xml">
+            <form string="AI Agent Configuration">
+                <header>
+                    <button name="action_set_as_default" type="object" string="Set as Default" 
+                            class="btn-primary" invisible="is_default"/>
+                    <button name="action_duplicate" type="object" string="Duplicate" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_use_agent" type="object" class="oe_stat_button" icon="fa-play">
+                            <field name="usage_count" widget="statinfo" string="Times Used"/>
+                        </button>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="agent_type"/>
+                            <field name="model"/>
+                            <field name="is_default"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="last_used"/>
+                            <field name="created_by"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Instructions" name="instructions">
+                            <group>
+                                <field name="instructions" nolabel="1" widget="text" 
+                                       placeholder="Enter detailed system instructions for this AI agent..."/>
+                            </group>
+                        </page>
+                        
+                        <page string="Default Query" name="default_query">
+                            <group>
+                                <field name="default_query" nolabel="1" widget="text" 
+                                       placeholder="Enter default query template (use {today} for date placeholders)..."/>
+                            </group>
+                        </page>
+                        
+                        <page string="Notes" name="notes">
+                            <group>
+                                <field name="notes" nolabel="1" widget="text" 
+                                       placeholder="Additional notes about this agent configuration..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- AI Agent Configuration Kanban View -->
+    <record id="sc_ai_agent_config_view_kanban" model="ir.ui.view">
+        <field name="name">sc.ai.agent.config.kanban</field>
+        <field name="model">sc.ai.agent.config</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="agent_type" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="agent_type"/>
+                <field name="model"/>
+                <field name="is_default"/>
+                <field name="usage_count"/>
+                <field name="last_used"/>
+                <field name="active"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_title">
+                                    <field name="name"/>
+                                    <span class="float-end">
+                                        <span t-if="record.is_default.raw_value" class="badge badge-success">Default</span>
+                                        <span t-if="!record.active.raw_value" class="badge badge-secondary">Inactive</span>
+                                    </span>
+                                </div>
+                                <div class="o_kanban_record_subtitle text-muted">
+                                    <i class="fa fa-microchip"/> <field name="model"/>
+                                </div>
+                                <div class="o_kanban_record_bottom mt16">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span class="badge badge-pill badge-info">
+                                            <i class="fa fa-play"/> <field name="usage_count"/> uses
+                                        </span>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <button name="action_set_as_default" type="object" 
+                                                class="btn btn-sm btn-primary" 
+                                                invisible="is_default">Set Default</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- AI Agent Configuration Search View -->
+    <record id="sc_ai_agent_config_view_search" model="ir.ui.view">
+        <field name="name">sc.ai.agent.config.search</field>
+        <field name="model">sc.ai.agent.config</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Agent Name"/>
+                <field name="agent_type" string="Agent Type"/>
+                <field name="model" string="OpenAI Model"/>
+                <filter name="research_agents" string="Research Agents" 
+                        domain="[('agent_type', '=', 'research')]"/>
+                <filter name="generation_agents" string="Generation Agents" 
+                        domain="[('agent_type', '=', 'generation')]"/>
+                <filter name="default_agents" string="Default Agents" 
+                        domain="[('is_default', '=', True)]"/>
+                <filter name="active" string="Active" 
+                        domain="[('active', '=', True)]"/>
+                <filter name="inactive" string="Inactive" 
+                        domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_type" string="Agent Type" context="{'group_by': 'agent_type'}"/>
+                    <filter name="group_by_model" string="OpenAI Model" context="{'group_by': 'model'}"/>
+                    <filter name="group_by_default" string="Default Status" context="{'group_by': 'is_default'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- AI Agent Configuration Action -->
+    <record id="action_sc_ai_agent_config" model="ir.actions.act_window">
+        <field name="name">AI Agent Configurations</field>
+        <field name="res_model">sc.ai.agent.config</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first AI agent configuration
+            </p>
+            <p>
+                AI agents power the content research and generation features of this module.
+                Configure different agents with specific instructions, models, and behaviors
+                to optimize your content automation workflow.
+            </p>
+        </field>
+    </record>
+
+</odoo>

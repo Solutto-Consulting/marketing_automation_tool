@@ -38,34 +38,11 @@ class ResConfigSettings(models.TransientModel):
         default='gpt-4o',
     )
     
-    sc_research_agent_instructions = fields.Text(
-        string="Research Agent Instructions",
-        help="System instructions for the Content Research Agent",
-        config_parameter='sc_marketing_automation_tool.research_agent_instructions',
-        default="""You are a content research agent specialized in finding relevant, recent articles and news for content marketing.
-
-Your task is to search the web for articles related to the given topic and return a structured list of content ideas.
-
-For each article you find, provide:
-1. The article title
-2. The full URL to the article
-3. The publication date (if available)
-4. A concise summary highlighting the key points and why it would be valuable for content creation
-
-Focus on:
-- Recent articles (preferably within the last 6 months)
-- Authoritative sources and industry publications
-- Trending topics and emerging insights
-- Actionable information that can inspire blog content
-
-Return your findings as a JSON list with the specified structure.""",
-    )
-    
-    sc_research_agent_default_query = fields.Text(
-        string="Default Research Query",
-        help="Default search query that will populate the research wizard",
-        config_parameter='sc_marketing_automation_tool.research_agent_default_query',
-        default="Find recent articles about digital marketing trends and best practices published after {today}",
+    sc_enable_agent_config = fields.Boolean(
+        string="Enable AI Agent Configurations",
+        help="Enable advanced AI agent configuration management",
+        config_parameter='sc_marketing_automation_tool.enable_agent_config',
+        default=True,
     )
     
     # Content Generation Agent Configuration  
@@ -75,31 +52,6 @@ Return your findings as a JSON list with the specified structure.""",
         help="Select the OpenAI model for the Content Generation Agent",
         config_parameter='sc_marketing_automation_tool.generation_agent_model',
         default='gpt-4o',
-    )
-    
-    sc_generation_agent_instructions = fields.Text(
-        string="Generation Agent Instructions",
-        help="System instructions for the Content Generation Agent",
-        config_parameter='sc_marketing_automation_tool.generation_agent_instructions',
-        default="""You are a professional content writer specialized in creating engaging blog posts for business audiences.
-
-Your task is to create a complete blog post based on the provided source content and user requirements.
-
-Generate a comprehensive blog post with:
-1. An engaging, SEO-friendly title
-2. Well-structured HTML content with proper headings, paragraphs, and formatting
-3. A compelling meta description for SEO
-4. Relevant keywords for content optimization
-
-Content Guidelines:
-- Write in a professional yet engaging tone
-- Use clear headings and subheadings (H2, H3)
-- Include actionable insights and practical advice
-- Aim for 800-1500 words depending on the topic
-- Ensure content is original and adds value beyond the source material
-- Include a strong introduction and conclusion
-
-Return your response as a JSON object with the specified structure containing title, content, meta_description, and keywords.""",
     )
     
     @api.model

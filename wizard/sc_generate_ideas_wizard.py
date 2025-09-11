@@ -68,23 +68,12 @@ class ScGenerateIdeasWizard(models.TransientModel):
         """Set default values from configuration"""
         defaults = super().default_get(fields_list)
         
-        # Get default query from settings
-        default_query = self.env['ir.config_parameter'].sudo().get_param(
-            'sc_marketing_automation_tool.research_agent_default_query',
-            'Find recent articles about digital marketing trends and best practices published after {today}'
-        )
+        # Get default values from research agent configuration
+        agent_config = self.env['sc.ai.agent.config'].get_default_agent('research')
         
-        # Get default agent model from settings
-        default_agent_model = self.env['ir.config_parameter'].sudo().get_param(
-            'sc_marketing_automation_tool.research_agent_model', 
-            'gpt-4o-mini'
-        )
-        
-        # Get default agent instructions from settings
-        default_instructions = self.env['ir.config_parameter'].sudo().get_param(
-            'sc_marketing_automation_tool.research_agent_instructions',
-            ''
-        )
+        default_query = agent_config.default_query if agent_config else 'Find recent articles about digital marketing trends and best practices published after {today}'
+        default_agent_model = agent_config.model if agent_config else 'gpt-4o'
+        default_instructions = agent_config.instructions if agent_config else ''
         
         if 'query' in fields_list:
             defaults['query'] = default_query

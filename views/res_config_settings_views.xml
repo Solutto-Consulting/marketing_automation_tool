@@ -38,48 +38,46 @@
                     </div>
                 </setting>
                 
-                <!-- Content Research Agent Settings v18.0.1.0.1 -->
-                <setting id="sc_research_agent_setting" string="Content Research Agent">
+                <!-- AI Agent Configuration v18.0.1.0.1 -->
+                <setting id="sc_ai_agent_setting" string="AI Agent Management">
                     <div class="content-group">
                         <div class="mt16">
-                            <label for="sc_research_agent_model" class="o_light_label">Research Agent Model</label>
-                            <field name="sc_research_agent_model"/>
+                            <field name="sc_enable_agent_config"/>
+                            <label for="sc_enable_agent_config" class="o_light_label">Enable Advanced Agent Management</label>
                             <div class="text-muted">
-                                OpenAI model for content research and topic generation.
+                                Enable comprehensive AI agent configuration system with custom instructions, models, and templates.
                             </div>
                         </div>
-                        <div class="mt16">
-                            <label for="sc_research_agent_instructions" class="o_light_label">Agent Instructions</label>
-                            <field name="sc_research_agent_instructions"/>
-                            <div class="text-muted">
-                                System instructions that guide the research agent behavior.
-                            </div>
-                        </div>
-                        <div class="mt16">
-                            <label for="sc_research_agent_default_query" class="o_light_label">Default Search Query</label>
-                            <field name="sc_research_agent_default_query"/>
-                            <div class="text-muted">
-                                Default search query template (use {today} for current date).
+                        <div class="mt16" invisible="not sc_enable_agent_config">
+                            <div class="alert alert-info">
+                                <strong>Advanced AI Agent Configuration is Active!</strong><br/>
+                                Configure your AI agents with detailed instructions, custom models, and specialized templates.
+                                <br/><br/>
+                                <button name="%(action_sc_ai_agent_config)d" 
+                                        string="Manage AI Agent Configurations" 
+                                        type="action" 
+                                        class="btn btn-primary btn-sm"
+                                        icon="fa-cogs"/>
                             </div>
                         </div>
                     </div>
                 </setting>
                 
-                <!-- Content Generation Agent Settings v18.0.1.0.1 -->
-                <setting id="sc_generation_agent_setting" string="Content Generation Agent">
+                <!-- Legacy Agent Model Settings (for backward compatibility) -->
+                <setting id="sc_legacy_agent_setting" string="Legacy Agent Models" invisible="sc_enable_agent_config">
                     <div class="content-group">
+                        <div class="mt16">
+                            <label for="sc_research_agent_model" class="o_light_label">Research Agent Model</label>
+                            <field name="sc_research_agent_model"/>
+                            <div class="text-muted">
+                                OpenAI model for content research (legacy setting - upgrade to advanced agent management).
+                            </div>
+                        </div>
                         <div class="mt16">
                             <label for="sc_generation_agent_model" class="o_light_label">Generation Agent Model</label>
                             <field name="sc_generation_agent_model"/>
                             <div class="text-muted">
-                                OpenAI model for blog content generation.
-                            </div>
-                        </div>
-                        <div class="mt16">
-                            <label for="sc_generation_agent_instructions" class="o_light_label">Agent Instructions</label>
-                            <field name="sc_generation_agent_instructions"/>
-                            <div class="text-muted">
-                                System instructions for the content generation agent.
+                                OpenAI model for content generation (legacy setting - upgrade to advanced agent management).
                             </div>
                         </div>
                     </div>

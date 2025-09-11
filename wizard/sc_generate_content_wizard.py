@@ -119,17 +119,11 @@ class ScGenerateContentWizard(models.TransientModel):
         """Set default values from configuration"""
         defaults = super().default_get(fields_list)
         
-        # Get default agent model from settings
-        default_agent_model = self.env['ir.config_parameter'].sudo().get_param(
-            'sc_marketing_automation_tool.generation_agent_model', 
-            'gpt-4o-mini'
-        )
+        # Get default values from generation agent configuration
+        agent_config = self.env['sc.ai.agent.config'].get_default_agent('generation')
         
-        # Get default agent instructions from settings
-        default_instructions = self.env['ir.config_parameter'].sudo().get_param(
-            'sc_marketing_automation_tool.generation_agent_instructions',
-            ''
-        )
+        default_agent_model = agent_config.model if agent_config else 'gpt-4o'
+        default_instructions = agent_config.instructions if agent_config else ''
         
         # Set default blog if only one exists
         if 'blog_id' in fields_list:

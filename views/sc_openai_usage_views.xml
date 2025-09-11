@@ -143,7 +143,7 @@
         <record id="action_sc_openai_usage_snapshot" model="ir.actions.act_window">
             <field name="name">OpenAI Usage Statistics</field>
             <field name="res_model">sc.openai.usage.snapshot</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
             <field name="context">{'search_default_last_30_days': 1}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">

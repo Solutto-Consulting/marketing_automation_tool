@@ -54,10 +54,12 @@ Technical Requirements:
         # Security must come first
         'security/sc_marketing_automation_tool_security.xml',
         'security/ir.model.access.csv',
-        # Data and configuration
+        # Data and configuration (basic setup)
         'data/ir_cron_data.xml',
         'data/server_actions.xml',
         # Views (must load before menus that reference them)
+        # AI agent config views MUST load before settings views (action dependency)
+        'views/sc_ai_agent_config_views.xml',
         'views/res_config_settings_views.xml',
         'views/sc_translation_task_views.xml',
         'views/sc_content_idea_views.xml',
@@ -69,6 +71,8 @@ Technical Requirements:
         'wizard/sc_translate_blog_post_wizard_views.xml',
         'views/sc_generate_ideas_wizard_views.xml',
         'views/sc_generate_content_wizard_views.xml',
+        # Data that depends on views/actions (load after views)
+        'data/sc_ai_agent_config_data.xml',
         # Menus must load LAST (after all actions are defined)
         'views/menu_views.xml',
     ],
