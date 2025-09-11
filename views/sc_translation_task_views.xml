@@ -32,17 +32,37 @@
                             class="btn-primary"
                             invisible="state != 'draft'"
                             confirm="This will translate the blog post. Continue?"/>
+                    <button name="action_emergency_fix_translation" 
+                            string="🚨 Emergency Fix" 
+                            type="object" 
+                            class="btn-warning"
+                            invisible="state != 'done'"
+                            confirm="This will force a fresh translation using the proven method. Continue?"
+                            help="Emergency fix for identical content in both languages"/>
                     <button name="action_verify_translations" 
                             string="Verify Translations" 
                             type="object" 
                             class="btn-info"
                             invisible="state == 'draft'"/>
+                    <button name="action_diagnose_translation_issues" 
+                            string="Diagnose Issues" 
+                            type="object" 
+                            class="btn-secondary"
+                            invisible="state == 'draft'"
+                            help="Diagnose translation problems and get fix recommendations"/>
                     <button name="action_validate_html_structure" 
                             string="Validate HTML Structure" 
                             type="object" 
                             class="btn-info"
                             invisible="state == 'draft'"
                             help="Check if HTML structure is consistent between original and translated content"/>
+                    <button name="action_retranslate_blog_post" 
+                            string="Fix Translation" 
+                            type="object" 
+                            class="btn-warning"
+                            invisible="state != 'done'"
+                            confirm="This will reapply the translation using the correct method. Continue?"
+                            help="Use this if the translation didn't apply correctly"/>
                     <button name="action_reset_to_draft" 
                             string="Reset to Draft" 
                             type="object" 

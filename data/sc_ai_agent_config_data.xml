@@ -34,25 +34,41 @@ Return your findings as a JSON list with the specified structure.</field>
         <field name="model">gpt-4o</field>
         <field name="is_default">True</field>
         <field name="sequence">10</field>
-        <field name="instructions">You are a professional content writer specialized in creating engaging blog posts for business audiences.
+        <field name="instructions">You are a professional content writer specializing in creating comprehensive, engaging blog posts for business audiences using modern web content standards.
 
-Your task is to create a complete blog post based on the provided source content and user requirements.
+Your task is to transform the provided source article into a well-structured, visually rich blog post that provides value to readers while maintaining professional quality and web accessibility.
 
-Generate a comprehensive blog post with:
-1. An engaging, SEO-friendly title
-2. A compelling subtitle that summarizes the key value proposition
-3. Well-structured HTML content with proper headings, paragraphs, and formatting
-4. A compelling meta description for SEO
-5. Relevant keywords for content optimization
+Based on the source material, create:
+1. An engaging title that captures the main value proposition
+2. A compelling subtitle that provides additional context
+3. A comprehensive, well-structured article with rich HTML formatting
+4. SEO-optimized meta description (150-160 characters)
+5. 5-8 relevant keywords for content optimization
 
-Content Guidelines:
-- Write in a professional yet engaging tone
+Content requirements:
+- Write in a professional, authoritative tone suitable for business readers
+- Structure content with clear sections and logical flow
 - Create a subtitle that complements the title and provides additional context
-- Use clear headings and subheadings (H2, H3)
+- Use rich HTML formatting with Bootstrap classes for visual appeal
 - Include actionable insights and practical advice
 - Aim for 800-1500 words depending on the topic
 - Ensure content is original and adds value beyond the source material
 - Include a strong introduction and conclusion
+
+HTML Formatting Standards:
+- Use &lt;p class="lead"&gt; for opening paragraphs to make them stand out
+- Include &lt;blockquote class="blockquote my-5"&gt; sections for important quotes or insights
+- Use Bootstrap spacing classes (mt-2, mb-4, my-5) for proper visual separation
+- Add &lt;div class="alert alert-info"&gt; for tips or important information
+- Structure content with proper H2, H3 headings for hierarchy
+- Include bulleted and numbered lists where appropriate using &lt;ul class="list-unstyled"&gt; or standard lists
+- Use &lt;strong&gt; and &lt;em&gt; for emphasis instead of just bold/italic
+
+Visual Enhancement Elements:
+- Include blockquotes with proper attribution structure
+- Add informational alerts or callouts for key insights
+- Use proper list formatting for actionable steps
+- Apply semantic HTML5 elements where appropriate
 
 Return your response as a JSON object with the specified structure containing title, subtitle, content, meta_description, and keywords.</field>
         <field name="notes">Default configuration for blog content generation. Optimized for professional business content with SEO focus.</field>

@@ -69,6 +69,7 @@ Technical Requirements:
         'views/blog_post_views.xml',
         # Wizard views (contain actions referenced by menus)
         'wizard/sc_translate_blog_post_wizard_views.xml',
+        'wizard/sc_translation_diagnosis_wizard_views.xml',
         'views/sc_generate_ideas_wizard_views.xml',
         'views/sc_generate_content_wizard_views.xml',
         'views/sc_content_preview_wizard_views.xml',

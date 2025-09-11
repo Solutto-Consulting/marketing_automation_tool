@@ -35,3 +35,6 @@ access_web_content_reader_admin,web.content.reader admin,model_web_content_reade
 access_sc_ai_agent_config_manager,sc.ai.agent.config manager,model_sc_ai_agent_config,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
 access_sc_ai_agent_config_user,sc.ai.agent.config user,model_sc_ai_agent_config,sc_marketing_automation_tool.group_marketing_user,1,0,0,0
 access_sc_ai_agent_config_admin,sc.ai.agent.config admin,model_sc_ai_agent_config,base.group_system,1,1,1,1
+access_sc_translation_diagnosis_wizard_manager,sc.translation.diagnosis.wizard manager,model_sc_translation_diagnosis_wizard,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
+access_sc_translation_diagnosis_wizard_user,sc.translation.diagnosis.wizard user,model_sc_translation_diagnosis_wizard,sc_marketing_automation_tool.group_marketing_user,1,1,1,0
+access_sc_translation_diagnosis_wizard_admin,sc.translation.diagnosis.wizard admin,model_sc_translation_diagnosis_wizard,base.group_system,1,1,1,1
