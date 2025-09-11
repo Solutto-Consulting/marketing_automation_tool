@@ -1,411 +1,344 @@
-# Implementation Plan: sc_marketing_automation_tool (v18.0.1.0.0)
+# Implementation Plan: SC Marketing Automation Tool v18.0.1.0.1
 
 ## Plan Metadata
-- **Module Name**: sc_marketing_automation_tool
-- **Module Path**: /home/gilsonrincon/development/odoo18/custom-addons/sc_marketing_automation_tool
-- **Spec Path**: /home/gilsonrincon/development/odoo18/custom-addons/sc_marketing_automation_tool/docs/Technical-specs-v2025-sep-04.md
-- **Spec Version**: v2025-sep-04
-- **Last Updated**: 2025-09-09T00:00:00Z
-- **Target Odoo Version**: 18.0
+- **Module**: sc_marketing_automation_tool
+- **Target Version**: 18.0.1.0.1
+- **Spec Version**: 18.0.1.0.1
+- **Spec Path**: `/home/gilsonrincon/development/odoo18/custom-addons/sc_marketing_automation_tool/docs/Technical Specifications v18.0.1.0.1.md`
+- **Module Path**: `/home/gilsonrincon/development/odoo18/custom-addons/sc_marketing_automation_tool`
+- **Last Updated**: 2025-09-11T17:00:00Z
 
 ---
 
 ## Module Overview
 
-The **Content Management Tool for Odoo** enhances and automates marketing activities by integrating OpenAI for AI-powered content translation of blog posts. This initial version provides administrators with bulk translation capabilities via a user-friendly wizard, asynchronous background processing through cron jobs, and comprehensive task tracking with status management.
-
-**Key Features:**
-- OpenAI integration with centralized configuration
-- Bulk blog post translation with AI
-- User-friendly translation wizard
-- Asynchronous background processing
-- Translation task logging and status management
-- Error handling and task reset capabilities
-
----
-
-## External Research
-
-### OpenAI Agents Python Library
-- **Library**: openai-agents
-- **Installation**: `pip install openai-agents`
-- **Official Repository**: https://github.com/openai/openai-agents-python
-- **Documentation**: https://github.com/openai/openai-agents-python/blob/main/docs/quickstart.md
-- **Usage Pattern**: Asynchronous Agent/Runner architecture
-- **Version**: Latest stable (0.2.9 available)
-- **Key Classes**: 
-  - `Agent`: Configures AI assistant with instructions and model
-  - `Runner`: Executes agent interactions asynchronously
-
-**Integration Requirements**:
-- Environment variables for API key/organization ID management
-- Async/await pattern within Odoo cron context
-- Error handling for API timeouts and rate limits
-- JSON-based prompt/response structure for content translation
-
----
-
-## Core Examples Research
-
-**Settings Configuration Inheritance**:
-- **Reference Path**: `/home/gilsonrincon/development/odoo18/odoo-src/addons/base_setup/views/res_config_settings_views.xml`
-- **Anchor Strategy**: Use stable `//setting[@id='...']` xpath selectors
-- **Inherit ID**: `base_setup.res_config_settings_view_form` (confirmed available)
-- **Pattern**: Place settings within `<setting>` blocks with descriptive IDs
-
----
-
-## Milestone 1: Module Foundation & Configuration
-
-### Task 1 → SP-3.1 & SP-4
-**Task**: Module Structure and Dependencies Setup
-**Description**: Create base module structure with proper Odoo 18.0 manifest and dependencies
-**Technical Instructions**:
-- Create `__init__.py` and `__manifest__.py` with dependencies: base, website, website_blog
-- Add external library requirements.txt with openai-agents
-- Follow Solutto standards: English-only, proper structure, i18n setup
-- [ ] Complete
-
-### Task 2 → SP-4
-**Task**: OpenAI Configuration Settings
-**Description**: Implement res.config.settings inheritance for OpenAI credentials
-**Technical Instructions**:
-- Inherit from `base_setup.res_config_settings_view_form` (reference: `/home/gilsonrincon/development/odoo18/odoo-src/addons/base_setup/views/res_config_settings_views.xml`)
-- Use stable anchor: `//setting[@id='partner_autocomplete']` with `position="after"`
-- Create AI Marketing Tools section with fields: sc_openai_api_key (password=True), sc_openai_organization_id, sc_openai_model (Selection)
-- Implement dynamic model selection via OpenAI API call with fallback defaults
-- [ ] Complete
-
-### Task 3 → SP-4
-**Task**: Dynamic Model Selection Implementation
-**Description**: API-driven OpenAI model selection with fallback
-**Technical Instructions**:
-- Method to call OpenAI v1/models endpoint
-- Filter models (gpt- prefix), return tuple list for Selection field
-- Fallback to ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'] on API failure
-- Default: gpt-4o
-- [ ] Complete
-
----
-
-## Milestone 2: Data Models & Core Logic
-
-### Task 4 → SP-5.1
-**Task**: Translation Task Model
-**Description**: Create sc.translation.task model for tracking translations
-**Technical Instructions**:
-- Model: sc.translation.task
-- Fields: name (Char, required), blog_post_id (Many2one, ondelete='cascade'), target_lang_id (Many2one), system_instructions (Text), state (Selection: draft/in_progress/done/error), error_message (Text)
-- Inherit mail.thread for chatter integration (add "mail" to depends)
-- [ ] Complete
-
-### Task 5 → SP-5.2
-**Task**: Blog Post Extension
-**Description**: Extend blog.post model with translation tracking
-**Technical Instructions**:
-- Inherit blog.post model
-- Add fields: translation_task_ids (One2many), translation_in_progress (Boolean, default=False)
-- Ensure proper relationship with sc.translation.task
-- [ ] Complete
-
----
-
-## Milestone 3: User Interface & Views
-
-### Task 6 → SP-6.1
-**Task**: Server Action Implementation
-**Description**: Create "Translate with AI" server action for blog.post
-**Technical Instructions**:
-- ir.actions.server record targeting blog.post model
-- Action launches sc.translate.blog.post.wizard
-- Apply Odoo 18.0 standards: use `<list>` instead of `<tree>`
-- [ ] Complete
-
-### Task 7 → SP-6.2
-**Task**: Translation Wizard
-**Description**: Create wizard for translation input
-**Technical Instructions**:
-- Transient model: sc.translate.blog.post.wizard
-- Fields: target_lang_id (Many2one with domain: website_published=True), system_instructions (Text)
-- Form view with modal dialog presentation
-- Buttons: Translate (action) and Cancel
-- [ ] Complete
-
-### Task 8 → SP-6.3
-**Task**: Translation Task Views
-**Description**: Create management views for translation tasks
-**Technical Instructions**:
-- Menu: Marketing Automation > Content Translation > Translation Tasks
-- List view: name, blog_post_id, target_lang_id, state (widget="badge" with decorations)
-- Form view: all details, error_message (conditional), "Reset to Draft" button
-- Kanban view with meaningful default_group_by (MANDATORY: use state field)
-- [ ] Complete
-
-### Task 9 → SP-6.4
-**Task**: Blog Post Form Enhancement
-**Description**: Add translation history to blog.post form
-**Technical Instructions**:
-- Add "Translation History" page to notebook
-- Display translation_task_ids as tree view
-- Include chatter at form end (after </sheet>)
-- [ ] Complete
-
----
-
-## Milestone 4: Business Logic & AI Integration
-
-### Task 10 → SP-7.1
-**Task**: Translation Wizard Logic
-**Description**: Implement wizard action for task creation
-**Technical Instructions**:
-- Process active_ids from context (selected blog posts)
-- Skip posts with translation_in_progress=True
-- Create sc.translation.task records with state='draft'
-- Set blog_post.translation_in_progress=True
-- User notification for skipped posts
-- [ ] Complete
-
-### Task 11 → SP-7.2 & SP-3.2
-**Task**: OpenAI Integration Utility
-**Description**: Create async AI translation function using openai-agents SDK
-**Technical Instructions**:
-- Create utility module for openai-agents integration
-- Async function: perform_ai_translation(model_name, system_instructions, prompt)
-- Agent configuration with proper instructions and model selection
-- Environment variable setup for API credentials
-- Error handling for API failures, timeouts, rate limits
-- [ ] Complete
-
-### Task 12 → SP-7.2
-**Task**: Cron Job Implementation
-**Description**: Background processing for translation tasks
-**Technical Instructions**:
-- ir.cron record: runs every 5 minutes
-- Search sc.translation.task with state='draft', limit 10 per run
-- For each task: update to in_progress, prepare data, build prompt, execute AI call
-- JSON structure for blog fields: name, subtitle, content, website_meta_title, website_meta_description, website_meta_keywords
-- Update blog post with translated content and task state
-- Comprehensive error handling with error_message logging
-- [ ] Complete
-
----
-
-## Milestone 5: Security & Permissions
-
-### Task 13 → Security
-**Task**: Access Control Implementation
-**Description**: Create security groups, ACLs, and record rules
-**Technical Instructions**:
-- Groups: Marketing Manager (full access), Marketing User (read/create)
-- ir.model.access.csv for sc.translation.task model
-- Record rules for multi-company environments if applicable
-- Least privilege principle with admin maintaining full access
-- [ ] Complete
-
-### Task 14 → Security
-**Task**: Environment Variables Security
-**Description**: Secure API key management
-**Technical Instructions**:
-- Document environment variable setup for OpenAI credentials
-- Ensure no hardcoded secrets in code
-- Implement proper credential validation in configuration
-- [ ] Complete
-
----
-
-## Milestone 6: Testing & Quality Assurance
-
-### Task 15 → Testing
-**Task**: Unit Test Suite
-**Description**: Comprehensive test coverage for core functionality
-**Technical Instructions**:
-- Test wizard task creation logic
-- Test cron job processing (mock OpenAI calls)
-- Test configuration settings validation
-- Test error handling scenarios
-- Install/upgrade tests
-- [ ] Complete
-
-### Task 16 → Testing
-**Task**: Integration Tests
-**Description**: End-to-end workflow testing
-**Technical Instructions**:
-- Test complete translation workflow
-- Test multi-language scenarios
-- Test error recovery and task reset
-- Performance testing for bulk operations
-- [ ] Complete
-
----
-
-## Milestone 7: Documentation & Localization
-
-### Task 17 → i18n
-**Task**: Internationalization Setup
-**Description**: Create and maintain translation files
-**Technical Instructions**:
-- Create i18n/es_ES.po file
-- Mark all user-facing strings with _() using English base strings
-- Ensure model descriptions, field labels, and help texts are translatable
-- [ ] Complete
-
-### Task 18 → Documentation
-**Task**: Module Documentation
-**Description**: Create comprehensive documentation
-**Technical Instructions**:
-- README.md (English) and README.es.md (Spanish) at module root
-- Functional documentation in docs/functional/
-- Technical documentation in docs/technical/
-- Installation and configuration guides
-- User manuals with screenshots
-- [ ] Complete
+This version introduces powerful "Agent-based" functionalities moving beyond simple translation to proactive content strategy and creation. The core focus is on implementing two new AI agents: a **Content Research Agent** for generating topic ideas using web search capabilities, and a **Content Generation Agent** for drafting complete blog articles. Additionally, this version implements an OpenAI API usage monitoring dashboard and consolidates all module settings into a dedicated settings section within Odoo for better organization and usability.
 
 ---
 
 ## Milestones & PR Strategy
 
-### Milestone 1: Foundation (Tasks 1-3)
-- [x] Task 1: Module Structure and Dependencies Setup
-- [x] Task 2: OpenAI Configuration Settings  
-- [x] Task 3: Dynamic Model Selection Implementation
+### Phase 1: Settings Refactoring & Infrastructure (Foundation)
+- [ ] **Task 1** → SP-2: Create dedicated res.config.settings view with Marketing Automation section
+- [ ] **Task 2** → SP-2: Migrate existing OpenAI configuration fields to new settings page
+- [ ] **Task 3** → SP-2: Create new menu item "Settings > Marketing Automation" with dedicated action
+- [ ] **Task 4** → SP-2: Update existing translation feature to use new centralized settings
+- [ ] **Task 5**: Add required external libraries to requirements.txt (openai-agents)
 
-### Milestone 2: Data Models (Tasks 4-5)
-- [x] Task 4: Translation Task Model
-- [x] Task 5: Blog Post Extension
+### Phase 2: Content Research Agent Implementation
+- [ ] **Task 6** → SP-3.1: Create sc.content.idea model with required fields
+- [ ] **Task 7** → SP-3.1: Create sc.content.idea.task model with state management
+- [ ] **Task 8** → SP-3.2: Add Content Research Agent configuration fields to settings
+- [ ] **Task 9** → SP-3.3: Create menu items and tree/form views for content ideas
+- [ ] **Task 10** → SP-3.3: Implement sc.generate.ideas.wizard (TransientModel)
+- [ ] **Task 11** → SP-3.4: Create cron job for processing research tasks
+- [ ] **Task 12** → SP-3.4: Implement OpenAI Agents SDK integration with WebSearchTool
+- [ ] **Task 13** → SP-3.4: Add placeholder processing logic ({today} replacement)
+- [ ] **Task 14** → SP-3.4: Implement structured JSON response parsing
 
-### Milestone 3: User Interface (Tasks 6-9)
-- [x] Task 6: Server Action Implementation
-- [x] Task 7: Translation Wizard
-- [x] Task 8: Translation Task Views
-- [x] Task 9: Blog Post Form Enhancement
+### Phase 3: Content Generation Agent Implementation
+- [ ] **Task 15** → SP-4.1: Create sc.content.generation.task model
+- [ ] **Task 16** → SP-4.2: Add Content Generation Agent configuration to settings
+- [ ] **Task 17** → SP-4.3: Create generation tasks menu and views
+- [ ] **Task 18** → SP-4.3: Implement sc.generate.content.wizard with blog.post integration
+- [ ] **Task 19** → SP-4.4: Create cron job for content generation processing
+- [ ] **Task 20** → SP-4.4: Implement blog.post creation with structured AI output
 
-### Milestone 4: Business Logic (Tasks 10-12)
-- [x] Task 10: Translation Wizard Logic
-- [x] Task 11: OpenAI Integration Utility
-- [x] Task 12: Cron Job Implementation
+### Phase 4: OpenAI Usage Monitoring Dashboard
+- [ ] **Task 21** → SP-5.1: Research OpenAI Usage API endpoints and authentication
+- [ ] **Task 22** → SP-5.1: Create sc.openai.usage.snapshot model
+- [ ] **Task 23** → SP-5.2: Create OpenAI Usage dashboard view with graph components
+- [ ] **Task 24** → SP-5.2: Implement "Fetch Latest Data" button functionality
+- [ ] **Task 25** → SP-5.2: Create automated nightly cron job for usage data collection
 
-### Milestone 5: Security (Tasks 13-14)
-- [x] Task 13: Access Control Implementation
-- [x] Task 14: Environment Variables Security
+### Phase 5: Security, Testing & Documentation
+- [ ] **Task 26**: Implement security groups and ACLs for new models
+- [ ] **Task 27**: Create record rules for multi-company environments
+- [ ] **Task 28**: Write unit tests for agent functionality and API integrations
+- [ ] **Task 29**: Create integration tests for wizard workflows
+- [ ] **Task 30**: Update i18n/es_ES.po with new translatable strings
+- [ ] **Task 31**: Update README.md and README.es.md files
+- [ ] **Task 32**: Update module documentation (functional/technical guides)
 
-### Milestone 6: Testing (Tasks 15-16)
-- [ ] Task 15: Unit Test Suite
-- [ ] Task 16: Integration Tests
+---
 
-### Milestone 7: Documentation (Tasks 17-18)
-- [x] Task 17: Internationalization Setup
-- [x] Task 18: Module Documentation
+## Technical Deliverables
+
+### 1. UI/Views Implementation
+
+#### Settings Views
+- **Reference Pattern**: Following Odoo 18.0 standards for res.config.settings inheritance
+- **Core Example**: Since no specific core example was found in the current workspace, will follow the standard pattern from `base_setup.res_config_settings_view_form` inheritance
+- **Views to Create**:
+  - `res_config_settings_view_form_inherit_sc_marketing` - Main settings inheritance view
+  - Organized sections for:
+    - OpenAI API Configuration (migrated fields)
+    - Content Research Agent settings
+    - Content Generation Agent settings
+
+#### List Views (using `<list>` tag per Odoo 18.0 standards)
+- `sc_content_idea_view_tree` - Ideas list with search/filter capabilities
+- `sc_content_idea_task_view_tree` - Research tasks with state filtering
+- `sc_content_generation_task_view_tree` - Generation tasks management
+- `sc_openai_usage_snapshot_view_tree` - Usage statistics table
+
+#### Form Views
+- `sc_content_idea_view_form` - Individual idea details
+- `sc_content_idea_task_view_form` - Task tracking with progress indicators
+- `sc_content_generation_task_view_form` - Generation task details
+- `sc_openai_usage_dashboard_view` - Custom dashboard with graphs
+
+#### Wizard Views
+- `sc_generate_ideas_wizard_view_form` - Research parameters input
+- `sc_generate_content_wizard_view_form` - Content generation setup
+
+#### Kanban Views (with mandatory `default_group_by`)
+- `sc_content_idea_view_kanban` with `default_group_by="task_id"`
+- `sc_content_idea_task_view_kanban` with `default_group_by="state"`
+- `sc_content_generation_task_view_kanban` with `default_group_by="state"`
+
+### 2. Data Models
+
+#### New Models to Create
+1. **sc.content.idea** - Content idea storage
+   - Fields: name, url, publish_date, summary, task_id
+   - Inherits: `mail.thread` for chatter integration
+   
+2. **sc.content.idea.task** - Research task tracking
+   - Fields: name, search_query, requested_ideas, generated_ideas_ids, state, error_message
+   - Inherits: `mail.thread`, `mail.activity.mixin` for full chatter support
+   
+3. **sc.content.generation.task** - Generation task tracking
+   - Fields: name, content_idea_id, user_prompt, generated_blog_post_id, target_blog_id, target_author_id, target_lang_id, state, error_message
+   - Inherits: `mail.thread`, `mail.activity.mixin`
+   
+4. **sc.openai.usage.snapshot** - API usage tracking
+   - Fields: date (unique), prompt_tokens, completion_tokens, total_tokens
+
+#### Model Extensions
+- **res.config.settings** - Add new configuration fields for agent settings
+
+### 3. Security Implementation
+
+#### Groups & ACLs
+- **Group: Marketing Automation User** - Basic access to views and wizards
+- **Group: Marketing Automation Manager** - Full access including settings
+- **ir.model.access.csv** entries for all new models with appropriate permissions
+
+#### Record Rules
+- Multi-company support where applicable
+- User-level access restrictions for sensitive operations
+
+### 4. Integrations
+
+#### OpenAI Agents SDK Integration
+- **Library**: openai-agents-python (pinned to latest stable version)
+- **Components**:
+  - Agent initialization with WebSearchTool
+  - Structured response handling with JSON parsing
+  - Error handling and retry mechanisms
+  - Token usage tracking
+
+#### OpenAI Usage API Integration
+- **Endpoints**: `/v1/organization/usage/completions`, `/v1/organization/usage/embeddings`
+- **Authentication**: Bearer token with OPENAI_ADMIN_KEY
+- **Rate Limiting**: Implement proper backoff strategies
+- **Data Processing**: Daily aggregation and storage
+
+### 5. Cron Jobs & Background Processing
+
+#### Scheduled Actions
+1. **Content Ideas Research Processor**
+   - Frequency: Every 5 minutes
+   - Processes sc.content.idea.task records in 'draft' state
+   - Implements placeholder replacement and AI agent calls
+
+2. **Content Generation Processor** 
+   - Frequency: Every 5 minutes
+   - Processes sc.content.generation.task records in 'draft' state
+   - Creates blog.post records with AI-generated content
+
+3. **OpenAI Usage Data Collector**
+   - Frequency: Daily at 2:00 AM
+   - Fetches usage statistics from OpenAI API
+   - Updates sc.openai.usage.snapshot records
+
+### 6. Chatter Integration
+
+All task tracking models will inherit from `mail.thread` and `mail.activity.mixin`:
+- **Dependencies**: Add `"mail"` to `__manifest__.py` depends
+- **Form Views**: Include `<chatter/>` element at end of forms (after `</sheet>`)
+- **Tracking**: Automated status updates and error logging in chatter
+- **Activities**: Manual task assignments and follow-ups
+
+---
+
+## External Libraries Research
+
+### OpenAI Agents Python SDK
+- **Library ID**: `/openai/openai-agents-python`
+- **Official Documentation**: https://github.com/openai/openai-agents-python
+- **Version**: Latest stable (to be pinned in requirements.txt)
+- **Key Components**:
+  - `Agent` class for AI agent initialization
+  - `WebSearchTool` for web research capabilities  
+  - `Runner.run()` for asynchronous agent execution
+  - Structured output handling with JSON responses
+- **Integration Points**:
+  - Content Research Agent with web search capabilities
+  - Content Generation Agent for blog post creation
+  - Error handling and retry mechanisms
+
+### OpenAI Usage API
+- **Documentation**: https://platform.openai.com/docs/api-reference/
+- **Endpoints**:
+  - `GET /v1/organization/usage/completions` - Token usage for completions
+  - `GET /v1/organization/usage/embeddings` - Embedding usage statistics
+- **Authentication**: Requires `OPENAI_ADMIN_KEY` environment variable
+- **Rate Limits**: Standard OpenAI API limits apply
+- **Data Format**: Time-bucketed usage data with token counts
+
+---
+
+## Files Map
+
+```
+custom-addons/sc_marketing_automation_tool/
+├── requirements.txt                           # Updated with openai-agents
+├── __manifest__.py                            # Updated dependencies (mail)
+├── models/
+│   ├── __init__.py                            # Updated imports
+│   ├── res_config_settings.py                 # Updated with new fields
+│   ├── sc_content_idea.py                     # New model
+│   ├── sc_content_idea_task.py                # New model
+│   ├── sc_content_generation_task.py          # New model
+│   └── sc_openai_usage_snapshot.py           # New model
+├── wizard/
+│   ├── __init__.py                            # Updated imports
+│   ├── sc_generate_ideas_wizard.py           # New wizard
+│   └── sc_generate_content_wizard.py         # New wizard
+├── views/
+│   ├── res_config_settings_views.xml         # New settings inheritance
+│   ├── sc_content_idea_views.xml             # New views
+│   ├── sc_content_idea_task_views.xml        # New views
+│   ├── sc_content_generation_task_views.xml  # New views
+│   ├── sc_openai_usage_views.xml             # New dashboard
+│   └── menu_items.xml                        # Updated menu structure
+├── data/
+│   ├── ir_cron_data.xml                      # New cron jobs
+│   └── res_groups_data.xml                   # New security groups
+├── security/
+│   └── ir.model.access.csv                   # Updated ACLs
+└── i18n/
+    └── es_ES.po                               # Updated translations
+```
+
+---
+
+## Testing Strategy
+
+### Unit Tests
+- Model method testing for all CRUD operations
+- Agent integration testing with mocked API responses
+- Configuration field validation testing
+- Error handling and state management testing
+
+### Integration Tests
+- Complete wizard workflows (ideas generation → content creation)
+- Cron job processing with real/mocked external API calls
+- Multi-user and multi-company scenarios
+- Blog post creation and publishing workflows
+
+### Compliance Testing
+- Install/upgrade tests for clean deployment
+- Security tests for groups, ACLs, and record rules
+- i18n completeness verification
+- UI responsiveness and navigation testing
+
+---
+
+## i18n & Documentation
+
+### Internationalization
+- **Base Language**: English (all code, comments, technical strings)
+- **User Language**: Spanish translation via `i18n/es_ES.po`
+- **Translatable Elements**:
+  - All user-facing strings in views, wizards, and messages
+  - Field labels, help text, and selection options
+  - Error messages and notifications
+  - Menu items and action names
+
+### Documentation Updates
+- **README.md** (English): Updated features list, installation, usage
+- **README.es.md** (Spanish): Synchronized translation of README
+- **docs/functional/**: User guides for new agent features
+- **docs/technical/**: Developer documentation for API integrations
+- **CHANGELOG.md**: Version 18.0.1.0.1 feature summary
+
+---
+
+## Risk Assessment & Mitigation
+
+### High-Risk Areas
+1. **OpenAI API Integration Complexity**
+   - Risk: Agent SDK integration failures or API changes
+   - Mitigation: Comprehensive error handling, fallback mechanisms, version pinning
+
+2. **External Dependencies**
+   - Risk: openai-agents library compatibility issues
+   - Mitigation: Thorough testing, version constraints, alternative library research
+
+3. **Performance with Large Datasets**
+   - Risk: Slow response times with many content ideas/tasks
+   - Mitigation: Pagination, async processing, database indexing
+
+### Medium-Risk Areas
+1. **Settings Migration Complexity**
+   - Risk: Data loss during field migration to new settings view
+   - Mitigation: Migration scripts, backup procedures, rollback plans
+
+2. **Multi-company Compatibility**
+   - Risk: Data isolation issues in multi-company environments
+   - Mitigation: Proper record rules, thorough multi-company testing
 
 ---
 
 ## Acceptance Checklist
 
-### Odoo 18.0 Standards Compliance
-- [ ] All list views use `<list>` instead of `<tree>`
-- [ ] Conditional UI uses `invisible`, `readonly`, `required`, `column_invisible` (no legacy `attrs`)
-- [ ] Kanban view defines meaningful `default_group_by` (state field)
-- [ ] Chatter integration properly implemented where applicable
-- [ ] Settings view uses stable anchors from core examples
+### Functional Requirements
+- [ ] Content Research Agent generates relevant topic ideas from web search
+- [ ] Content Generation Agent creates complete blog posts from ideas
+- [ ] OpenAI usage monitoring displays accurate token consumption data
+- [ ] All settings consolidated in dedicated Marketing Automation section
+- [ ] Wizard workflows are intuitive and error-free
+- [ ] Background processing works reliably with proper error handling
 
-### Technical Requirements
-- [ ] OpenAI agents SDK properly integrated with async/await pattern
-- [ ] Dynamic model selection with API fallback implemented
-- [ ] Comprehensive error handling for API failures and timeouts
-- [ ] Environment variables used for secure credential management
-- [ ] Cron job handles bulk processing with appropriate limits
+### Technical Compliance
+- [ ] All views use Odoo 18.0 standards (`<list>` tags, conditional UI)
+- [ ] Kanban views define meaningful `default_group_by` attributes
+- [ ] Chatter integration implemented correctly with mail dependencies
+- [ ] Security groups, ACLs, and record rules provide appropriate access control
+- [ ] External libraries properly integrated with error handling
+- [ ] Server actions are thin with business logic in model methods
 
 ### Quality Assurance
-- [ ] Security groups and ACLs implemented with least privilege
 - [ ] Unit and integration tests cover primary business flows
-- [ ] Install/upgrade tests pass successfully
-- [ ] Multi-company compatibility where applicable
-
-### Documentation & Localization
-- [ ] i18n/es_ES.po file created and maintained
-- [ ] English base strings properly marked for translation
-- [ ] README.md and README.es.md files present and synchronized
-- [ ] Technical and functional documentation complete
-- [ ] Installation and configuration guides provided
-
-### External Dependencies
-- [ ] requirements.txt includes openai-agents with pinned version
-- [ ] External library integration documented with official links
-- [ ] API rate limits and timeout handling implemented
-- [ ] Graceful degradation for API unavailability
+- [ ] Install/upgrade processes complete successfully
+- [ ] i18n coverage complete with Spanish translations
+- [ ] Documentation updated (README, functional, technical guides)
+- [ ] Multi-company environments supported appropriately
+- [ ] Performance acceptable under expected load conditions
 
 ---
 
 ## Plan Changelog
 
-### 2025-09-09T00:00:00Z - v2025-sep-04 - Initial Plan Creation
-- Created comprehensive implementation plan for sc_marketing_automation_tool v18.0.1.0.0
+### 2025-09-11T17:00:00Z - Version 18.0.1.0.1 Plan Created
+- **Spec Version**: 18.0.1.0.1
+- **Summary**: Created comprehensive implementation plan for agent-based content automation features
 - **External Research**: 
-  - OpenAI Agents Python library (official repo: https://github.com/openai/openai-agents-python)
-  - Core settings configuration patterns from base_setup module
-- Structured plan into 7 milestones with 18 detailed tasks
-- Incorporated Solutto standards and Odoo 18.0 compliance requirements
-- Defined security, testing, and documentation requirements
-- Included acceptance checklist with compliance gates
-
-### 2025-09-09T01:00:00Z - v2025-sep-04 - Implementation Completed
-- **Milestones 1-5 and 7 COMPLETED** (16/18 tasks)
-- **Core Implementation**:
-  - Module scaffold with proper Odoo 18.0 manifest and structure
-  - OpenAI integration using official openai-agents SDK
-  - Configuration settings with stable anchor from base_setup core example
-  - Translation task model with mail.thread integration and chatter
-  - Blog post extension with translation tracking
-  - Complete UI implementation using `<list>` views (Odoo 18.0 standard)
-  - Kanban with `default_group_by="state"` (compliance requirement)
-  - Translation wizard with modal presentation
-  - Server action using Model Methods First pattern
-  - Cron job for background processing with error handling
-  - Security groups and ACLs implementation
-  - Complete Spanish i18n translation
-  - Technical and functional documentation
-
-- **Compliance Verification**:
-  - ✅ All views use `<list>` instead of `<tree>`
-  - ✅ Conditional UI uses modern attributes (no legacy `attrs`)
-  - ✅ Kanban defines meaningful `default_group_by`
-  - ✅ Chatter integration with `mail` dependency
-  - ✅ Settings use stable anchor from core examples
-  - ✅ Environment variables for API security
-  - ✅ Server actions follow Model Methods First pattern
-
-- **Remaining**: Testing implementation (Tasks 15-16) - Ready for manual testing phase
-
----
-
-## Documentation Status (v18.0.1.0.0)
-
-### ✅ Documentation Completed (September 2025)
-- **Bilingual Functional Guides**: Complete user guides in English and Spanish
-  - `/docs/functional/guide.en.md` - English functional guide (✅ Created)
-  - `/docs/functional/guide.es.md` - Spanish functional guide (✅ Created)
-- **Bilingual Technical Guides**: Complete developer guides in English and Spanish  
-  - `/docs/technical/guide.en.md` - English technical guide (✅ Created)
-  - `/docs/technical/guide.es.md` - Spanish technical guide (✅ Created)
-- **README Files**: Updated with version-specific context
-  - `/README.md` - English overview (✅ Updated)
-  - `/README.es.md` - Spanish overview (✅ Updated)
-- **Coverage Matrix**: Complete feature mapping for v18.0.1.0.0
-  - `/docs/coverage-matrix-v18.0.1.0.0.md` - Version-specific coverage (✅ Created)
-
-### 📊 Documentation Coverage Statistics
-- **Target Version**: 18.0.1.0.0 (Initial Release)
-- **Total Features Documented**: 20/20 (100% coverage)
-- **User Audiences Covered**: Functional Users, Administrators, Developers
-- **Languages Supported**: English, Spanish (bilingual)
-- **External References**: Core Odoo examples + OpenAI official documentation
-- **Version N/A Features**: 8 features (marked as post-v18.0.1.0.0)
-
-### 🎯 Documentation Quality Gates Met
-- [x] **Version-Aware Content**: All documentation scoped to v18.0.1.0.0
-- [x] **External References**: Core settings implementation with stable anchors
-- [x] **Official Documentation Links**: OpenAI Agents SDK and API documentation
-- [x] **Odoo 18.0 Compliance**: Modern syntax patterns documented
-- [x] **Best Practices**: User and developer guidelines included
-- [x] **Troubleshooting**: Common issues and solutions documented
-- [x] **Migration Context**: Version limitations and upgrade paths noted
-
+  - OpenAI Agents Python SDK documentation and integration patterns
+  - OpenAI Usage API endpoints and authentication requirements
+  - Odoo 18.0 standards compliance for views and conditional UI
+- **Milestones**: Defined 5-phase approach with 32 tasks covering settings refactoring, agent implementation, usage monitoring, and quality assurance
+- **Risk Assessment**: Identified external dependency and API integration risks with mitigation strategies

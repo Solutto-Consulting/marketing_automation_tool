@@ -2,7 +2,7 @@ import asyncio
 import os
 import json
 import logging
-from odoo import api, models
+from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -197,3 +197,279 @@ JSON to translate:
             _logger.error("Failed to parse AI response as JSON: %s", str(e))
             _logger.error("AI Response: %s", translated_content_str)
             raise Exception("AI returned invalid JSON format. Please try again.")
+
+    @api.model
+    async def perform_content_research(self, model_name, system_instructions, search_query, num_ideas=5):
+        """
+        Perform content research using OpenAI Agents SDK with WebSearchTool
+        
+        Args:
+            model_name (str): The OpenAI model to use
+            system_instructions (str): Instructions for the research agent
+            search_query (str): The search query for finding content ideas
+            num_ideas (int): Number of ideas to generate
+            
+        Returns:
+            list: List of content ideas with structure [{'name': str, 'url': str, 'publish_date': str, 'summary': str}]
+        """
+        try:
+            # Import here to avoid import errors if package not installed
+            from agents import Agent, Runner, WebSearchTool
+            
+            # Create agent with WebSearchTool
+            agent = Agent(
+                name="Content Research Agent",
+                instructions=system_instructions,
+                model=model_name,
+                tools=[WebSearchTool()],
+            )
+            
+            # Build structured prompt for content research
+            prompt = f"""
+Search for recent articles and content related to: {search_query}
+
+Please find {num_ideas} relevant articles and return them as a JSON list with the following structure:
+
+[
+  {{
+    "name": "Article title",
+    "url": "Full URL to the article",
+    "publish_date": "Publication date in YYYY-MM-DD format (or null if not available)",
+    "summary": "Concise summary highlighting key points and content marketing value"
+  }}
+]
+
+Focus on finding:
+- Recent, high-quality articles from authoritative sources
+- Content that would be valuable for business/marketing audiences
+- Articles with actionable insights and practical information
+- Diverse perspectives and sources when possible
+
+Return ONLY the JSON array, no additional text or explanation.
+"""
+            
+            # Execute research
+            result = await Runner.run(agent, prompt)
+            
+            # Parse the JSON response
+            try:
+                response_text = result.final_output.strip()
+                if response_text.startswith('```json'):
+                    response_text = response_text[7:]
+                if response_text.endswith('```'):
+                    response_text = response_text[:-3]
+                
+                ideas = json.loads(response_text)
+                
+                # Validate the structure
+                if not isinstance(ideas, list):
+                    raise ValueError("Response must be a JSON list")
+                
+                for idea in ideas:
+                    if not all(key in idea for key in ['name', 'url', 'summary']):
+                        raise ValueError("Each idea must have name, url, and summary fields")
+                
+                return ideas
+                
+            except (json.JSONDecodeError, ValueError) as e:
+                _logger.error("Failed to parse research response: %s", str(e))
+                _logger.error("Agent Response: %s", result.final_output)
+                raise Exception(f"Agent returned invalid response format: {str(e)}")
+            
+        except ImportError:
+            _logger.error("openai-agents package not installed. Please install with: pip install openai-agents")
+            raise Exception("OpenAI Agents SDK not available. Please install the required package.")
+        except Exception as e:
+            _logger.error("Content research failed: %s", str(e))
+            raise Exception(f"Content research failed: {str(e)}")
+
+    @api.model
+    async def perform_content_generation(self, model_name, system_instructions, content_idea, user_prompt=""):
+        """
+        Generate blog content using OpenAI Agents SDK
+        
+        Args:
+            model_name (str): The OpenAI model to use
+            system_instructions (str): Instructions for the generation agent
+            content_idea (dict): Content idea with name, url, summary fields
+            user_prompt (str): Additional user instructions
+            
+        Returns:
+            dict: Generated content with structure {'title': str, 'content': str, 'meta_description': str, 'keywords': str}
+        """
+        try:
+            # Import here to avoid import errors if package not installed
+            from agents import Agent, Runner
+            
+            # Create content generation agent
+            agent = Agent(
+                name="Content Generation Agent",
+                instructions=system_instructions,
+                model=model_name,
+            )
+            
+            # Build structured prompt for content generation
+            prompt = f"""
+Based on the following source content, create a comprehensive blog post:
+
+SOURCE CONTENT:
+Title: {content_idea.get('name', '')}
+URL: {content_idea.get('url', '')}
+Summary: {content_idea.get('summary', '')}
+
+ADDITIONAL INSTRUCTIONS:
+{user_prompt or 'Create engaging, professional content suitable for a business audience.'}
+
+Generate a complete blog post and return it as a JSON object with the following structure:
+
+{{
+  "title": "SEO-friendly blog post title",
+  "content": "Complete HTML content with proper headings and formatting",
+  "meta_description": "Compelling meta description for SEO (150-160 characters)",
+  "keywords": "Relevant keywords separated by commas"
+}}
+
+Content Requirements:
+- Create original content that adds value beyond the source material
+- Use proper HTML structure with H2/H3 headings for organization
+- Aim for 800-1500 words of engaging, actionable content
+- Include a strong introduction and conclusion
+- Write in a professional yet engaging tone
+- Ensure content is SEO-optimized and business-focused
+
+Return ONLY the JSON object, no additional text or explanation.
+"""
+            
+            # Execute content generation
+            result = await Runner.run(agent, prompt)
+            
+            # Parse the JSON response
+            try:
+                response_text = result.final_output.strip()
+                if response_text.startswith('```json'):
+                    response_text = response_text[7:]
+                if response_text.endswith('```'):
+                    response_text = response_text[:-3]
+                
+                content = json.loads(response_text)
+                
+                # Validate the structure
+                required_fields = ['title', 'content', 'meta_description', 'keywords']
+                if not all(key in content for key in required_fields):
+                    raise ValueError(f"Response must contain all required fields: {required_fields}")
+                
+                return content
+                
+            except (json.JSONDecodeError, ValueError) as e:
+                _logger.error("Failed to parse generation response: %s", str(e))
+                _logger.error("Agent Response: %s", result.final_output)
+                raise Exception(f"Agent returned invalid response format: {str(e)}")
+            
+        except ImportError:
+            _logger.error("openai-agents package not installed. Please install with: pip install openai-agents")
+            raise Exception("OpenAI Agents SDK not available. Please install the required package.")
+        except Exception as e:
+            _logger.error("Content generation failed: %s", str(e))
+            raise Exception(f"Content generation failed: {str(e)}")
+
+    @api.model
+    def fetch_and_store_usage_data(self):
+        """
+        Fetch usage data from OpenAI API and store in snapshots
+        
+        Returns:
+            dict: Summary of fetched data
+        """
+        try:
+            import requests
+            from datetime import datetime, timedelta
+            
+            # Get API credentials
+            api_key = self.env['ir.config_parameter'].sudo().get_param('sc_marketing_automation_tool.openai_api_key')
+            if not api_key:
+                raise Exception("OpenAI API key not configured")
+            
+            # Prepare headers
+            headers = {
+                'Authorization': f'Bearer {api_key}',
+                'Content-Type': 'application/json'
+            }
+            
+            org_id = self.env['ir.config_parameter'].sudo().get_param('sc_marketing_automation_tool.openai_organization_id')
+            if org_id:
+                headers['OpenAI-Organization'] = str(org_id)
+            
+            # Calculate date range (last 90 days)
+            end_date = datetime.now().date()
+            start_date = end_date - timedelta(days=90)
+            
+            # Note: OpenAI Usage API endpoint structure may vary
+            # This is a placeholder implementation - actual endpoint needs to be researched
+            usage_endpoints = [
+                'https://api.openai.com/v1/organization/usage/completions',
+                'https://api.openai.com/v1/organization/usage/embeddings',
+            ]
+            
+            total_records_updated = 0
+            
+            for endpoint in usage_endpoints:
+                try:
+                    # Make API call
+                    params = {
+                        'start_time': int(start_date.timestamp()),
+                        'end_time': int(end_date.timestamp()),
+                        'bucket_width': '1d',  # Daily buckets
+                    }
+                    
+                    response = requests.get(endpoint, headers=headers, params=params, timeout=30)
+                    response.raise_for_status()
+                    
+                    data = response.json()
+                    
+                    # Process the response (structure depends on actual API)
+                    # This is a placeholder - actual implementation needs API research
+                    if 'data' in data:
+                        for bucket in data['data']:
+                            # Extract date and token counts
+                            # Actual field names depend on API structure
+                            date = datetime.fromtimestamp(bucket.get('start_time', 0)).date()
+                            prompt_tokens = bucket.get('prompt_tokens', 0)
+                            completion_tokens = bucket.get('completion_tokens', 0)
+                            
+                            # Create or update snapshot record
+                            snapshot = self.env['sc.openai.usage.snapshot'].search([('date', '=', date)], limit=1)
+                            if snapshot:
+                                snapshot.write({
+                                    'prompt_tokens': snapshot.prompt_tokens + prompt_tokens,
+                                    'completion_tokens': snapshot.completion_tokens + completion_tokens,
+                                    'fetch_timestamp': fields.Datetime.now(),
+                                    'api_response_raw': json.dumps(bucket),
+                                })
+                            else:
+                                self.env['sc.openai.usage.snapshot'].create({
+                                    'date': date,
+                                    'prompt_tokens': prompt_tokens,
+                                    'completion_tokens': completion_tokens,
+                                    'fetch_timestamp': fields.Datetime.now(),
+                                    'api_response_raw': json.dumps(bucket),
+                                })
+                            
+                            total_records_updated += 1
+                
+                except requests.exceptions.RequestException as e:
+                    _logger.warning("Failed to fetch from %s: %s", endpoint, str(e))
+                    continue
+            
+            return {
+                'success': True,
+                'records_updated': total_records_updated,
+                'message': f"Successfully updated {total_records_updated} usage records"
+            }
+            
+        except Exception as e:
+            _logger.error("Failed to fetch usage data: %s", str(e))
+            return {
+                'success': False,
+                'error': str(e),
+                'message': f"Failed to fetch usage data: {str(e)}"
+            }

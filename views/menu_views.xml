@@ -7,11 +7,88 @@
         <field name="web_icon">sc_marketing_automation_tool,static/description/icon.png</field>
     </record>
 
+    <!-- Content Generation Sub-menu -->
+    <record id="menu_content_generation" model="ir.ui.menu">
+        <field name="name">Content Generation</field>
+        <field name="parent_id" ref="menu_marketing_automation_root"/>
+        <field name="sequence" eval="5"/>
+    </record>
+
+    <!-- Content Ideas Menu -->
+    <record id="menu_content_ideas" model="ir.ui.menu">
+        <field name="name">Content Ideas</field>
+        <field name="parent_id" ref="menu_content_generation"/>
+        <field name="action" ref="action_sc_content_idea"/>
+        <field name="sequence" eval="10"/>
+    </record>
+
+    <!-- Generate Ideas Wizard Menu -->
+    <record id="menu_generate_ideas_wizard" model="ir.ui.menu">
+        <field name="name">Generate Ideas</field>
+        <field name="parent_id" ref="menu_content_generation"/>
+        <field name="action" ref="action_sc_generate_ideas_wizard"/>
+        <field name="sequence" eval="20"/>
+    </record>
+
+    <!-- Generate Content Wizard Menu -->
+    <record id="menu_generate_content_wizard" model="ir.ui.menu">
+        <field name="name">Generate Content</field>
+        <field name="parent_id" ref="menu_content_generation"/>
+        <field name="action" ref="action_sc_generate_content_wizard"/>
+        <field name="sequence" eval="30"/>
+    </record>
+
+    <!-- Task Management Sub-menu -->
+    <record id="menu_task_management" model="ir.ui.menu">
+        <field name="name">Task Management</field>
+        <field name="parent_id" ref="menu_marketing_automation_root"/>
+        <field name="sequence" eval="10"/>
+    </record>
+
+    <!-- Research Tasks Menu -->
+    <record id="menu_content_idea_tasks" model="ir.ui.menu">
+        <field name="name">Research Tasks</field>
+        <field name="parent_id" ref="menu_task_management"/>
+        <field name="action" ref="action_sc_content_idea_task"/>
+        <field name="sequence" eval="10"/>
+    </record>
+
+    <!-- Generation Tasks Menu -->
+    <record id="menu_content_generation_tasks" model="ir.ui.menu">
+        <field name="name">Generation Tasks</field>
+        <field name="parent_id" ref="menu_task_management"/>
+        <field name="action" ref="action_sc_content_generation_task"/>
+        <field name="sequence" eval="20"/>
+    </record>
+
+    <!-- Analytics Sub-menu -->
+    <record id="menu_analytics" model="ir.ui.menu">
+        <field name="name">Analytics</field>
+        <field name="parent_id" ref="menu_marketing_automation_root"/>
+        <field name="sequence" eval="15"/>
+    </record>
+
+    <!-- OpenAI Usage Dashboard Menu -->
+    <record id="menu_openai_usage_dashboard" model="ir.ui.menu">
+        <field name="name">Usage Dashboard</field>
+        <field name="parent_id" ref="menu_analytics"/>
+        <field name="action" ref="action_sc_openai_usage_dashboard"/>
+        <field name="sequence" eval="10"/>
+    </record>
+
+    <!-- OpenAI Usage Statistics Menu -->
+    <record id="menu_openai_usage_statistics" model="ir.ui.menu">
+        <field name="name">Usage Statistics</field>
+        <field name="parent_id" ref="menu_analytics"/>
+        <field name="action" ref="action_sc_openai_usage_snapshot"/>
+        <field name="sequence" eval="20"/>
+    </record>
+
     <!-- Content Translation Sub-menu -->
     <record id="menu_content_translation" model="ir.ui.menu">
         <field name="name">Content Translation</field>
         <field name="parent_id" ref="menu_marketing_automation_root"/>
-        <field name="sequence" eval="10"/>
+        <field name="sequence" eval="20"/>
     </record>
 
     <!-- Translation Tasks Menu -->

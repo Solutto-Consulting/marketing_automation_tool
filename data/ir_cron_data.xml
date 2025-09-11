@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Cron job to process pending content idea tasks -->
+        <record id="cron_process_content_idea_tasks" model="ir.cron">
+            <field name="name">Process Content Idea Tasks</field>
+            <field name="model_id" ref="model_sc_content_idea_task"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_process_pending_tasks()</field>
+            <field name="interval_number">15</field>
+            <field name="interval_type">minutes</field>
+            <field name="nextcall" eval="(datetime.now() + timedelta(minutes=15)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="active">True</field>
+            <field name="priority">5</field>
+        </record>
+
+        <!-- Cron job to process pending content generation tasks -->
+        <record id="cron_process_content_generation_tasks" model="ir.cron">
+            <field name="name">Process Content Generation Tasks</field>
+            <field name="model_id" ref="model_sc_content_generation_task"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_process_pending_tasks()</field>
+            <field name="interval_number">10</field>
+            <field name="interval_type">minutes</field>
+            <field name="nextcall" eval="(datetime.now() + timedelta(minutes=10)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="active">True</field>
+            <field name="priority">5</field>
+        </record>
+
+        <!-- Cron job to fetch daily OpenAI usage data -->
+        <record id="cron_fetch_openai_usage" model="ir.cron">
+            <field name="name">Fetch OpenAI Usage Data</field>
+            <field name="model_id" ref="model_sc_openai_usage_snapshot"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_fetch_daily_usage()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="nextcall" eval="(datetime.now().replace(hour=23, minute=0, second=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="active">True</field>
+            <field name="priority">10</field>
+        </record>
+
+        <!-- Cron job to clean old completed tasks -->
+        <record id="cron_cleanup_old_tasks" model="ir.cron">
+            <field name="name">Cleanup Old Completed Tasks</field>
+            <field name="model_id" ref="model_sc_content_idea_task"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_cleanup_old_tasks()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="nextcall" eval="(datetime.now().replace(hour=2, minute=0, second=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="active">True</field>
+            <field name="priority">15</field>
+        </record>
+    </data>
+</odoo>

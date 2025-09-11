@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Generate Ideas Wizard Form View -->
+        <record id="sc_generate_ideas_wizard_view_form" model="ir.ui.view">
+            <field name="name">sc.generate.ideas.wizard.form</field>
+            <field name="model">sc.generate.ideas.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Generate Content Ideas">
+                    <header>
+                        <button name="action_generate_ideas" type="object" string="Generate Ideas" 
+                                class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="action_reset" type="object" string="Reset" 
+                                class="btn-secondary" invisible="state == 'draft'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,processing,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Wizard Name"/>
+                            </h1>
+                        </div>
+                        
+                        <group>
+                            <group string="Research Parameters">
+                                <field name="blog_id" required="1" 
+                                       domain="[('active', '=', True)]"/>
+                                <field name="query" required="1" 
+                                       placeholder="e.g., 'digital marketing trends 2024'"/>
+                                <field name="num_ideas" required="1"/>
+                            </group>
+                            <group string="Agent Configuration">
+                                <field name="agent_model" required="1"/>
+                                <field name="agent_instructions" 
+                                       placeholder="Custom instructions for the content research agent..."/>
+                            </group>
+                        </group>
+                        
+                        <notebook>
+                            <page string="Processing Log" invisible="not processing_log">
+                                <field name="processing_log" readonly="1" nolabel="1"/>
+                            </page>
+                            
+                            <page string="Error Details" invisible="not error_message">
+                                <group>
+                                    <field name="error_message" readonly="1" nolabel="1"/>
+                                </group>
+                            </page>
+                        </notebook>
+                        
+                        <div class="oe_clear"/>
+                        
+                        <!-- Help text -->
+                        <div class="alert alert-info" role="alert" invisible="state != 'draft'">
+                            <strong>How it works:</strong>
+                            <ul>
+                                <li>The AI agent will search the web using your query</li>
+                                <li>It will analyze search results and generate content ideas</li>
+                                <li>Ideas will be stored and can be used for blog post generation</li>
+                                <li>Processing may take 1-2 minutes depending on the number of ideas requested</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="alert alert-success" role="alert" invisible="state != 'done'">
+                            <strong>Ideas Generated Successfully!</strong>
+                            <p>You can now use these ideas to generate blog posts or review them in the Content Ideas section.</p>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Generate Ideas Wizard Action -->
+        <record id="action_sc_generate_ideas_wizard" model="ir.actions.act_window">
+            <field name="name">Generate Content Ideas</field>
+            <field name="res_model">sc.generate.ideas.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{'default_name': 'Content Ideas Generation'}</field>
+        </record>
+    </data>
+</odoo>

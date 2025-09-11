@@ -37,6 +37,53 @@
                         </div>
                     </div>
                 </setting>
+                
+                <!-- Content Research Agent Settings v18.0.1.0.1 -->
+                <setting id="sc_research_agent_setting" string="Content Research Agent">
+                    <div class="content-group">
+                        <div class="mt16">
+                            <label for="sc_research_agent_model" class="o_light_label">Research Agent Model</label>
+                            <field name="sc_research_agent_model"/>
+                            <div class="text-muted">
+                                OpenAI model for content research and topic generation.
+                            </div>
+                        </div>
+                        <div class="mt16">
+                            <label for="sc_research_agent_instructions" class="o_light_label">Agent Instructions</label>
+                            <field name="sc_research_agent_instructions"/>
+                            <div class="text-muted">
+                                System instructions that guide the research agent behavior.
+                            </div>
+                        </div>
+                        <div class="mt16">
+                            <label for="sc_research_agent_default_query" class="o_light_label">Default Search Query</label>
+                            <field name="sc_research_agent_default_query"/>
+                            <div class="text-muted">
+                                Default search query template (use {today} for current date).
+                            </div>
+                        </div>
+                    </div>
+                </setting>
+                
+                <!-- Content Generation Agent Settings v18.0.1.0.1 -->
+                <setting id="sc_generation_agent_setting" string="Content Generation Agent">
+                    <div class="content-group">
+                        <div class="mt16">
+                            <label for="sc_generation_agent_model" class="o_light_label">Generation Agent Model</label>
+                            <field name="sc_generation_agent_model"/>
+                            <div class="text-muted">
+                                OpenAI model for blog content generation.
+                            </div>
+                        </div>
+                        <div class="mt16">
+                            <label for="sc_generation_agent_instructions" class="o_light_label">Agent Instructions</label>
+                            <field name="sc_generation_agent_instructions"/>
+                            <div class="text-muted">
+                                System instructions for the content generation agent.
+                            </div>
+                        </div>
+                    </div>
+                </setting>
             </xpath>
         </field>
     </record>

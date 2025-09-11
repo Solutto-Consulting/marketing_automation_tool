@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Generate Content Wizard Form View -->
+        <record id="sc_generate_content_wizard_view_form" model="ir.ui.view">
+            <field name="name">sc.generate.content.wizard.form</field>
+            <field name="model">sc.generate.content.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Generate Blog Content">
+                    <header>
+                        <button name="action_generate_content" type="object" string="Generate Content" 
+                                class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="action_reset" type="object" string="Reset" 
+                                class="btn-secondary" invisible="state == 'draft'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,processing,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Wizard Name"/>
+                            </h1>
+                        </div>
+                        
+                        <group>
+                            <group string="Content Generation">
+                                <field name="content_idea_id" required="1" 
+                                       domain="[('state', '=', 'approved')]"/>
+                                <field name="blog_id" required="1" 
+                                       domain="[('active', '=', True)]"/>
+                                <field name="target_word_count" required="1"/>
+                            </group>
+                            <group string="Agent Configuration">
+                                <field name="agent_model" required="1"/>
+                                <field name="agent_instructions" 
+                                       placeholder="Custom instructions for the content generation agent..."/>
+                            </group>
+                        </group>
+                        
+                        <group string="SEO Configuration">
+                            <field name="auto_publish" string="Auto-publish after generation"/>
+                            <field name="generate_meta_tags" string="Generate SEO meta tags"/>
+                        </group>
+                        
+                        <notebook>
+                            <page string="Selected Content Idea" invisible="not content_idea_id">
+                                <group>
+                                    <group>
+                                        <field name="content_idea_title" readonly="1"/>
+                                        <field name="content_idea_summary" readonly="1"/>
+                                        <field name="content_idea_source_domain" readonly="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="content_idea_word_count" readonly="1"/>
+                                        <field name="content_idea_keywords" readonly="1"/>
+                                    </group>
+                                </group>
+                            </page>
+                            
+                            <page string="Generated Content" invisible="state != 'done'">
+                                <group>
+                                    <field name="generated_blog_post_id" readonly="1" 
+                                           invisible="not generated_blog_post_id"/>
+                                </group>
+                                <div invisible="not generated_blog_post_id">
+                                    <button name="action_open_blog_post" type="object" 
+                                            string="Open Generated Blog Post" class="btn-primary"/>
+                                </div>
+                            </page>
+                            
+                            <page string="Processing Log" invisible="not processing_log">
+                                <field name="processing_log" readonly="1" nolabel="1"/>
+                            </page>
+                            
+                            <page string="Error Details" invisible="not error_message">
+                                <group>
+                                    <field name="error_message" readonly="1" nolabel="1"/>
+                                </group>
+                            </page>
+                        </notebook>
+                        
+                        <div class="oe_clear"/>
+                        
+                        <!-- Help text -->
+                        <div class="alert alert-info" role="alert" invisible="state != 'draft'">
+                            <strong>How it works:</strong>
+                            <ul>
+                                <li>The AI agent will use the selected content idea as a source</li>
+                                <li>It will generate a complete blog post with the specified word count</li>
+                                <li>SEO meta tags will be automatically generated if enabled</li>
+                                <li>The post can be auto-published or saved as draft</li>
+                                <li>Processing may take 2-3 minutes depending on content length</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="alert alert-success" role="alert" invisible="state != 'done'">
+                            <strong>Content Generated Successfully!</strong>
+                            <p>Your blog post has been created and is ready for review or publication.</p>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Generate Content Wizard Action -->
+        <record id="action_sc_generate_content_wizard" model="ir.actions.act_window">
+            <field name="name">Generate Blog Content</field>
+            <field name="res_model">sc.generate.content.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{'default_name': 'Blog Content Generation'}</field>
+        </record>
+
+        <!-- Generate Content from Idea Action (callable from content ideas) -->
+        <record id="action_generate_content_from_idea" model="ir.actions.act_window">
+            <field name="name">Generate Blog Content</field>
+            <field name="res_model">sc.generate.content.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{
+                'default_name': 'Blog Content Generation',
+                'default_content_idea_id': active_id
+            }</field>
+        </record>
+    </data>
+</odoo>
