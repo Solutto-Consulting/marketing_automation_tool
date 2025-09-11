@@ -33,6 +33,11 @@
                 <field name="translation_in_progress" invisible="1"/>
                 <field name="translation_task_count" invisible="1"/>
             </xpath>
+            
+            <!-- Make subtitle more prominent in the form -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="subtitle" placeholder="Optional subtitle to complement the main title"/>
+            </xpath>
         </field>
     </record>
 </odoo>

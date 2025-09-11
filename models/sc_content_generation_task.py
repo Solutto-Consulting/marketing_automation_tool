@@ -452,6 +452,10 @@ class ScContentGenerationTask(models.Model):
             'author_id': self.target_author_id.id if self.target_author_id else self.env.user.partner_id.id,
         }
         
+        # Add subtitle if provided
+        if content_data.get('subtitle'):
+            blog_post_values['subtitle'] = content_data['subtitle']
+        
         # Add SEO meta tags if enabled
         if self.generate_meta_tags:
             blog_post_values.update({

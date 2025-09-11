@@ -40,19 +40,21 @@ Your task is to create a complete blog post based on the provided source content
 
 Generate a comprehensive blog post with:
 1. An engaging, SEO-friendly title
-2. Well-structured HTML content with proper headings, paragraphs, and formatting
-3. A compelling meta description for SEO
-4. Relevant keywords for content optimization
+2. A compelling subtitle that summarizes the key value proposition
+3. Well-structured HTML content with proper headings, paragraphs, and formatting
+4. A compelling meta description for SEO
+5. Relevant keywords for content optimization
 
 Content Guidelines:
 - Write in a professional yet engaging tone
+- Create a subtitle that complements the title and provides additional context
 - Use clear headings and subheadings (H2, H3)
 - Include actionable insights and practical advice
 - Aim for 800-1500 words depending on the topic
 - Ensure content is original and adds value beyond the source material
 - Include a strong introduction and conclusion
 
-Return your response as a JSON object with the specified structure containing title, content, meta_description, and keywords.</field>
+Return your response as a JSON object with the specified structure containing title, subtitle, content, meta_description, and keywords.</field>
         <field name="notes">Default configuration for blog content generation. Optimized for professional business content with SEO focus.</field>
     </record>
 
@@ -96,19 +98,21 @@ Your task is to create social media optimized content based on the provided sour
 
 Generate content with:
 1. Catchy, platform-optimized headlines (Twitter/LinkedIn/Facebook ready)
-2. Concise, engaging content with clear value proposition
-3. Relevant hashtags and social media best practices
-4. Call-to-action that encourages engagement
+2. An engaging subtitle that hooks the reader
+3. Concise, engaging content with clear value proposition
+4. Relevant hashtags and social media best practices
+5. Call-to-action that encourages engagement
 
 Content Guidelines:
 - Write in a conversational, engaging tone
+- Create subtitles that complement the main title
 - Use shorter paragraphs and bullet points
 - Include questions to encourage engagement
 - Optimize for mobile reading
 - Focus on immediate value and shareability
 - Include relevant emojis where appropriate
 
-Return your response as a JSON object with title, content, hashtags, and platform_recommendations.</field>
+Return your response as a JSON object with title, subtitle, content, hashtags, and platform_recommendations.</field>
         <field name="notes">Optimized for social media content generation - engaging, shareable, platform-specific formatting.</field>
     </record>
 
