@@ -86,6 +86,48 @@ class ScGenerateContentWizard(models.TransientModel):
         help="Generate SEO meta tags for the blog post"
     )
     
+    # Image Generation Options
+    generate_cover_image = fields.Boolean(
+        string="Generate Cover Image",
+        default=True,
+        help="Automatically generate a cover image for the blog post using DALL-E"
+    )
+    
+    image_prompt_override = fields.Text(
+        string="Custom Image Prompt",
+        help="Optional: Custom prompt for image generation. If empty, will be generated from the article content."
+    )
+    
+    image_size = fields.Selection(
+        selection=[
+            ('1024x1024', '1024x1024 (Square)'),
+            ('1024x1792', '1024x1792 (Portrait)'),
+            ('1792x1024', '1792x1024 (Landscape)'),
+            ('512x512', '512x512 (Square - DALL-E 2)'),
+            ('256x256', '256x256 (Square - DALL-E 2)'),
+        ],
+        string="Image Size",
+        help="Size for the generated cover image"
+    )
+    
+    image_quality = fields.Selection(
+        selection=[
+            ('standard', 'Standard'),
+            ('hd', 'HD (Higher detail)'),
+        ],
+        string="Image Quality",
+        help="Quality for the generated image (DALL-E 3 only)"
+    )
+    
+    image_style = fields.Selection(
+        selection=[
+            ('vivid', 'Vivid (Hyper-real and dramatic)'),
+            ('natural', 'Natural (Less hyper-real)'),
+        ],
+        string="Image Style",
+        help="Visual style for the generated image (DALL-E 3 only)"
+    )
+    
     target_lang_id = fields.Many2one(
         'res.lang',
         string="Language",
@@ -282,6 +324,12 @@ class ScGenerateContentWizard(models.TransientModel):
             'auto_publish': self.auto_publish,
             'generate_meta_tags': self.generate_meta_tags,
             'state': 'draft',
+            # Image generation configuration
+            'generate_cover_image': self.generate_cover_image,
+            'image_prompt_override': self.image_prompt_override,
+            'image_size': self.image_size,
+            'image_quality': self.image_quality,
+            'image_style': self.image_style,
         }
         
         # Add content source specific fields
@@ -339,3 +387,31 @@ class ScGenerateContentWizard(models.TransientModel):
             'view_mode': 'form',
             'target': 'current',
         }
+    
+    @api.model
+    def default_get(self, fields_list):
+        """Set default values from system configuration"""
+        result = super().default_get(fields_list)
+        
+        # Get image generation defaults from config parameters
+        config = self.env['ir.config_parameter'].sudo()
+        
+        if 'image_size' in fields_list:
+            result['image_size'] = config.get_param(
+                'sc_marketing_automation_tool.image_default_size',
+                '1024x1024'
+            )
+            
+        if 'image_quality' in fields_list:
+            result['image_quality'] = config.get_param(
+                'sc_marketing_automation_tool.image_default_quality',
+                'standard'
+            )
+            
+        if 'image_style' in fields_list:
+            result['image_style'] = config.get_param(
+                'sc_marketing_automation_tool.image_default_style',
+                'vivid'
+            )
+        
+        return result

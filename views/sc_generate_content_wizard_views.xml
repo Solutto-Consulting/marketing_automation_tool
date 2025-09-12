@@ -52,6 +52,20 @@
                             <field name="generate_meta_tags" string="Generate SEO meta tags"/>
                         </group>
                         
+                        <group string="Cover Image Generation">
+                            <group>
+                                <field name="generate_cover_image" string="Generate Cover Image"/>
+                                <field name="image_prompt_override" 
+                                       placeholder="Optional: Custom prompt for image generation..."
+                                       invisible="not generate_cover_image"/>
+                            </group>
+                            <group>
+                                <field name="image_size" invisible="not generate_cover_image"/>
+                                <field name="image_quality" invisible="not generate_cover_image"/>
+                                <field name="image_style" invisible="not generate_cover_image"/>
+                            </group>
+                        </group>
+                        
                         <notebook>
                             <page string="Selected Content Idea" invisible="not content_idea_id">
                                 <group>
@@ -98,8 +112,9 @@
                                 <li>The AI agent will use the selected content idea as a source</li>
                                 <li>It will generate a complete blog post with the specified word count</li>
                                 <li>SEO meta tags will be automatically generated if enabled</li>
+                                <li>Cover images will be automatically generated using DALL-E if enabled</li>
                                 <li>The post can be auto-published or saved as draft</li>
-                                <li>Processing may take 2-3 minutes depending on content length</li>
+                                <li>Processing may take 2-3 minutes depending on content length and image generation</li>
                             </ul>
                         </div>
                         

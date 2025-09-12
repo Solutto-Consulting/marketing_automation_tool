@@ -17,6 +17,13 @@
                     <field name="agent_config_id"/>
                     <field name="target_blog_id"/>
                     <field name="target_lang_id"/>
+                    <field name="generate_cover_image" string="Image Gen" widget="boolean_toggle"/>
+                    <field name="image_generation_status" string="Image Status" widget="badge"
+                           decoration-success="image_generation_status == 'success'"
+                           decoration-info="image_generation_status == 'generating'"
+                           decoration-warning="image_generation_status == 'pending'"
+                           decoration-danger="image_generation_status == 'failed'"
+                           optional="show"/>
                     <field name="generated_blog_post_id"/>
                     <field name="duration"/>
                     <field name="create_date"/>
@@ -90,6 +97,30 @@
                             <field name="agent_config_id" readonly="state != 'draft'"/>
                             <field name="agent_model" readonly="1" invisible="not agent_model"/>
                             <field name="agent_instructions" readonly="1" invisible="not agent_instructions"/>
+                        </group>
+                        
+                        <group string="Cover Image Generation" invisible="not generate_cover_image">
+                            <group>
+                                <field name="generate_cover_image" readonly="1"/>
+                                <field name="image_generation_status" readonly="1" widget="badge"
+                                       decoration-success="image_generation_status == 'success'"
+                                       decoration-info="image_generation_status == 'generating'"
+                                       decoration-warning="image_generation_status == 'pending'"
+                                       decoration-danger="image_generation_status == 'failed'"/>
+                                <field name="generated_image_path" readonly="1" invisible="not generated_image_path"/>
+                            </group>
+                            <group>
+                                <field name="image_size" readonly="1"/>
+                                <field name="image_quality" readonly="1"/>
+                                <field name="image_style" readonly="1"/>
+                            </group>
+                            <group string="Image Generation Details" col="1" invisible="not image_generation_prompt">
+                                <field name="image_generation_prompt" readonly="1" nolabel="1" 
+                                       placeholder="Image prompt will appear here after generation..."/>
+                            </group>
+                            <group string="Error Details" col="1" invisible="not image_generation_error">
+                                <field name="image_generation_error" readonly="1" nolabel="1"/>
+                            </group>
                         </group>
                         
                         <group string="Error Details" invisible="state != 'error'">

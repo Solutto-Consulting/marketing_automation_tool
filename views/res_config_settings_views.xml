@@ -8,45 +8,59 @@
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
                 <app data-string="AI Marketing Tools" string="AI Marketing Tools" name="sc_marketing_automation_tool" groups="base.group_system">
-                    <block title="OpenAI Integration" id="openai_integration_settings">
-                        <setting id="sc_openai_api_key_setting" string="OpenAI API Key" help="Configure your OpenAI API key for AI-powered content translation">
-                            <div class="content-group">
-                                <div class="mt16">
-                                    <field name="sc_openai_api_key" placeholder="sk-..." password="True"/>
-                                    <div class="text-muted mt8">
-                                        Your OpenAI API key for accessing AI translation services.
-                                        <a href="https://platform.openai.com/api-keys" target="_blank" class="oe_link ms-2">
-                                            Get your API key here →
-                                        </a>
-                                    </div>
-                                </div>
+            <block title="OpenAI Integration" id="openai_block">
+                <setting string="OpenAI API Configuration" id="openai_api_setting">
+                    <div class="content-group">
+                        <div class="mt16">
+                            <field name="sc_openai_api_key" string="API Key" password="True"/>
+                            <div class="text-muted">
+                                Your OpenAI API key for content generation
                             </div>
-                        </setting>
-                        
-                        <setting id="sc_openai_organization_setting" string="OpenAI Organization" help="Your OpenAI Organization ID (optional but recommended for team accounts)">
-                            <div class="content-group">
-                                <div class="mt16">
-                                    <field name="sc_openai_organization_id" placeholder="org-..."/>
-                                    <div class="text-muted mt8">
-                                        Organization ID from your OpenAI account settings. Only required for team/organization accounts.
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="mt16">
+                            <field name="sc_openai_organization_id" string="Organization ID"/>
+                            <div class="text-muted">
+                                Optional: Your OpenAI Organization ID
                             </div>
-                        </setting>
-                        
-                        <setting id="sc_openai_model_setting" string="AI Model Selection" help="Select the OpenAI model to use for content translation">
-                            <div class="content-group">
-                                <div class="mt16">
-                                    <field name="sc_openai_model"/>
-                                    <div class="text-muted mt8">
-                                        Choose the AI model for content translation. Model list is dynamically loaded from your OpenAI account.
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="mt16">
+                            <field name="sc_openai_model" string="Text Generation Model"/>
+                            <div class="text-muted">
+                                Model to use for text and translation generation
                             </div>
-                        </setting>
-                    </block>
-
-                    <block title="AI Agent Management" id="ai_agent_management">
+                        </div>
+                    </div>
+                </setting>
+                
+                <setting string="Image Generation Configuration" id="image_generation_setting">
+                    <div class="content-group">
+                        <div class="mt16">
+                            <field name="sc_image_generation_model" string="Image Generation Model"/>
+                            <div class="text-muted">
+                                DALL-E model to use for automatic image generation
+                            </div>
+                        </div>
+                        <div class="mt16">
+                            <field name="sc_image_default_size" string="Default Image Size"/>
+                            <div class="text-muted">
+                                Default size for generated blog cover images
+                            </div>
+                        </div>
+                        <div class="mt16">
+                            <field name="sc_image_default_quality" string="Default Image Quality"/>
+                            <div class="text-muted">
+                                Image quality (DALL-E 3 supports HD quality)
+                            </div>
+                        </div>
+                        <div class="mt16">
+                            <field name="sc_image_default_style" string="Default Image Style"/>
+                            <div class="text-muted">
+                                Visual style for generated images (DALL-E 3 only)
+                            </div>
+                        </div>
+                    </div>
+                </setting>
+            </block>                    <block title="AI Agent Management" id="ai_agent_management">
                         <setting id="sc_agent_config_setting" string="AI Agent Configuration System" help="Enable advanced AI agent configuration with custom instructions and templates">
                             <field name="sc_enable_agent_config"/>
                             <div class="content-group" invisible="not sc_enable_agent_config">

@@ -29,6 +29,54 @@ class ResConfigSettings(models.TransientModel):
         default='gpt-4o',
     )
     
+    # Image Generation Configuration
+    sc_image_generation_model = fields.Selection(
+        selection=[
+            ('dall-e-3', 'DALL-E 3'),
+            ('dall-e-2', 'DALL-E 2'),
+        ],
+        string="Image Generation Model",
+        help="Select the DALL-E model to use for image generation",
+        config_parameter='sc_marketing_automation_tool.image_generation_model',
+        default='dall-e-3',
+    )
+    
+    sc_image_default_size = fields.Selection(
+        selection=[
+            ('1024x1024', '1024x1024 (Square)'),
+            ('1024x1792', '1024x1792 (Portrait)'),
+            ('1792x1024', '1792x1024 (Landscape)'),
+            ('512x512', '512x512 (Square - DALL-E 2)'),
+            ('256x256', '256x256 (Square - DALL-E 2)'),
+        ],
+        string="Default Image Size",
+        help="Default size for generated images",
+        config_parameter='sc_marketing_automation_tool.image_default_size',
+        default='1024x1024',
+    )
+    
+    sc_image_default_quality = fields.Selection(
+        selection=[
+            ('standard', 'Standard'),
+            ('hd', 'HD (Higher detail)'),
+        ],
+        string="Default Image Quality",
+        help="Default quality for generated images (DALL-E 3 only)",
+        config_parameter='sc_marketing_automation_tool.image_default_quality',
+        default='standard',
+    )
+    
+    sc_image_default_style = fields.Selection(
+        selection=[
+            ('vivid', 'Vivid (Hyper-real and dramatic)'),
+            ('natural', 'Natural (Less hyper-real)'),
+        ],
+        string="Default Image Style",
+        help="Default style for generated images (DALL-E 3 only)",
+        config_parameter='sc_marketing_automation_tool.image_default_style',
+        default='vivid',
+    )
+    
     # Content Research Agent Configuration
     sc_research_agent_model = fields.Selection(
         selection='_get_openai_models',

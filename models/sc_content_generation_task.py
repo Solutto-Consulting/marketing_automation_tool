@@ -60,6 +60,76 @@ class ScContentGenerationTask(models.Model):
         help="Generate SEO meta tags for the blog post"
     )
     
+    # Image Generation Configuration
+    generate_cover_image = fields.Boolean(
+        string="Generate Cover Image",
+        default=True,
+        help="Automatically generate a cover image for the blog post using DALL-E"
+    )
+    
+    image_prompt_override = fields.Text(
+        string="Custom Image Prompt",
+        help="Optional: Custom prompt for image generation. If empty, will be generated from the article content."
+    )
+    
+    image_size = fields.Selection(
+        selection=[
+            ('1024x1024', '1024x1024 (Square)'),
+            ('1024x1792', '1024x1792 (Portrait)'),
+            ('1792x1024', '1792x1024 (Landscape)'),
+            ('512x512', '512x512 (Square - DALL-E 2)'),
+            ('256x256', '256x256 (Square - DALL-E 2)'),
+        ],
+        string="Image Size",
+        help="Size for the generated cover image"
+    )
+    
+    image_quality = fields.Selection(
+        selection=[
+            ('standard', 'Standard'),
+            ('hd', 'HD (Higher detail)'),
+        ],
+        string="Image Quality",
+        help="Quality for the generated image (DALL-E 3 only)"
+    )
+    
+    image_style = fields.Selection(
+        selection=[
+            ('vivid', 'Vivid (Hyper-real and dramatic)'),
+            ('natural', 'Natural (Less hyper-real)'),
+        ],
+        string="Image Style",
+        help="Visual style for the generated image (DALL-E 3 only)"
+    )
+    
+    # Image Generation Results
+    generated_image_path = fields.Char(
+        string="Generated Image Path",
+        help="Local path where the generated image is stored"
+    )
+    
+    image_generation_prompt = fields.Text(
+        string="Final Image Prompt",
+        help="The actual prompt used for image generation (may be revised by DALL-E)"
+    )
+    
+    image_generation_status = fields.Selection(
+        selection=[
+            ('pending', 'Pending'),
+            ('generating', 'Generating'),
+            ('success', 'Success'),
+            ('failed', 'Failed'),
+        ],
+        string="Image Generation Status",
+        default='pending',
+        help="Status of the image generation process"
+    )
+    
+    image_generation_error = fields.Text(
+        string="Image Generation Error",
+        help="Error details if image generation fails"
+    )
+    
     generated_blog_post_id = fields.Many2one(
         'blog.post',
         string="Generated Blog Post",
@@ -470,10 +540,145 @@ class ScContentGenerationTask(models.Model):
         # Create the blog post in the specified language context
         blog_post = self.env['blog.post'].with_context(lang=lang_code).create(blog_post_values)
         
+        # Generate cover image if enabled
+        if self.generate_cover_image:
+            try:
+                image_path = self._generate_and_save_cover_image(
+                    content_data['title'],
+                    content_data['content']
+                )
+                
+                if image_path:
+                    # Update blog post with cover properties containing the generated image
+                    import json
+                    cover_properties = {
+                        "background_color_class": "o_cc o_cc1",  # Default color class
+                        "background-image": f"url('{image_path}')",
+                        "opacity": "0.4",  # Default opacity
+                        "resize_class": "o_half_screen_height"  # Default resize class
+                    }
+                    blog_post.cover_properties = json.dumps(cover_properties)
+                    _logger.info(f"Cover image generated and set in cover_properties for blog post {blog_post.id}")
+                else:
+                    _logger.warning(f"Cover image generation failed for blog post {blog_post.id}")
+                    
+            except Exception as e:
+                _logger.error(f"Error during cover image generation for blog post {blog_post.id}: {str(e)}")
+                # Don't fail the entire task if image generation fails
+        
         # Log creation
         _logger.info(f"Created blog post {blog_post.id} for task {self.id}")
         
         return blog_post
+    
+    def _generate_and_save_cover_image(self, article_title, article_content):
+        """
+        Generate and save cover image for the blog post
+        
+        Args:
+            article_title (str): Title of the article
+            article_content (str): Content of the article
+            
+        Returns:
+            str or None: Path to saved image or None if generation failed
+        """
+        self.ensure_one()
+        
+        if not self.generate_cover_image:
+            return None
+            
+        try:
+            # Import image utilities
+            from ..utils.openai_image_utils import create_image_generator_from_config, get_image_generation_settings
+            
+            # Update status
+            self.image_generation_status = 'generating'
+            self.env.cr.commit()  # Commit status change
+            
+            # Create image generator
+            image_generator = create_image_generator_from_config(self.env)
+            
+            # Get generation settings
+            settings = get_image_generation_settings(self.env)
+            
+            # Use task-specific settings if provided, otherwise use defaults
+            model = settings['model']
+            size = self.image_size or settings['size']
+            quality = self.image_quality or settings['quality']
+            style = self.image_style or settings['style']
+            
+            # Generate image prompt
+            prompt = image_generator.generate_image_prompt(
+                article_title,
+                article_content,
+                self.image_prompt_override
+            )
+            
+            # Store the prompt used
+            self.image_generation_prompt = prompt
+            
+            _logger.info(f"Generating cover image for task {self.id} with prompt: {prompt[:100]}...")
+            
+            # Generate image
+            result = image_generator.generate_image(
+                prompt=prompt,
+                model=model,
+                size=size,
+                quality=quality,
+                style=style
+            )
+            
+            if not result['success']:
+                raise Exception(result['error'])
+            
+            # Create filename and path
+            import uuid
+            import os
+            image_filename = f"blog_cover_{self.id}_{uuid.uuid4().hex[:8]}.png"
+            
+            # Get the module path for saving the image
+            module_path = os.path.dirname(os.path.dirname(__file__))
+            image_dir = os.path.join(module_path, 'static', 'src', 'img', 'generated')
+            image_path = os.path.join(image_dir, image_filename)
+            
+            # Save image from base64 data
+            image_data = result['data']
+            if 'b64_json' in image_data:
+                success = image_generator.save_image_from_base64(
+                    image_data['b64_json'],
+                    image_path
+                )
+            elif 'url' in image_data:
+                success = image_generator.download_image_from_url(
+                    image_data['url'],
+                    image_path
+                )
+            else:
+                raise Exception("No image data found in response")
+            
+            if not success:
+                raise Exception("Failed to save generated image")
+            
+            # Store relative path for web access
+            relative_path = f"/sc_marketing_automation_tool/static/src/img/generated/{image_filename}"
+            self.generated_image_path = relative_path
+            self.image_generation_status = 'success'
+            
+            # Update prompt if it was revised by DALL-E
+            if 'revised_prompt' in result and result['revised_prompt']:
+                self.image_generation_prompt = result['revised_prompt']
+            
+            _logger.info(f"Successfully generated and saved cover image for task {self.id}")
+            return relative_path
+            
+        except Exception as e:
+            error_msg = f"Error generating cover image: {str(e)}"
+            _logger.error(error_msg)
+            
+            self.image_generation_status = 'failed'
+            self.image_generation_error = error_msg
+            
+            return None
 
     @api.model
     def _cron_cleanup_old_tasks(self):
