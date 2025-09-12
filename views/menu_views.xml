@@ -99,6 +99,14 @@
         <field name="sequence" eval="100"/>
     </record>
 
+    <!-- Module Settings Menu -->
+    <record id="menu_module_settings" model="ir.ui.menu">
+        <field name="name">Settings</field>
+        <field name="parent_id" ref="menu_configuration"/>
+        <field name="action" ref="action_sc_marketing_automation_settings"/>
+        <field name="sequence" eval="5"/>
+    </record>
+
     <!-- AI Agent Configurations Menu -->
     <record id="menu_ai_agent_config" model="ir.ui.menu">
         <field name="name">AI Agent Configurations</field>
