@@ -1,91 +1,185 @@
-# Technical Guide: Content Management Tool for Odoo v18.0.1.0.0
+# Technical Guide: Content Management Tool for Odoo v18.0.1.0.1
 
 ## Table of Contents
 1. [Architecture Overview](#architecture-overview)
-2. [Module Structure](#module-structure)
-3. [Data Models](#data-models)
-4. [Integration Points](#integration-points)
-5. [API Implementation](#api-implementation)
-6. [Security Framework](#security-framework)
-7. [Configuration Management](#configuration-management)
-8. [Background Processing](#background-processing)
-9. [Error Handling](#error-handling)
-10. [Version-Specific Implementation](#version-specific-implementation)
-11. [Development Guidelines](#development-guidelines)
-12. [Testing Framework](#testing-framework)
+2. [Agent-Based Architecture](#agent-based-architecture)
+3. [Module Structure](#module-structure)
+4. [Data Models](#data-models)
+5. [Integration Points](#integration-points)
+6. [OpenAI Agents SDK Implementation](#openai-agents-sdk-implementation)
+7. [Security Framework](#security-framework)
+8. [Configuration Management](#configuration-management)
+9. [Multi-Agent Background Processing](#multi-agent-background-processing)
+10. [Error Handling](#error-handling)
+11. [Version-Specific Implementation](#version-specific-implementation)
+12. [Development Guidelines](#development-guidelines)
+13. [Testing Framework](#testing-framework)
 
 ---
 
 ## Architecture Overview
 
-The Content Management Tool for Odoo v18.0.1.0.0 implements a modular architecture for AI-powered content translation, built on Odoo 18.0 standards and integrated with OpenAI's language models.
+The Content Management Tool for Odoo v18.0.1.0.1 implements a sophisticated **multi-agent architecture** for AI-powered content strategy, representing a significant evolution from the translation-focused v18.0.1.0.0 to a comprehensive content management platform.
 
-### System Components
+### System Components (v18.0.1.0.1)
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   User Interface │    │  Business Logic │    │  External APIs  │
+│   User Interface │    │  Agent Layer    │    │  External APIs  │
 │                 │    │                 │    │                 │
-│ • Blog Post List│    │ • Translation   │    │ • OpenAI API    │
-│ • Translation   │◄──►│   Tasks         │◄──►│ • Model Listing │
-│   Wizard        │    │ • Task Manager  │    │ • Translation   │
-│ • Task Views    │    │ • Cron Jobs     │    │   Execution     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
+│ • Agent Config  │    │ • Research      │    │ • OpenAI API    │
+│ • Content Ideas │◄──►│   Agent         │◄──►│ • WebSearchTool │
+│ • Generation    │    │ • Generation    │    │ • Usage API     │
+│   Wizards       │    │   Agent         │    │ • Models API    │
+│ • Usage Monitor │    │ • Translation   │    └─────────────────┘
+│ • Task Mgmt     │    │   Agent         │             │
+└─────────────────┘    └─────────────────┘             │
+         │                       │                      │
+         └───────────────────────┼──────────────────────┘
                                  │
                     ┌─────────────────┐
                     │   Data Layer    │
                     │                 │
-                    │ • sc.translation│
+                    │ • sc.content    │
+                    │   .idea         │
+                    │ • sc.content    │
+                    │   .idea.task    │
+                    │ • sc.content    │
+                    │   .generation   │
                     │   .task         │
-                    │ • blog.post     │
-                    │   (extended)    │
-                    │ • res.config    │
-                    │   .settings     │
+                    │ • sc.openai     │
+                    │   .usage        │
+                    │   .snapshot     │
+                    │ • Enhanced      │
+                    │   Settings      │
                     └─────────────────┘
 ```
 
-### Key Design Principles (v18.0.1.0.0)
-- **Odoo 18.0 Compliance**: Modern view syntax and conditional attributes
-- **Asynchronous Processing**: Non-blocking translation execution
-- **Error Recovery**: Manual task reset capabilities
-- **Security First**: Encrypted credential storage and access controls
-- **Extensibility**: Foundation for future automation features
+### Key Design Principles (v18.0.1.0.1)
+- **Multi-Agent Architecture**: Specialized AI agents for research, generation, and translation
+- **OpenAI Agents SDK Integration**: Leveraging structured AI responses and WebSearchTool
+- **Centralized Settings Architecture**: Dedicated Marketing Automation configuration section
+- **Asynchronous Multi-Agent Processing**: Independent cron jobs for each agent type
+- **Structured AI Responses**: JSON-based content generation with defined schemas
+- **Enhanced Error Recovery**: Agent-specific error handling and recovery mechanisms
+- **Security First**: Enhanced credential storage and agent-specific access controls
+- **Extensibility**: Scalable foundation for additional AI agents and automation features
+
+---
+
+## Agent-Based Architecture
+
+### Agent Specialization Pattern
+
+v18.0.1.0.1 implements a **specialized agent pattern** where each AI agent has a dedicated purpose, configuration, and processing pipeline:
+
+```python
+# Agent Types and Responsibilities
+CONTENT_RESEARCH_AGENT = {
+    'purpose': 'Topic discovery and content idea generation',
+    'tools': ['WebSearchTool'],
+    'output': 'Structured JSON list of content ideas',
+    'model': 'Configurable (default: gpt-4o)',
+    'cron': 'Research processor (every 5 minutes)'
+}
+
+CONTENT_GENERATION_AGENT = {
+    'purpose': 'Complete blog post creation from ideas',
+    'tools': ['Standard OpenAI completion'],
+    'output': 'Structured blog post data (title, content, meta)',
+    'model': 'Configurable (default: gpt-4o)',
+    'cron': 'Generation processor (every 5 minutes)'
+}
+
+TRANSLATION_AGENT = {
+    'purpose': 'Enhanced blog post translation',
+    'tools': ['OpenAI Agents SDK'],
+    'output': 'Translated content with preserved structure',
+    'model': 'Configurable (default: gpt-4o)',
+    'cron': 'Translation processor (every 5 minutes)'
+}
+```
+
+### Agent Communication Pattern
+
+```
+Research Agent Output → Content Ideas Database
+         ↓
+User Selection + Generation Request
+         ↓
+Generation Agent Input → Blog Post Creation
+         ↓
+Optional Translation → Multi-language Content
+```
+
+### Configuration Isolation
+
+Each agent maintains isolated configuration to prevent cross-agent interference:
+
+```xml
+<!-- Settings Architecture -->
+<page string="Content Research Agent">
+    <group name="research_config">
+        <field name="sc_research_agent_model"/>
+        <field name="sc_research_agent_instructions"/>
+        <field name="sc_research_agent_default_query"/>
+    </group>
+</page>
+
+<page string="Content Generation Agent">
+    <group name="generation_config">
+        <field name="sc_generation_agent_model"/>
+        <field name="sc_generation_agent_instructions"/>
+    </group>
+</page>
+```
 
 ---
 
 ## Module Structure
 
-### File Organization
+### Enhanced File Organization (v18.0.1.0.1)
 ```
 sc_marketing_automation_tool/
 ├── __init__.py                    # Module initialization
-├── __manifest__.py                # Module manifest (v18.0.1.0.0)
+├── __manifest__.py                # Module manifest (v18.0.1.0.1)
 ├── models/
 │   ├── __init__.py
-│   ├── res_config_settings.py     # OpenAI configuration
-│   ├── sc_translation_task.py     # Translation task model
+│   ├── res_config_settings.py     # Enhanced OpenAI + Agent configuration
+│   ├── sc_translation_task.py     # Enhanced translation task model
+│   ├── sc_content_idea.py         # NEW: Content idea model
+│   ├── sc_content_idea_task.py    # NEW: Research task tracking
+│   ├── sc_content_generation_task.py  # NEW: Generation task tracking
+│   ├── sc_openai_usage_snapshot.py    # NEW: Usage monitoring
+│   ├── sc_ai_agent_config.py      # NEW: Agent configuration
 │   └── blog_post.py               # Blog post extensions
 ├── wizard/
 │   ├── __init__.py
-│   └── sc_translate_blog_post_wizard.py  # Translation wizard
+│   ├── sc_translate_blog_post_wizard.py     # Enhanced translation wizard
+│   ├── sc_generate_ideas_wizard.py         # NEW: Research wizard
+│   ├── sc_generate_content_wizard.py       # NEW: Generation wizard
+│   └── sc_content_preview_wizard.py        # NEW: Content preview
 ├── views/
-│   ├── res_config_settings_views.xml     # Configuration UI
-│   ├── sc_translation_task_views.xml     # Task management views
-│   ├── blog_post_views.xml               # Blog post enhancements
-│   └── sc_translate_blog_post_wizard_views.xml  # Wizard UI
+│   ├── res_config_settings_views.xml       # Enhanced configuration UI
+│   ├── sc_translation_task_views.xml       # Enhanced task views
+│   ├── sc_content_idea_views.xml           # NEW: Content idea views
+│   ├── sc_content_idea_task_views.xml      # NEW: Research task views
+│   ├── sc_content_generation_task_views.xml # NEW: Generation task views
+│   ├── sc_openai_usage_views.xml           # NEW: Usage monitoring views
+│   ├── blog_post_views.xml                 # Enhanced blog views
+│   └── menu_views.xml                      # NEW: Centralized menu structure
 ├── security/
-│   ├── ir.model.access.csv        # Model access controls
-│   └── security.xml               # Groups and record rules
+│   ├── ir.model.access.csv        # Enhanced model access controls
+│   └── sc_marketing_automation_tool_security.xml  # Enhanced groups and rules
 ├── data/
-│   ├── ir_actions_server.xml      # Server actions
-│   ├── ir_cron.xml                # Scheduled jobs
-│   └── menu.xml                   # Menu structure
+│   ├── server_actions.xml          # Enhanced server actions
+│   ├── ir_cron_data.xml           # Multi-agent cron jobs
+│   └── sc_ai_agent_config_data.xml # NEW: Default agent configurations
 ├── i18n/
-│   └── es_ES.po                   # Spanish translations
-├── docs/                          # Documentation
-└── requirements.txt               # External dependencies
+│   └── es_ES.po                   # Enhanced Spanish translations
+├── docs/                          # Comprehensive documentation
+└── external_dependencies/
+    └── requirements.txt           # OpenAI Agents SDK (>=0.2.9)
 ```
 
 ### Dependencies Matrix

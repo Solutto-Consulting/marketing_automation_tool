@@ -5,6 +5,68 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [18.0.1.0.1] - 2025-09-12
+
+### Added - Agent-Based Content Strategy
+- **Content Research Agent**: AI-powered topic discovery using WebSearchTool integration
+  - New models: `sc.content.idea`, `sc.content.idea.task`
+  - Web search capabilities for trending content ideas
+  - Placeholder processing support ({today} replacement)
+  - Structured JSON response handling
+- **Content Generation Agent**: Complete blog post creation from research ideas
+  - New model: `sc.content.generation.task`
+  - Blog post drafting with title, content, meta description, and keywords
+  - Integration with existing blog.post model
+  - Unpublished draft creation for review workflow
+- **OpenAI Usage Monitoring**: Daily API usage tracking and cost optimization
+  - New model: `sc.openai.usage.snapshot`
+  - Usage dashboard with historical data and graphs
+  - Manual and automatic data synchronization
+  - Cost tracking and optimization insights
+
+### Enhanced - Settings Architecture Refactor
+- **Centralized Settings**: Moved all configuration from General Settings to dedicated Marketing Automation section
+  - New dedicated settings action and menu structure
+  - Agent-specific configuration sections
+  - Enhanced organization and usability
+- **OpenAI Agents SDK Integration**: Upgraded from basic OpenAI API to OpenAI Agents SDK (>=0.2.9)
+  - WebSearchTool support for content research
+  - Structured agent responses with defined schemas
+  - Enhanced error handling and agent orchestration
+- **Multi-Agent Background Processing**: Separate cron jobs for each agent type
+  - Research processor for content idea generation
+  - Generation processor for blog post creation
+  - Enhanced translation processor with agent improvements
+  - Independent error handling and status tracking
+
+### Enhanced - User Interface & Workflows
+- **Marketing Automation Menu**: New centralized navigation structure
+  - Content Ideas management (All Ideas, Generation Tasks)
+  - Content Generation management (Generation Tasks)
+  - OpenAI Usage monitoring dashboard
+  - Centralized settings access
+- **Agent Configuration Wizards**: New user-friendly wizards for content pipeline
+  - Research ideas wizard with search query customization
+  - Content generation wizard with blog integration
+  - Enhanced translation wizard with agent improvements
+- **Enhanced Task Management**: Improved status tracking across all agent types
+  - Color-coded status indicators
+  - Detailed error reporting and recovery
+  - Task history and audit trails
+
+### Migration - Settings and Data Preservation
+- **Automatic Settings Migration**: Seamless migration from General Settings to Marketing Automation
+- **Backward Compatibility**: All existing translation functionality preserved and enhanced
+- **Data Integrity**: Existing translation tasks and blog posts remain fully functional
+- **Configuration Upgrade**: Existing OpenAI credentials automatically migrated to new structure
+
+### Technical - Architecture & Dependencies
+- **Agent Architecture**: Multi-agent system with specialized AI agents
+- **OpenAI Agents SDK**: External dependency upgrade to >=0.2.9
+- **Structured Responses**: JSON-based AI output processing with defined schemas
+- **Enhanced Security**: Agent-specific access controls and credential management
+- **Improved Error Handling**: Agent-specific error patterns and recovery mechanisms
+
 ## [18.0.1.1.0] - 2025-09-10
 
 ### Fixed

@@ -1,50 +1,73 @@
 # Content Management Tool for Odoo (sc_marketing_automation_tool)
 
 [![Odoo Version](https://img.shields.io/badge/Odoo-18.0-blue.svg)](https://odoo.com)
+[![Version](https://img.shields.io/badge/Version-18.0.1.0.1-green.svg)](https://github.com/Solutto-Consulting/marketing_automation_tool)
 [![License](https://img.shields.io/badge/License-LGPL--3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 ## Overview
 
-The **Content Management Tool for Odoo** enhances and automates marketing activities within the Odoo ecosystem by integrating Artificial Intelligence for content translation processes. This module provides administrators with powerful tools to streamline blog post translation workflows using OpenAI's advanced language models.
+The **Content Management Tool for Odoo v18.0.1.0.1** introduces powerful **agent-based content strategy** capabilities, transforming from a translation-focused tool into a comprehensive AI-powered content management platform. This version features specialized AI agents for content research, generation, and enhanced translation workflows.
 
-## Key Features (v18.0.1.0.0)
+## Key Features (v18.0.1.0.1)
 
-- **OpenAI Integration**: Centralized configuration for OpenAI API credentials and model selection
-- **Bulk Blog Translation**: Server action on blog posts for simultaneous translation of multiple articles
-- **AI-Powered Translation**: Leverages OpenAI's language models for high-quality content translation
-- **User-Friendly Wizard**: Intuitive interface for selecting target languages and providing AI instructions
-- **Asynchronous Processing**: Background translation processing to avoid UI blocking
-- **Task Management**: Comprehensive tracking and status management for translation requests
-- **Error Handling**: Robust error management with manual task reset capabilities
-- **Multi-Language Support**: Built-in internationalization with Spanish translation support
+### 🤖 **Agent-Based Content Strategy** (NEW)
+- **Content Research Agent**: AI-powered topic discovery using web search capabilities
+- **Content Generation Agent**: Complete blog post creation from research ideas
+- **Enhanced Translation Agent**: Improved translation capabilities with OpenAI Agents SDK
 
-## Version Features
+### 📊 **Usage Monitoring & Optimization** (NEW)
+- **OpenAI Usage Tracking**: Daily API consumption monitoring with cost insights
+- **Usage Dashboard**: Historical data visualization and trend analysis
+- **Cost Optimization**: Token usage breakdown and optimization recommendations
 
-### ✅ Included in v18.0.1.0.0 (September 2025)
-- **Complete OpenAI Integration**: openai-agents SDK with secure configuration
-- **Dynamic Model Selection**: Automatic loading from OpenAI API with fallbacks
-- **Translation Wizard**: Modal interface with customizable system instructions
-- **Asynchronous Processing**: Cron jobs every 5 minutes for background tasks
-- **Comprehensive Task Management**: Status tracking with manual reset capabilities
-- **Kanban Views**: State-based grouping (Odoo 18.0 compliance)
-- **Chatter Integration**: Change tracking for translation tasks
-- **Security Controls**: Marketing groups with role-based access
-- **i18n Support**: Complete Spanish translation
-- **Complete Documentation**: Bilingual functional and technical guides
+### ⚙️ **Centralized Configuration** (ENHANCED)
+- **Marketing Automation Settings**: Dedicated configuration section for all AI agents
+- **Agent-Specific Configuration**: Specialized settings for each AI agent type
+- **Enhanced Security**: Improved credential management and access controls
 
-### 🔧 Technical Highlights
-- **Odoo 18.0 Compliance**: Modern `<list>` views, proper conditional attributes
-- **Stable Anchors**: Settings inheritance using stable xpath selectors
-- **Credential Management**: Secure storage with password fields
-- **Input Validation**: Proper domain filters for published languages
+### 🔄 **Multi-Agent Background Processing** (ENHANCED)
+- **Specialized Cron Jobs**: Independent processing for research, generation, and translation
+- **Enhanced Task Management**: Comprehensive status tracking across all agent types
+- **Improved Error Handling**: Agent-specific error patterns and recovery mechanisms
 
-### ⚠️ Known Limitations in v18.0.1.0.0
-- Processing limited to 10 tasks per cron cycle (every 5 minutes)
-- No automatic retry for API failures
-- Manual reset required for error recovery
-- Basic error reporting without advanced diagnostics
+## Version Features Matrix
 
-**Note**: Enhanced features available in later versions (18.0.1.1.0+).
+### ✅ Included in v18.0.1.0.1 (September 2025)
+
+#### **Content Strategy Features**
+- **Content Research Agent**: WebSearchTool integration for topic discovery
+- **Content Generation Agent**: Complete blog post drafting from research ideas
+- **Usage Monitoring Dashboard**: Daily OpenAI API usage tracking and cost optimization
+- **Centralized Settings Architecture**: Dedicated Marketing Automation configuration section
+- **Multi-Agent Workflow**: End-to-end content pipeline from research to publication
+
+#### **Enhanced Technical Features**
+- **OpenAI Agents SDK Integration**: Upgrade to >=0.2.9 with WebSearchTool support
+- **Structured AI Responses**: JSON-based content generation with defined schemas
+- **Placeholder Processing**: Dynamic content replacement ({today} support)
+- **Enhanced Background Processing**: Separate cron jobs for each agent type
+- **Improved Error Handling**: Agent-specific error patterns and recovery
+
+#### **User Interface Enhancements**
+- **Marketing Automation Menu**: Centralized navigation for all content features
+- **Agent Configuration Wizards**: User-friendly interfaces for research and generation
+- **Usage Monitoring Views**: Dashboard with graphs and historical data
+- **Enhanced Task Management**: Color-coded status tracking across all agents
+
+### 🔧 Technical Architecture (v18.0.1.0.1)
+- **Multi-Agent Architecture**: Specialized AI agents with dedicated configurations
+- **Settings Migration**: Automatic migration from General Settings to Marketing Automation
+- **Backward Compatibility**: All existing translation functionality preserved and enhanced
+- **Enhanced Security Model**: Agent-specific access controls and credential management
+- **Improved Data Models**: New models for content ideas, generation tasks, and usage tracking
+
+### ⚠️ Features Not Included in v18.0.1.0.1
+- **Advanced Analytics**: Comprehensive content performance metrics (planned for v18.0.1.1.0+)
+- **Multi-Provider Support**: Support for additional AI providers beyond OpenAI (planned for v18.0.2.0.0+)
+- **Webhook Integration**: External webhook notifications (planned for v18.0.1.2.0+)
+- **Custom Agent Training**: User-defined agent training and fine-tuning (enterprise feature)
+
+**Migration Path**: Seamless upgrade from v18.0.1.0.0 with automatic settings migration and data preservation.
 
 ## Technical Specifications
 
