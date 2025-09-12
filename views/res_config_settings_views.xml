@@ -1,88 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="res_config_settings_view_form" model="ir.ui.view">
-        <field name="name">res.config.settings.view.form.inherit.sc.marketing.automation.tool</field>
+    <!-- AI Marketing Tools Settings in General Settings -->
+    <record id="res_config_settings_view_form_inherit_sc_marketing" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sc.marketing</field>
         <field name="model">res.config.settings</field>
-        <field name="priority" eval="90"/>
-        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <!-- Add our settings as a new block within the Integrations section -->
-            <xpath expr="//setting[@id='module_auth_oauth']" position="after">
-                <setting id="sc_openai_integration_setting" string="AI Marketing Tools">
-                    <div class="content-group">
-                        <div class="mt16">
-                            <label for="sc_openai_api_key" class="o_light_label">OpenAI API Key</label>
-                            <field name="sc_openai_api_key" placeholder="sk-..." password="True"/>
-                            <div class="text-muted">
-                                Your OpenAI API key for accessing AI translation services.
-                                <a href="https://platform.openai.com/api-keys" target="_blank" class="oe_link">
-                                    Get your API key here
-                                </a>
+            <xpath expr="//form" position="inside">
+                <app data-string="AI Marketing Tools" string="AI Marketing Tools" name="sc_marketing_automation_tool" groups="base.group_system">
+                    <block title="OpenAI Integration" id="openai_integration_settings">
+                        <setting id="sc_openai_api_key_setting" string="OpenAI API Key" help="Configure your OpenAI API key for AI-powered content translation">
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="sc_openai_api_key" placeholder="sk-..." password="True"/>
+                                    <div class="text-muted mt8">
+                                        Your OpenAI API key for accessing AI translation services.
+                                        <a href="https://platform.openai.com/api-keys" target="_blank" class="oe_link ms-2">
+                                            Get your API key here →
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mt16">
-                            <label for="sc_openai_organization_id" class="o_light_label">OpenAI Organization ID</label>
-                            <field name="sc_openai_organization_id" placeholder="org-..."/>
-                            <div class="text-muted">
-                                Your OpenAI Organization ID (optional but recommended).
+                        </setting>
+                        
+                        <setting id="sc_openai_organization_setting" string="OpenAI Organization" help="Your OpenAI Organization ID (optional but recommended for team accounts)">
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="sc_openai_organization_id" placeholder="org-..."/>
+                                    <div class="text-muted mt8">
+                                        Organization ID from your OpenAI account settings. Only required for team/organization accounts.
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mt16">
-                            <label for="sc_openai_model" class="o_light_label">OpenAI Model</label>
-                            <field name="sc_openai_model"/>
-                            <div class="text-muted">
-                                Select the OpenAI model to use for content translations.
-                                Model list is loaded dynamically from your OpenAI account.
+                        </setting>
+                        
+                        <setting id="sc_openai_model_setting" string="AI Model Selection" help="Select the OpenAI model to use for content translation">
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="sc_openai_model"/>
+                                    <div class="text-muted mt8">
+                                        Choose the AI model for content translation. Model list is dynamically loaded from your OpenAI account.
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </setting>
-                
-                <!-- AI Agent Configuration v18.0.1.0.1 -->
-                <setting id="sc_ai_agent_setting" string="AI Agent Management">
-                    <div class="content-group">
-                        <div class="mt16">
+                        </setting>
+                    </block>
+
+                    <block title="AI Agent Management" id="ai_agent_management">
+                        <setting id="sc_agent_config_setting" string="AI Agent Configuration System" help="Enable advanced AI agent configuration with custom instructions and templates">
                             <field name="sc_enable_agent_config"/>
-                            <label for="sc_enable_agent_config" class="o_light_label">Enable Advanced Agent Management</label>
-                            <div class="text-muted">
-                                Enable comprehensive AI agent configuration system with custom instructions, models, and templates.
+                            <div class="content-group" invisible="not sc_enable_agent_config">
+                                <div class="alert alert-info mt16">
+                                    <strong>Advanced AI Agent Configuration is Active!</strong><br/>
+                                    <p>Configure your AI agents with detailed instructions, custom models, and specialized templates.</p>
+                                    <button name="%(action_sc_ai_agent_config)d" 
+                                            string="Manage AI Agent Configurations" 
+                                            type="action" 
+                                            class="btn btn-primary btn-sm"
+                                            icon="fa-cogs"/>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mt16" invisible="not sc_enable_agent_config">
-                            <div class="alert alert-info">
-                                <strong>Advanced AI Agent Configuration is Active!</strong><br/>
-                                Configure your AI agents with detailed instructions, custom models, and specialized templates.
-                                <br/><br/>
-                                <button name="%(action_sc_ai_agent_config)d" 
-                                        string="Manage AI Agent Configurations" 
-                                        type="action" 
-                                        class="btn btn-primary btn-sm"
-                                        icon="fa-cogs"/>
+                        </setting>
+                    </block>
+                    
+                    <block title="Legacy Configuration" id="legacy_configuration" invisible="sc_enable_agent_config">
+                        <setting id="sc_research_agent_setting" string="Research Agent Model" help="OpenAI model for content research (legacy setting)">
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="sc_research_agent_model"/>
+                                    <div class="text-muted mt8">
+                                        OpenAI model for content research. Consider upgrading to advanced agent management for better control.
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </setting>
-                
-                <!-- Legacy Agent Model Settings (for backward compatibility) -->
-                <setting id="sc_legacy_agent_setting" string="Legacy Agent Models" invisible="sc_enable_agent_config">
-                    <div class="content-group">
-                        <div class="mt16">
-                            <label for="sc_research_agent_model" class="o_light_label">Research Agent Model</label>
-                            <field name="sc_research_agent_model"/>
-                            <div class="text-muted">
-                                OpenAI model for content research (legacy setting - upgrade to advanced agent management).
+                        </setting>
+                        
+                        <setting id="sc_generation_agent_setting" string="Generation Agent Model" help="OpenAI model for content generation (legacy setting)">
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="sc_generation_agent_model"/>
+                                    <div class="text-muted mt8">
+                                        OpenAI model for content generation. Consider upgrading to advanced agent management for better control.
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mt16">
-                            <label for="sc_generation_agent_model" class="o_light_label">Generation Agent Model</label>
-                            <field name="sc_generation_agent_model"/>
-                            <div class="text-muted">
-                                OpenAI model for content generation (legacy setting - upgrade to advanced agent management).
-                            </div>
-                        </div>
-                    </div>
-                </setting>
+                        </setting>
+                    </block>
+                </app>
             </xpath>
         </field>
+    </record>
+    
+    <!-- Standard action for the settings (accessed via Settings menu) -->
+    <record id="action_sc_marketing_automation_settings" model="ir.actions.act_window">
+        <field name="name">AI Marketing Tools Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'sc_marketing_automation_tool', 'bin_size': False}</field>
     </record>
 </odoo>
