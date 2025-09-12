@@ -78,9 +78,12 @@ Technical Requirements:
         # Menus must load LAST (after all actions are defined)
         'views/menu_views.xml',
     ],
+    'images': [
+        'static/description/icon.png',
+    ],
     'demo': [],
     'test': [],
     'installable': True,
     'auto_install': False,
-    'application': False,
+    'application': True,
 }
