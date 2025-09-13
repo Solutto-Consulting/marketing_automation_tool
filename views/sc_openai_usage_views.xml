@@ -70,7 +70,112 @@
             </field>
         </record>
 
-        <!-- OpenAI Usage Dashboard -->
+        <!-- OpenAI Usage Dashboard (New Approach) -->
+        <record id="sc_openai_dashboard_view_form" model="ir.ui.view">
+            <field name="name">sc.openai.dashboard.form</field>
+            <field name="model">sc.openai.dashboard</field>
+            <field name="arch" type="xml">
+                <form string="OpenAI Usage Dashboard">
+                    <header>
+                        <button name="action_fetch_latest_data" string="Fetch Latest Data" 
+                                type="object" class="btn-primary" icon="fa-download"/>
+                        <button name="action_refresh_dashboard" string="Refresh Dashboard" 
+                                type="object" class="btn-secondary" icon="fa-refresh"/>
+                    </header>
+                    <sheet>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h1>OpenAI API Usage Dashboard</h1>
+                                <p class="text-muted">Monitor your OpenAI API token consumption and estimated costs</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Data Status -->
+                        <div class="row mt16" invisible="data_available">
+                            <div class="col-lg-12">
+                                <div class="alert alert-info">
+                                    <i class="fa fa-info-circle"/> No usage data available yet. Use "Fetch Latest Data" to retrieve statistics from OpenAI API.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Summary Cards -->
+                        <div class="row mt32" invisible="not data_available">
+                            <div class="col-lg-3">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-primary">
+                                            <field name="last_30_days_tokens" readonly="1"/>
+                                        </h3>
+                                        <p class="text-muted">Last 30 Days Tokens</p>
+                                        <small class="text-success">
+                                            $<field name="last_30_days_cost" readonly="1"/>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-info">
+                                            <field name="last_7_days_tokens" readonly="1"/>
+                                        </h3>
+                                        <p class="text-muted">Last 7 Days Tokens</p>
+                                        <small class="text-success">
+                                            $<field name="last_7_days_cost" readonly="1"/>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-warning">
+                                            <field name="total_records" readonly="1"/>
+                                        </h3>
+                                        <p class="text-muted">Total Records</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h4 class="text-muted">
+                                            <field name="last_fetch_date" readonly="1"/>
+                                        </h4>
+                                        <p class="text-muted">Last Data Fetch</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="row mt32">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4>Quick Actions</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <button name="action_view_all_records" string="View All Usage Records" 
+                                                type="object" class="btn btn-outline-primary me-3" icon="fa-list"/>
+                                        <button name="action_fetch_latest_data" string="Fetch Latest Data" 
+                                                type="object" class="btn btn-outline-success" icon="fa-download"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden fields for data -->
+                        <group invisible="1">
+                            <field name="data_available"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- OpenAI Usage Dashboard (Original - keeping for reference) -->
         <record id="sc_openai_usage_dashboard_view" model="ir.ui.view">
             <field name="name">sc.openai.usage.dashboard</field>
             <field name="model">sc.openai.usage.snapshot</field>
@@ -156,13 +261,23 @@
             </field>
         </record>
 
-        <!-- OpenAI Usage Dashboard Action -->
-        <record id="action_sc_openai_usage_dashboard" model="ir.actions.act_window">
+        <!-- OpenAI Usage Dashboard Action (New) -->
+        <record id="action_sc_openai_dashboard" model="ir.actions.act_window">
             <field name="name">OpenAI Usage Dashboard</field>
+            <field name="res_model">sc.openai.dashboard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="sc_openai_dashboard_view_form"/>
+            <field name="target">current</field>
+        </record>
+
+        <!-- OpenAI Usage Dashboard Action (Original - updated) -->
+        <record id="action_sc_openai_usage_dashboard" model="ir.actions.act_window">
+            <field name="name">OpenAI Usage Dashboard (Legacy)</field>
             <field name="res_model">sc.openai.usage.snapshot</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="sc_openai_usage_dashboard_view"/>
             <field name="target">current</field>
+            <field name="context">{'create': False, 'edit': False, 'delete': False}</field>
         </record>
     </data>
 </odoo>

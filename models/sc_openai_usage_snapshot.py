@@ -13,7 +13,7 @@ class ScOpenaiUsageSnapshot(models.Model):
     date = fields.Date(
         string="Date",
         required=True,
-        unique=True,
+        default=fields.Date.today,
         help="The day of the usage data"
     )
     
@@ -77,6 +77,10 @@ class ScOpenaiUsageSnapshot(models.Model):
             
             record.estimated_cost = prompt_cost + completion_cost
     
+    _sql_constraints = [
+        ('unique_date', 'UNIQUE(date)', 'Only one usage snapshot per date is allowed.')
+    ]
+    
     @api.constrains('prompt_tokens', 'completion_tokens')
     def _check_token_values(self):
         """Validate token values are non-negative"""
@@ -122,12 +126,48 @@ class ScOpenaiUsageSnapshot(models.Model):
         }
     
     @api.model
+    def get_dashboard_data(self):
+        """Get aggregated data for dashboard display"""
+        summary_30 = self.get_usage_summary(days=30)
+        summary_7 = self.get_usage_summary(days=7)
+        
+        # Get recent records
+        recent_records = self.search([], order='date desc', limit=10)
+        
+        return {
+            'last_30_days': summary_30,
+            'last_7_days': summary_7,
+            'recent_records': recent_records.read(['date', 'total_tokens', 'estimated_cost']),
+            'total_records': self.search_count([]),
+        }
+    
+    @api.model
     def fetch_usage_data_from_api(self):
         """Fetch usage data from OpenAI API and create/update records"""
         # This method will be implemented in the OpenAI utils module
         # to handle the actual API calls and data processing
-        openai_utils = self.env['openai.utils']
-        return openai_utils.fetch_and_store_usage_data()
+        try:
+            # For now, return a placeholder response
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Info'),
+                    'message': _('OpenAI API integration will be implemented in the next version.'),
+                    'type': 'info',
+                }
+            }
+        except Exception as e:
+            _logger.error(f"Error fetching usage data: {str(e)}")
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Error'),
+                    'message': str(e),
+                    'type': 'danger',
+                }
+            }
     
     def action_refetch_data(self):
         """Manually refetch data for this specific date"""

@@ -18,8 +18,11 @@ access_sc_content_generation_task_manager,sc.content.generation.task manager,mod
 access_sc_content_generation_task_user,sc.content.generation.task user,model_sc_content_generation_task,sc_marketing_automation_tool.group_marketing_user,1,0,0,0
 access_sc_content_generation_task_admin,sc.content.generation.task admin,model_sc_content_generation_task,base.group_system,1,1,1,1
 access_sc_openai_usage_snapshot_manager,sc.openai.usage.snapshot manager,model_sc_openai_usage_snapshot,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
-access_sc_openai_usage_snapshot_user,sc.openai.usage.snapshot user,model_sc_openai_usage_snapshot,sc_marketing_automation_tool.group_marketing_user,1,0,0,0
+access_sc_openai_usage_snapshot_user,sc.openai.usage.snapshot user,model_sc_openai_usage_snapshot,sc_marketing_automation_tool.group_marketing_user,1,0,1,0
 access_sc_openai_usage_snapshot_admin,sc.openai.usage.snapshot admin,model_sc_openai_usage_snapshot,base.group_system,1,1,1,1
+access_sc_openai_dashboard_manager,sc.openai.dashboard manager,model_sc_openai_dashboard,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
+access_sc_openai_dashboard_user,sc.openai.dashboard user,model_sc_openai_dashboard,sc_marketing_automation_tool.group_marketing_user,1,1,1,0
+access_sc_openai_dashboard_admin,sc.openai.dashboard admin,model_sc_openai_dashboard,base.group_system,1,1,1,1
 access_sc_generate_ideas_wizard_manager,sc.generate.ideas.wizard manager,model_sc_generate_ideas_wizard,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
 access_sc_generate_ideas_wizard_user,sc.generate.ideas.wizard user,model_sc_generate_ideas_wizard,sc_marketing_automation_tool.group_marketing_user,1,1,1,0
 access_sc_generate_ideas_wizard_admin,sc.generate.ideas.wizard admin,model_sc_generate_ideas_wizard,base.group_system,1,1,1,1
@@ -43,4 +46,5 @@ access_sc_usage_statistics_user,sc.usage.statistics user,model_sc_usage_statisti
 access_sc_usage_statistics_admin,sc.usage.statistics admin,model_sc_usage_statistics,base.group_system,1,1,1,1
 access_sc_usage_statistics_daily_manager,sc.usage.statistics.daily manager,model_sc_usage_statistics_daily,sc_marketing_automation_tool.group_marketing_manager,1,1,1,1
 access_sc_usage_statistics_daily_user,sc.usage.statistics.daily user,model_sc_usage_statistics_daily,sc_marketing_automation_tool.group_marketing_user,1,0,0,0
+access_sc_usage_statistics_daily_admin,sc.usage.statistics.daily admin,model_sc_usage_statistics_daily,base.group_system,1,1,1,1
 access_sc_usage_statistics_daily_admin,sc.usage.statistics.daily admin,model_sc_usage_statistics_daily,base.group_system,1,1,1,1

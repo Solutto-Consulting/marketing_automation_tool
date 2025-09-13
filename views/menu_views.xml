@@ -80,7 +80,7 @@
     <record id="menu_openai_usage_dashboard" model="ir.ui.menu">
         <field name="name">Usage Dashboard</field>
         <field name="parent_id" ref="menu_analytics"/>
-        <field name="action" ref="action_sc_openai_usage_dashboard"/>
+        <field name="action" ref="action_sc_openai_dashboard"/>
         <field name="sequence" eval="10"/>
     </record>
 
