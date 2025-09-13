@@ -73,6 +73,42 @@ class ScContentIdea(models.Model):
     ], string="State", default='draft', tracking=True,
        help="Approval state of the content idea")
     
+    # Generated Articles Tracking
+    generation_tasks_ids = fields.One2many(
+        'sc.content.generation.task',
+        'content_idea_id',
+        string="Generation Tasks",
+        help="Content generation tasks that use this idea"
+    )
+    
+    generated_articles_count = fields.Integer(
+        string="Generated Articles",
+        compute='_compute_generated_articles_count',
+        store=True,
+        help="Number of blog articles generated from this idea"
+    )
+    
+    generated_blog_posts_ids = fields.One2many(
+        'blog.post',
+        compute='_compute_generated_blog_posts',
+        string="Generated Blog Posts",
+        help="Blog posts generated from this idea"
+    )
+    
+    has_generated_content = fields.Boolean(
+        string="Has Generated Content",
+        compute='_compute_generated_articles_count',
+        store=True,
+        help="True if this idea has been used to generate content"
+    )
+    
+    generation_tasks_count = fields.Integer(
+        string="Generation Tasks Count",
+        compute='_compute_generation_tasks_count',
+        store=True,
+        help="Number of generation tasks for this idea"
+    )
+    
     @api.depends('summary')
     def _compute_word_count(self):
         """Compute word count of the summary"""
@@ -97,6 +133,32 @@ class ScContentIdea(models.Model):
                     record.domain_name = "Unknown"
             else:
                 record.domain_name = ""
+    
+    @api.depends('generation_tasks_ids', 'generation_tasks_ids.generated_blog_post_id')
+    def _compute_generated_articles_count(self):
+        """Compute the number of articles generated from this idea"""
+        for record in self:
+            # Count generation tasks that have successfully created a blog post
+            successful_tasks = record.generation_tasks_ids.filtered('generated_blog_post_id')
+            record.generated_articles_count = len(successful_tasks)
+            record.has_generated_content = bool(successful_tasks)
+            
+            # Auto-update state to 'used' if content has been generated
+            if successful_tasks and record.state == 'approved':
+                record.state = 'used'
+    
+    @api.depends('generation_tasks_ids', 'generation_tasks_ids.generated_blog_post_id')
+    def _compute_generated_blog_posts(self):
+        """Compute the blog posts generated from this idea"""
+        for record in self:
+            blog_posts = record.generation_tasks_ids.mapped('generated_blog_post_id')
+            record.generated_blog_posts_ids = blog_posts.ids
+    
+    @api.depends('generation_tasks_ids')
+    def _compute_generation_tasks_count(self):
+        """Compute the number of generation tasks for this idea"""
+        for record in self:
+            record.generation_tasks_count = len(record.generation_tasks_ids)
     
     def action_view_source(self):
         """Open the source URL in a new window"""
@@ -169,6 +231,47 @@ class ScContentIdea(models.Model):
             'res_model': 'sc.generate.content.wizard',
             'view_mode': 'form',
             'target': 'new',
+            'context': {
+                'default_content_idea_id': self.id,
+            }
+        }
+    
+    def action_view_generated_articles(self):
+        """View blog posts generated from this idea"""
+        self.ensure_one()
+        blog_posts = self.generated_blog_posts_ids
+        
+        if not blog_posts:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('No Articles Generated'),
+                    'message': _('No blog articles have been generated from this content idea yet.'),
+                    'type': 'warning',
+                }
+            }
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Generated Blog Articles'),
+            'res_model': 'blog.post',
+            'view_mode': 'list,form',
+            'domain': [('id', 'in', blog_posts.ids)],
+            'context': {
+                'default_content_idea_id': self.id,
+            }
+        }
+    
+    def action_view_generation_tasks(self):
+        """View generation tasks for this idea"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Generation Tasks'),
+            'res_model': 'sc.content.generation.task',
+            'view_mode': 'list,form',
+            'domain': [('content_idea_id', '=', self.id)],
             'context': {
                 'default_content_idea_id': self.id,
             }

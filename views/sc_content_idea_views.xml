@@ -12,6 +12,8 @@
                     <field name="state"/>
                     <field name="publish_date"/>
                     <field name="word_count"/>
+                    <field name="generated_articles_count" string="Articles Generated"/>
+                    <field name="has_generated_content" invisible="1"/>
                     <field name="task_id"/>
                     <field name="create_date"/>
                 </list>
@@ -33,11 +35,26 @@
                                 invisible="not url"/>
                         <button name="action_extract_full_content" type="object" string="Preview Full Content" 
                                 class="btn-info" invisible="not url"/>
-                        <button name="action_generate_content" type="object" string="Generate Blog Content" 
+                        <button name="action_generate_content" type="object" string="Generate First Article" 
                                 class="btn-primary" invisible="state != 'approved'"/>
+                        <button name="action_generate_content" type="object" string="Generate Additional Article" 
+                                class="btn-primary" invisible="state != 'used'"/>
+                        <button name="action_view_generated_articles" type="object" string="View Generated Articles" 
+                                class="btn-outline-primary" invisible="generated_articles_count == 0"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>
                     </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" type="object" name="action_view_generated_articles" 
+                                    invisible="generated_articles_count == 0" icon="fa-newspaper-o">
+                                <field name="generated_articles_count" widget="statinfo" string="Articles Generated"/>
+                            </button>
+                            <button class="oe_stat_button" type="object" name="action_view_generation_tasks" 
+                                    invisible="not generation_tasks_ids" icon="fa-tasks">
+                                <field name="generation_tasks_count" widget="statinfo" string="Generation Tasks"/>
+                            </button>
+                        </div>
+                        
                         <group>
                             <group>
                                 <field name="name"/>
@@ -50,11 +67,39 @@
                                 <field name="state"/>
                                 <field name="word_count"/>
                                 <field name="create_date"/>
+                                <field name="has_generated_content" invisible="1"/>
+                                <field name="generation_tasks_ids" invisible="1"/>
                             </group>
                         </group>
                         <group>
                             <field name="summary" nolabel="1"/>
                         </group>
+                        
+                        <notebook invisible="generated_articles_count == 0">
+                            <page string="Generated Articles" name="generated_articles">
+                                <field name="generated_blog_posts_ids" nolabel="1">
+                                    <list string="Generated Blog Posts">
+                                        <field name="name"/>
+                                        <field name="blog_id"/>
+                                        <field name="author_id"/>
+                                        <field name="create_date"/>
+                                        <field name="is_published"/>
+                                        <field name="website_published"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Generation Tasks" name="generation_tasks">
+                                <field name="generation_tasks_ids" nolabel="1">
+                                    <list string="Generation Tasks">
+                                        <field name="name"/>
+                                        <field name="state"/>
+                                        <field name="generated_blog_post_id"/>
+                                        <field name="create_date"/>
+                                        <field name="completed_at"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
                     <chatter/>
                 </form>
@@ -73,12 +118,21 @@
                     <field name="task_id" string="Task"/>
                     <filter name="approved" string="Approved" 
                             domain="[('state', '=', 'approved')]"/>
+                    <filter name="used_for_content" string="Used for Content" 
+                            domain="[('has_generated_content', '=', True)]"/>
+                    <filter name="unused" string="Not Used Yet" 
+                            domain="[('has_generated_content', '=', False)]"/>
+                    <separator/>
                     <filter name="recent" string="Recent (Last 30 Days)" 
                             domain="[('create_date', '>=', (context_today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
                     <filter name="published_this_year" string="Published This Year"
                             domain="[('publish_date', '>=', context_today().replace(month=1, day=1))]"/>
+                    <separator/>
+                    <filter name="with_articles" string="With Generated Articles" 
+                            domain="[('generated_articles_count', '>', 0)]"/>
                     <group expand="0" string="Group By">
                         <filter name="group_by_state" string="State" context="{'group_by': 'state'}"/>
+                        <filter name="group_by_usage" string="Usage Status" context="{'group_by': 'has_generated_content'}"/>
                         <filter name="group_by_task" string="Task" context="{'group_by': 'task_id'}"/>
                         <filter name="group_by_domain" string="Source Domain" context="{'group_by': 'domain_name'}"/>
                         <filter name="group_by_date" string="Creation Date" context="{'group_by': 'create_date:month'}"/>
@@ -97,19 +151,38 @@
                     <field name="domain_name"/>
                     <field name="word_count"/>
                     <field name="state"/>
+                    <field name="generated_articles_count"/>
+                    <field name="has_generated_content"/>
                     <templates>
                         <t t-name="kanban-box">
                             <div class="oe_kanban_card oe_kanban_global_click">
                                 <div class="oe_kanban_content">
                                     <div class="o_kanban_record_title">
                                         <field name="name"/>
+                                        <t t-if="record.has_generated_content.raw_value">
+                                            <span class="badge bg-success ms-2">
+                                                <i class="fa fa-check"/> Used
+                                            </span>
+                                        </t>
                                     </div>
                                     <div class="o_kanban_record_subtitle text-muted">
                                         <i class="fa fa-globe"/> <field name="domain_name"/>
                                         <span class="float-end"><field name="word_count"/> words</span>
                                     </div>
+                                    <t t-if="record.generated_articles_count.raw_value > 0">
+                                        <div class="o_kanban_record_bottom mt8">
+                                            <span class="badge bg-info">
+                                                <i class="fa fa-newspaper-o"/> 
+                                                <field name="generated_articles_count"/> article(s) generated
+                                            </span>
+                                        </div>
+                                    </t>
                                     <div class="o_kanban_record_bottom mt16">
                                         <div class="oe_kanban_bottom_right">
+                                            <t t-if="record.generated_articles_count.raw_value > 0">
+                                                <button name="action_view_generated_articles" type="object" 
+                                                        class="btn btn-sm btn-outline-primary me-2">View Articles</button>
+                                            </t>
                                             <t t-if="record.state.raw_value == 'approved'">
                                                 <button name="action_generate_content" type="object" 
                                                         class="btn btn-sm btn-primary">Generate Content</button>
