@@ -66,6 +66,7 @@ Technical Requirements:
         'views/sc_content_idea_task_views.xml',
         'views/sc_content_generation_task_views.xml',
         'views/sc_openai_usage_views.xml',
+        'views/sc_usage_statistics_views.xml',
         'views/blog_post_views.xml',
         # Wizard views (contain actions referenced by menus)
         'wizard/sc_translate_blog_post_wizard_views.xml',

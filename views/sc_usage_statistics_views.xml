@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Usage Statistics List View -->
+    <record id="view_sc_usage_statistics_list" model="ir.ui.view">
+        <field name="name">sc.usage.statistics.list</field>
+        <field name="model">sc.usage.statistics</field>
+        <field name="arch" type="xml">
+            <list string="OpenAI Usage Statistics">
+                <field name="create_date"/>
+                <field name="period_type"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="total_cost"/>
+                <field name="currency"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Usage Statistics Form View -->
+    <record id="view_sc_usage_statistics_form" model="ir.ui.view">
+        <field name="name">sc.usage.statistics.form</field>
+        <field name="model">sc.usage.statistics</field>
+        <field name="arch" type="xml">
+            <form string="OpenAI Usage Statistics">
+                <header>
+                    <button name="action_refresh_data" string="Refresh Data" type="object" class="btn-primary" icon="fa-refresh"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,loading,loaded,error"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>OpenAI Usage Statistics</h1>
+                        <h2 class="text-muted">
+                            <field name="period_type" widget="selection" readonly="1" class="o_selection_badge"/>
+                        </h2>
+                    </div>
+                    
+                    <group>
+                        <group name="period_selection" string="Period Selection">
+                            <field name="period_type"/>
+                            <field name="custom_start_date" invisible="period_type != 'custom'" required="period_type == 'custom'"/>
+                            <field name="custom_end_date" invisible="period_type != 'custom'" required="period_type == 'custom'"/>
+                        </group>
+                        <group name="period_info" string="Period Information">
+                            <field name="period_start" readonly="1"/>
+                            <field name="period_end" readonly="1"/>
+                            <field name="period_days" readonly="1"/>
+                            <field name="last_updated" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Cost Summary" name="cost_summary">
+                            <group>
+                                <group name="costs" string="Cost Information">
+                                    <field name="total_cost" readonly="1">
+                                        <span class="o_stat_text">Total Cost</span>
+                                    </field>
+                                    <field name="currency" readonly="1"/>
+                                    <field name="average_daily_cost" readonly="1"/>
+                                    <field name="estimated_monthly_cost" readonly="1"/>
+                                </group>
+                                <group name="project_info" string="Project Information">
+                                    <field name="project_id" readonly="1"/>
+                                </group>
+                            </group>
+                            
+                            <div class="row mt32" invisible="state != 'loaded'">
+                                <div class="col-lg-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Quick Actions</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <button name="action_view_daily_breakdown" 
+                                                    string="View Daily Breakdown" 
+                                                    type="object" 
+                                                    class="btn btn-outline-primary btn-block"
+                                                    icon="fa-bar-chart"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Cost Summary</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Total:</span>
+                                                <strong>
+                                                    <field name="total_cost" readonly="1" nolabel="1"/>
+                                                    <field name="currency" readonly="1" nolabel="1"/>
+                                                </strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span>Daily Average:</span>
+                                                <span>
+                                                    <field name="average_daily_cost" readonly="1" nolabel="1"/>
+                                                    <field name="currency" readonly="1" nolabel="1"/>
+                                                </span>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span>Monthly Estimate:</span>
+                                                <span>
+                                                    <field name="estimated_monthly_cost" readonly="1" nolabel="1"/>
+                                                    <field name="currency" readonly="1" nolabel="1"/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+                        
+                        <page string="Error Details" name="error_details" invisible="state != 'error'">
+                            <group>
+                                <field name="error_message" readonly="1" widget="text"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Usage Statistics Action -->
+    <record id="action_sc_usage_statistics" model="ir.actions.act_window">
+        <field name="name">OpenAI Usage Statistics</field>
+        <field name="res_model">sc.usage.statistics</field>
+        <field name="view_mode">list,form</field>
+        <field name="target">current</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- Daily Breakdown List View -->
+    <record id="view_sc_usage_statistics_daily_list" model="ir.ui.view">
+        <field name="name">sc.usage.statistics.daily.list</field>
+        <field name="model">sc.usage.statistics.daily</field>
+        <field name="arch" type="xml">
+            <list string="Daily Cost Breakdown" create="false" edit="false" delete="false">
+                <field name="date"/>
+                <field name="amount" sum="Total"/>
+                <field name="currency"/>
+                <field name="parent_statistics_id" invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Daily Breakdown Action -->
+    <record id="action_sc_usage_statistics_daily" model="ir.actions.act_window">
+        <field name="name">Daily Cost Breakdown</field>
+        <field name="res_model">sc.usage.statistics.daily</field>
+        <field name="view_mode">list</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

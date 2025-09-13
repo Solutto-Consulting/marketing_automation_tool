@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 import requests
 import logging
 
@@ -27,6 +27,19 @@ class ResConfigSettings(models.TransientModel):
         help="Select the OpenAI model to use for translations",
         config_parameter='sc_marketing_automation_tool.openai_model',
         default='gpt-4o',
+    )
+    
+    # Administrative Configuration for Usage Statistics
+    sc_openai_admin_key = fields.Char(
+        string="OpenAI Admin Key",
+        help="OpenAI admin/service key with organization:read scope for usage statistics",
+        config_parameter='sc_marketing_automation_tool.openai_admin_key',
+    )
+    
+    sc_openai_project_id = fields.Char(
+        string="OpenAI Project ID",
+        help="OpenAI project ID for usage tracking and cost analysis",
+        config_parameter='sc_marketing_automation_tool.openai_project_id',
     )
     
     # Image Generation Configuration
@@ -198,3 +211,14 @@ class ResConfigSettings(models.TransientModel):
             _logger.info("OpenAI API key updated, model list will refresh on next load")
         
         return result
+    
+    def action_view_usage_statistics(self):
+        """Open the usage statistics view"""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('OpenAI Usage Statistics'),
+            'res_model': 'sc.usage.statistics',
+            'view_mode': 'list,form',
+            'target': 'current',
+            'context': {}
+        }

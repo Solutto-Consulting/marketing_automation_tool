@@ -29,6 +29,18 @@
                                 Model to use for text and translation generation
                             </div>
                         </div>
+                        <div class="mt16">
+                            <field name="sc_openai_admin_key" string="Admin Key" password="True"/>
+                            <div class="text-muted">
+                                OpenAI admin/service key for usage statistics (requires organization:read scope)
+                            </div>
+                        </div>
+                        <div class="mt16">
+                            <field name="sc_openai_project_id" string="Project ID"/>
+                            <div class="text-muted">
+                                OpenAI project ID for cost tracking and usage analysis
+                            </div>
+                        </div>
                     </div>
                 </setting>
                 
@@ -60,7 +72,28 @@
                         </div>
                     </div>
                 </setting>
-            </block>                    <block title="AI Agent Management" id="ai_agent_management">
+            </block>
+            
+            <block title="Statistics &amp; Usage" id="statistics_usage_block">
+                <setting string="Usage Statistics" id="usage_statistics_setting">
+                    <div class="content-group">
+                        <div class="mt16">
+                            <div class="text-muted">
+                                View OpenAI usage statistics and costs for this project. Requires admin key and project ID configuration above.
+                            </div>
+                            <div class="mt16">
+                                <button name="action_view_usage_statistics" 
+                                        string="View Usage Statistics" 
+                                        type="object" 
+                                        class="btn btn-primary"
+                                        icon="fa-bar-chart"/>
+                            </div>
+                        </div>
+                    </div>
+                </setting>
+            </block>
+            
+            <block title="AI Agent Management" id="ai_agent_management">
                         <setting id="sc_agent_config_setting" string="AI Agent Configuration System" help="Enable advanced AI agent configuration with custom instructions and templates">
                             <field name="sc_enable_agent_config"/>
                             <div class="content-group" invisible="not sc_enable_agent_config">

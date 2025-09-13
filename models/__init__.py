@@ -8,3 +8,4 @@ from . import sc_content_idea
 from . import sc_content_idea_task
 from . import sc_content_generation_task
 from . import sc_openai_usage_snapshot
+from . import sc_usage_statistics
