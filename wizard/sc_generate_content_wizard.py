@@ -90,7 +90,7 @@ class ScGenerateContentWizard(models.TransientModel):
     generate_cover_image = fields.Boolean(
         string="Generate Cover Image",
         default=True,
-        help="Automatically generate a cover image for the blog post using DALL-E"
+        help="Automatically generate a cover image for the blog post using gpt-image-1"
     )
     
     image_prompt_override = fields.Text(
@@ -103,29 +103,55 @@ class ScGenerateContentWizard(models.TransientModel):
             ('1024x1024', '1024x1024 (Square)'),
             ('1024x1792', '1024x1792 (Portrait)'),
             ('1792x1024', '1792x1024 (Landscape)'),
-            ('512x512', '512x512 (Square - DALL-E 2)'),
-            ('256x256', '256x256 (Square - DALL-E 2)'),
+            ('1536x1024', '1536x1024 (Widescreen)'),
+            ('1024x1536', '1024x1536 (Tall)'),
         ],
         string="Image Size",
-        help="Size for the generated cover image"
+        help="Size for the generated cover image (gpt-image-1)"
     )
     
     image_quality = fields.Selection(
         selection=[
             ('standard', 'Standard'),
-            ('hd', 'HD (Higher detail)'),
+            ('high', 'High (HD quality)'),
         ],
         string="Image Quality",
-        help="Quality for the generated image (DALL-E 3 only)"
+        help="Quality for the generated image (gpt-image-1)"
     )
     
-    image_style = fields.Selection(
+    image_output_format = fields.Selection(
         selection=[
-            ('vivid', 'Vivid (Hyper-real and dramatic)'),
-            ('natural', 'Natural (Less hyper-real)'),
+            ('png', 'PNG'),
+            ('jpeg', 'JPEG'),
+            ('webp', 'WebP'),
         ],
-        string="Image Style",
-        help="Visual style for the generated image (DALL-E 3 only)"
+        string="Output Format",
+        help="Output format for the generated image"
+    )
+    
+    image_background = fields.Selection(
+        selection=[
+            ('opaque', 'Opaque'),
+            ('transparent', 'Transparent'),
+        ],
+        string="Background",
+        help="Background type for the generated image"
+    )
+    
+    image_moderation = fields.Selection(
+        selection=[
+            ('auto', 'Auto'),
+            ('strict', 'Strict'),
+            ('relaxed', 'Relaxed'),
+        ],
+        string="Moderation Level",
+        help="Content moderation level for image generation"
+    )
+    
+    image_partial_images = fields.Integer(
+        string="Partial Images",
+        help="Number of partial images to generate during streaming (0 to disable)",
+        default=0
     )
     
     target_lang_id = fields.Many2one(
@@ -256,6 +282,38 @@ class ScGenerateContentWizard(models.TransientModel):
         if 'agent_instructions' in fields_list:
             defaults['agent_instructions'] = default_instructions
             
+        # Set default values for gpt-image-1 fields from configuration
+        config_params = self.env['ir.config_parameter'].sudo()
+        
+        if 'image_size' in fields_list:
+            defaults['image_size'] = config_params.get_param(
+                'sc_marketing_automation_tool.image_default_size', '1024x1024'
+            )
+        
+        if 'image_quality' in fields_list:
+            quality = config_params.get_param(
+                'sc_marketing_automation_tool.image_default_quality', 'standard'
+            )
+            # Ensure valid quality values for gpt-image-1
+            if quality not in ['standard', 'high']:
+                quality = 'standard'
+            defaults['image_quality'] = quality
+            
+        if 'image_output_format' in fields_list:
+            defaults['image_output_format'] = config_params.get_param(
+                'sc_marketing_automation_tool.image_default_output_format', 'png'
+            )
+            
+        if 'image_background' in fields_list:
+            defaults['image_background'] = config_params.get_param(
+                'sc_marketing_automation_tool.image_default_background', 'opaque'
+            )
+            
+        if 'image_moderation' in fields_list:
+            defaults['image_moderation'] = config_params.get_param(
+                'sc_marketing_automation_tool.image_default_moderation', 'auto'
+            )
+            
         return defaults
     
     @api.constrains('target_word_count')
@@ -324,12 +382,15 @@ class ScGenerateContentWizard(models.TransientModel):
             'auto_publish': self.auto_publish,
             'generate_meta_tags': self.generate_meta_tags,
             'state': 'draft',
-            # Image generation configuration
+            # Image generation configuration (gpt-image-1)
             'generate_cover_image': self.generate_cover_image,
             'image_prompt_override': self.image_prompt_override,
             'image_size': self.image_size,
             'image_quality': self.image_quality,
-            'image_style': self.image_style,
+            'image_output_format': self.image_output_format,
+            'image_background': self.image_background,
+            'image_moderation': self.image_moderation,
+            'image_partial_images': self.image_partial_images,
         }
         
         # Add content source specific fields
@@ -408,10 +469,22 @@ class ScGenerateContentWizard(models.TransientModel):
                 'standard'
             )
             
-        if 'image_style' in fields_list:
-            result['image_style'] = config.get_param(
-                'sc_marketing_automation_tool.image_default_style',
-                'vivid'
+        if 'image_output_format' in fields_list:
+            result['image_output_format'] = config.get_param(
+                'sc_marketing_automation_tool.image_default_output_format',
+                'png'
+            )
+            
+        if 'image_background' in fields_list:
+            result['image_background'] = config.get_param(
+                'sc_marketing_automation_tool.image_default_background',
+                'opaque'
+            )
+            
+        if 'image_moderation' in fields_list:
+            result['image_moderation'] = config.get_param(
+                'sc_marketing_automation_tool.image_default_moderation',
+                'auto'
             )
         
         return result

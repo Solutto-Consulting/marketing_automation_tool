@@ -112,7 +112,10 @@
                             <group>
                                 <field name="image_size" readonly="1"/>
                                 <field name="image_quality" readonly="1"/>
-                                <field name="image_style" readonly="1"/>
+                                <field name="image_output_format" readonly="1"/>
+                                <field name="image_background" readonly="1"/>
+                                <field name="image_moderation" readonly="1"/>
+                                <field name="image_partial_images" readonly="1"/>
                             </group>
                             <group string="Image Generation Details" col="1" invisible="not image_generation_prompt">
                                 <field name="image_generation_prompt" readonly="1" nolabel="1" 

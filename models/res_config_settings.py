@@ -42,16 +42,15 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='sc_marketing_automation_tool.openai_project_id',
     )
     
-    # Image Generation Configuration
+    # Image Generation Configuration (gpt-image-1)
     sc_image_generation_model = fields.Selection(
         selection=[
-            ('dall-e-3', 'DALL-E 3'),
-            ('dall-e-2', 'DALL-E 2'),
+            ('gpt-image-1', 'GPT-Image-1 (Responses API)'),
         ],
         string="Image Generation Model",
-        help="Select the DALL-E model to use for image generation",
+        help="Image generation model (gpt-image-1 via Responses API)",
         config_parameter='sc_marketing_automation_tool.image_generation_model',
-        default='dall-e-3',
+        default='gpt-image-1',
     )
     
     sc_image_default_size = fields.Selection(
@@ -59,11 +58,11 @@ class ResConfigSettings(models.TransientModel):
             ('1024x1024', '1024x1024 (Square)'),
             ('1024x1792', '1024x1792 (Portrait)'),
             ('1792x1024', '1792x1024 (Landscape)'),
-            ('512x512', '512x512 (Square - DALL-E 2)'),
-            ('256x256', '256x256 (Square - DALL-E 2)'),
+            ('1536x1024', '1536x1024 (Widescreen)'),
+            ('1024x1536', '1024x1536 (Tall)'),
         ],
         string="Default Image Size",
-        help="Default size for generated images",
+        help="Default size for generated images (gpt-image-1)",
         config_parameter='sc_marketing_automation_tool.image_default_size',
         default='1024x1024',
     )
@@ -71,23 +70,47 @@ class ResConfigSettings(models.TransientModel):
     sc_image_default_quality = fields.Selection(
         selection=[
             ('standard', 'Standard'),
-            ('hd', 'HD (Higher detail)'),
+            ('high', 'High (HD quality)'),
         ],
         string="Default Image Quality",
-        help="Default quality for generated images (DALL-E 3 only)",
+        help="Default quality for generated images (gpt-image-1)",
         config_parameter='sc_marketing_automation_tool.image_default_quality',
         default='standard',
     )
     
-    sc_image_default_style = fields.Selection(
+    sc_image_default_output_format = fields.Selection(
         selection=[
-            ('vivid', 'Vivid (Hyper-real and dramatic)'),
-            ('natural', 'Natural (Less hyper-real)'),
+            ('png', 'PNG'),
+            ('jpeg', 'JPEG'),
+            ('webp', 'WebP'),
         ],
-        string="Default Image Style",
-        help="Default style for generated images (DALL-E 3 only)",
-        config_parameter='sc_marketing_automation_tool.image_default_style',
-        default='vivid',
+        string="Default Output Format",
+        help="Default output format for generated images",
+        config_parameter='sc_marketing_automation_tool.image_default_output_format',
+        default='png',
+    )
+    
+    sc_image_default_background = fields.Selection(
+        selection=[
+            ('opaque', 'Opaque'),
+            ('transparent', 'Transparent'),
+        ],
+        string="Default Background",
+        help="Default background type for generated images",
+        config_parameter='sc_marketing_automation_tool.image_default_background',
+        default='opaque',
+    )
+    
+    sc_image_default_moderation = fields.Selection(
+        selection=[
+            ('auto', 'Auto'),
+            ('strict', 'Strict'),
+            ('relaxed', 'Relaxed'),
+        ],
+        string="Default Moderation Level",
+        help="Default content moderation level for image generation",
+        config_parameter='sc_marketing_automation_tool.image_default_moderation',
+        default='auto',
     )
     
     # Content Research Agent Configuration

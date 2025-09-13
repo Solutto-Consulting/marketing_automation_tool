@@ -64,7 +64,7 @@ class ScContentGenerationTask(models.Model):
     generate_cover_image = fields.Boolean(
         string="Generate Cover Image",
         default=True,
-        help="Automatically generate a cover image for the blog post using DALL-E"
+        help="Automatically generate a cover image for the blog post using gpt-image-1"
     )
     
     image_prompt_override = fields.Text(
@@ -77,29 +77,55 @@ class ScContentGenerationTask(models.Model):
             ('1024x1024', '1024x1024 (Square)'),
             ('1024x1792', '1024x1792 (Portrait)'),
             ('1792x1024', '1792x1024 (Landscape)'),
-            ('512x512', '512x512 (Square - DALL-E 2)'),
-            ('256x256', '256x256 (Square - DALL-E 2)'),
+            ('1536x1024', '1536x1024 (Widescreen)'),
+            ('1024x1536', '1024x1536 (Tall)'),
         ],
         string="Image Size",
-        help="Size for the generated cover image"
+        help="Size for the generated cover image (gpt-image-1)"
     )
     
     image_quality = fields.Selection(
         selection=[
             ('standard', 'Standard'),
-            ('hd', 'HD (Higher detail)'),
+            ('high', 'High (HD quality)'),
         ],
         string="Image Quality",
-        help="Quality for the generated image (DALL-E 3 only)"
+        help="Quality for the generated image (gpt-image-1)"
     )
     
-    image_style = fields.Selection(
+    image_output_format = fields.Selection(
         selection=[
-            ('vivid', 'Vivid (Hyper-real and dramatic)'),
-            ('natural', 'Natural (Less hyper-real)'),
+            ('png', 'PNG'),
+            ('jpeg', 'JPEG'),
+            ('webp', 'WebP'),
         ],
-        string="Image Style",
-        help="Visual style for the generated image (DALL-E 3 only)"
+        string="Output Format",
+        help="Output format for the generated image"
+    )
+    
+    image_background = fields.Selection(
+        selection=[
+            ('opaque', 'Opaque'),
+            ('transparent', 'Transparent'),
+        ],
+        string="Background",
+        help="Background type for the generated image"
+    )
+    
+    image_moderation = fields.Selection(
+        selection=[
+            ('auto', 'Auto'),
+            ('strict', 'Strict'),
+            ('relaxed', 'Relaxed'),
+        ],
+        string="Moderation Level",
+        help="Content moderation level for image generation"
+    )
+    
+    image_partial_images = fields.Integer(
+        string="Partial Images",
+        help="Number of partial images to generate during streaming (0 to disable)",
+        default=0
     )
     
     # Image Generation Results
@@ -110,7 +136,7 @@ class ScContentGenerationTask(models.Model):
     
     image_generation_prompt = fields.Text(
         string="Final Image Prompt",
-        help="The actual prompt used for image generation (may be revised by DALL-E)"
+        help="The actual prompt used for image generation with gpt-image-1"
     )
     
     image_generation_status = fields.Selection(
@@ -573,7 +599,7 @@ class ScContentGenerationTask(models.Model):
     
     def _generate_and_save_cover_image(self, article_title, article_content):
         """
-        Generate and save cover image for the blog post
+        Generate and save cover image using OpenAI Direct Images API with gpt-image-1
         
         Args:
             article_title (str): Title of the article
@@ -588,91 +614,59 @@ class ScContentGenerationTask(models.Model):
             return None
             
         try:
-            # Import image utilities
-            from ..utils.openai_image_utils import create_image_generator_from_config, get_image_generation_settings
+            # Import new Direct Images API utilities
+            from ..utils.openai_responses_image_utils import create_responses_image_generator
             
             # Update status
             self.image_generation_status = 'generating'
             self.env.cr.commit()  # Commit status change
             
-            # Create image generator
-            image_generator = create_image_generator_from_config(self.env)
+            # Create Direct Images API generator
+            image_generator = create_responses_image_generator(self.env)
             
-            # Get generation settings
-            settings = get_image_generation_settings(self.env)
+            # Get generation options from task fields
+            generation_options = {}
             
-            # Use task-specific settings if provided, otherwise use defaults
-            model = settings['model']
-            size = self.image_size or settings['size']
-            quality = self.image_quality or settings['quality']
-            style = self.image_style or settings['style']
+            # Use task-specific settings or defaults from config
+            if self.image_size:
+                generation_options['size'] = self.image_size
+            if self.image_quality:
+                generation_options['quality'] = self.image_quality  
+            if self.image_output_format:
+                generation_options['output_format'] = self.image_output_format
+            if self.image_background:
+                generation_options['background'] = self.image_background
+            if self.image_moderation:
+                generation_options['moderation'] = self.image_moderation
+            if self.image_partial_images:
+                generation_options['partial_images'] = self.image_partial_images
             
-            # Generate image prompt
-            prompt = image_generator.generate_image_prompt(
-                article_title,
-                article_content,
-                self.image_prompt_override
-            )
+            _logger.info(f"Generating cover image for task {self.id} using gpt-image-1 Direct Images API with options: {generation_options}")
             
-            # Store the prompt used
-            self.image_generation_prompt = prompt
-            
-            _logger.info(f"Generating cover image for task {self.id} with prompt: {prompt[:100]}...")
-            
-            # Generate image
-            result = image_generator.generate_image(
-                prompt=prompt,
-                model=model,
-                size=size,
-                quality=quality,
-                style=style
+            # Generate image using Direct Images API
+            result = image_generator.generate_image_with_context(
+                article_title=article_title,
+                article_content=article_content,
+                custom_prompt=self.image_prompt_override,
+                **generation_options
             )
             
             if not result['success']:
                 raise Exception(result['error'])
             
-            # Create filename and path
-            import uuid
-            import os
-            image_filename = f"blog_cover_{self.id}_{uuid.uuid4().hex[:8]}.png"
-            
-            # Get the module path for saving the image
-            module_path = os.path.dirname(os.path.dirname(__file__))
-            image_dir = os.path.join(module_path, 'static', 'src', 'img', 'generated')
-            image_path = os.path.join(image_dir, image_filename)
-            
-            # Save image from base64 data
-            image_data = result['data']
-            if 'b64_json' in image_data:
-                success = image_generator.save_image_from_base64(
-                    image_data['b64_json'],
-                    image_path
-                )
-            elif 'url' in image_data:
-                success = image_generator.download_image_from_url(
-                    image_data['url'],
-                    image_path
-                )
-            else:
-                raise Exception("No image data found in response")
-            
-            if not success:
-                raise Exception("Failed to save generated image")
-            
-            # Store relative path for web access
-            relative_path = f"/sc_marketing_automation_tool/static/src/img/generated/{image_filename}"
-            self.generated_image_path = relative_path
+            # Store the generated image path and metadata
+            self.generated_image_path = result['image_path']
+            self.image_generation_prompt = result['image_prompt']
             self.image_generation_status = 'success'
             
-            # Update prompt if it was revised by DALL-E
-            if 'revised_prompt' in result and result['revised_prompt']:
-                self.image_generation_prompt = result['revised_prompt']
+            # Log metadata for analytics
+            metadata = result.get('metadata', {})
+            _logger.info(f"Successfully generated cover image for task {self.id} using {metadata.get('model', 'gpt-image-1')}")
             
-            _logger.info(f"Successfully generated and saved cover image for task {self.id}")
-            return relative_path
+            return result['image_path']
             
         except Exception as e:
-            error_msg = f"Error generating cover image: {str(e)}"
+            error_msg = f"Error generating cover image with Direct Images API: {str(e)}"
             _logger.error(error_msg)
             
             self.image_generation_status = 'failed'
