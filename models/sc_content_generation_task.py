@@ -322,6 +322,16 @@ class ScContentGenerationTask(models.Model):
                 'state': 'draft',  # Cron will pick it up
             })
             record.message_post(body=_("Task queued for processing"))
+        
+        # Reload current record to show updated state
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+            'context': self.env.context,
+        }
     
     def action_retry(self):
         """Reset task to draft state for retry"""
@@ -336,6 +346,16 @@ class ScContentGenerationTask(models.Model):
                 'generated_blog_post_id': False,
             })
             record.message_post(body=_("Task reset for retry"))
+        
+        # Reload current record to show updated state
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+            'context': self.env.context,
+        }
 
     def action_execute_immediately(self):
         """Execute content generation task immediately"""
@@ -344,32 +364,40 @@ class ScContentGenerationTask(models.Model):
                 # Process the task
                 task._process_task()
                 
-                # Return success notification
+                # Reload current record to show updated state
                 return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': _('Task Executed Successfully'),
-                        'message': _('Content generation task "%s" has been executed. Blog post created successfully.') % task.name,
-                        'type': 'success',
-                        'sticky': False,
-                    }
+                    'type': 'ir.actions.act_window',
+                    'res_model': self._name,
+                    'res_id': self.id,
+                    'view_mode': 'form',
+                    'target': 'current',
+                    'context': dict(self.env.context, 
+                        show_notification={
+                            'title': _('Task Executed Successfully'),
+                            'message': _('Content generation task "%s" has been executed. Blog post created successfully.') % task.name,
+                            'type': 'success'
+                        }
+                    ),
                 }
                 
             except Exception as e:
-                # Log error and show notification
+                # Log error and reload with error notification
                 error_msg = str(e)
                 _logger.error("Content generation task %s failed: %s", task.id, error_msg)
                 
                 return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': _('Task Execution Failed'),
-                        'message': _('Content generation task failed: %s') % error_msg,
-                        'type': 'danger',
-                        'sticky': True,
-                    }
+                    'type': 'ir.actions.act_window',
+                    'res_model': self._name,
+                    'res_id': self.id,
+                    'view_mode': 'form',
+                    'target': 'current',
+                    'context': dict(self.env.context,
+                        show_notification={
+                            'title': _('Task Execution Failed'),
+                            'message': _('Content generation task failed: %s') % error_msg,
+                            'type': 'danger'
+                        }
+                    ),
                 }
     
     def action_view_blog_post(self):

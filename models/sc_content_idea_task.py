@@ -149,6 +149,16 @@ class ScContentIdeaTask(models.Model):
                 'state': 'draft',  # Cron will pick it up
             })
             record.message_post(body=_("Task queued for processing"))
+        
+        # Reload current record to show updated state
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+            'context': self.env.context,
+        }
     
     def action_retry(self):
         """Reset task to draft state for retry"""
@@ -162,6 +172,16 @@ class ScContentIdeaTask(models.Model):
                 'completed_at': False,
             })
             record.message_post(body=_("Task reset for retry"))
+        
+        # Reload current record to show updated state
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+            'context': self.env.context,
+        }
     
     def action_view_ideas(self):
         """View generated ideas"""

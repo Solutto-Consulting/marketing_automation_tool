@@ -42,15 +42,19 @@ class OpenAIDirectImagesGenerator:
                 if not api_key:
                     raise Exception("OpenAI API key not configured")
                 
-                # Initialize client
-                self._client = OpenAI(api_key=api_key)
-                
-                # Add organization header if available
+                # Get organization ID if available
                 org_id = self.env['ir.config_parameter'].sudo().get_param(
                     'sc_marketing_automation_tool.openai_organization_id'
                 )
+                
+                # Initialize client with organization if available
                 if org_id:
-                    self._client.default_headers = {"OpenAI-Organization": str(org_id)}
+                    self._client = OpenAI(
+                        api_key=api_key,
+                        organization=str(org_id)
+                    )
+                else:
+                    self._client = OpenAI(api_key=api_key)
                 
             except ImportError:
                 raise Exception("OpenAI library not installed. Run: pip install openai")

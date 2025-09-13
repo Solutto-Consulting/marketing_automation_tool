@@ -88,22 +88,36 @@ class ScTranslationTask(models.Model):
             })
             # Reset blog post flag
             task.blog_post_id.write({'translation_in_progress': False})
-            
-        return True
+        
+        # Return action to refresh the view
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
     
     def action_set_in_progress(self):
         """Set task to in progress state"""
         for task in self:
             task.write({'state': 'in_progress'})
             task.blog_post_id.write({'translation_in_progress': True})
-        return True
+        
+        # Return action to refresh the view
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
     
     def action_set_done(self):
         """Set task to done state"""
         for task in self:
             task.write({'state': 'done'})
             task.blog_post_id.write({'translation_in_progress': False})
-        return True
+        
+        # Return action to refresh the view
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
     
     def action_set_error(self, error_message):
         """Set task to error state with message"""
@@ -113,7 +127,12 @@ class ScTranslationTask(models.Model):
                 'error_message': error_message,
             })
             task.blog_post_id.write({'translation_in_progress': False})
-        return True
+        
+        # Return action to refresh the view
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
     
     def action_process_translation(self):
         """Process this translation task manually"""
@@ -144,6 +163,10 @@ class ScTranslationTask(models.Model):
                         'message': f'Blog post "{task.blog_post_id.name}" has been translated to {task.target_lang_id.name}',
                         'type': 'success',
                         'sticky': False,
+                        'next': {
+                            'type': 'ir.actions.client',
+                            'tag': 'reload',
+                        }
                     }
                 }
                 
@@ -162,6 +185,10 @@ class ScTranslationTask(models.Model):
                         'message': f'Error: {error_msg}',
                         'type': 'danger',
                         'sticky': True,
+                        'next': {
+                            'type': 'ir.actions.client',
+                            'tag': 'reload',
+                        }
                     }
                 }
     
@@ -488,6 +515,10 @@ class ScTranslationTask(models.Model):
                     'message': message,
                     'type': msg_type,
                     'sticky': True,
+                    'next': {
+                        'type': 'ir.actions.client',
+                        'tag': 'reload',
+                    }
                 }
             }
                 
@@ -506,6 +537,10 @@ class ScTranslationTask(models.Model):
                     'message': f"Error during emergency fix: {str(e)}",
                     'type': 'danger',
                     'sticky': True,
+                    'next': {
+                        'type': 'ir.actions.client',
+                        'tag': 'reload',
+                    }
                 }
             }
 
