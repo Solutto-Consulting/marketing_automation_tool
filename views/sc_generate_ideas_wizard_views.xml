@@ -8,10 +8,6 @@
             <field name="arch" type="xml">
                 <form string="Generate Content Ideas">
                     <header>
-                        <button name="action_generate_ideas" type="object" string="Generate Ideas" 
-                                class="btn-primary" invisible="state != 'draft'"/>
-                        <button name="action_reset" type="object" string="Reset" 
-                                class="btn-secondary" invisible="state == 'draft'"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,processing,done"/>
                     </header>
                     <sheet>
@@ -64,6 +60,13 @@
                             <p>You can now use these ideas to generate blog posts or review them in the Content Ideas section.</p>
                         </div>
                     </sheet>
+                    <footer>
+                        <button name="action_generate_ideas" type="object" string="Generate Ideas" 
+                                class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="action_reset" type="object" string="Reset" 
+                                class="btn-secondary" invisible="state == 'draft'"/>
+                        <button string="Close" special="cancel" class="btn-secondary"/>
+                    </footer>
                 </form>
             </field>
         </record>

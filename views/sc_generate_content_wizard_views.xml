@@ -8,10 +8,6 @@
             <field name="arch" type="xml">
                 <form string="Generate Blog Content">
                     <header>
-                        <button name="action_generate_content" type="object" string="Generate Content" 
-                                class="btn-primary" invisible="state != 'draft'"/>
-                        <button name="action_reset" type="object" string="Reset" 
-                                class="btn-secondary" invisible="state == 'draft'"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,processing,done"/>
                     </header>
                     <sheet>
@@ -126,6 +122,13 @@
                             <p>Your blog post has been created and is ready for review or publication.</p>
                         </div>
                     </sheet>
+                    <footer>
+                        <button name="action_generate_content" type="object" string="Generate Content" 
+                                class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="action_reset" type="object" string="Reset" 
+                                class="btn-secondary" invisible="state == 'draft'"/>
+                        <button string="Close" special="cancel" class="btn-secondary"/>
+                    </footer>
                 </form>
             </field>
         </record>

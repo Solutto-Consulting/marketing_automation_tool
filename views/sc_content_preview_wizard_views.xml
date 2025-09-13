@@ -7,12 +7,6 @@
             <field name="model">sc.content.preview.wizard</field>
             <field name="arch" type="xml">
                 <form string="Content Preview">
-                    <header>
-                        <button name="action_generate_content_with_full_source" type="object" 
-                                string="Generate Content with Full Source" class="btn-primary"
-                                invisible="not extraction_success"/>
-                        <button name="action_close" type="object" string="Close" class="btn-secondary"/>
-                    </header>
                     <sheet>
                         <div class="oe_title">
                             <h1>
@@ -70,6 +64,12 @@
                         <!-- Hidden fields -->
                         <field name="extraction_success" invisible="1"/>
                     </sheet>
+                    <footer>
+                        <button name="action_generate_content_with_full_source" type="object" 
+                                string="Generate Content with Full Source" class="btn-primary"
+                                invisible="not extraction_success"/>
+                        <button string="Close" special="cancel" class="btn-secondary"/>
+                    </footer>
                 </form>
             </field>
         </record>
