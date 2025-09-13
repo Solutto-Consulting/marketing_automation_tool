@@ -18,17 +18,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Blog post drafting with title, content, meta description, and keywords
   - Integration with existing blog.post model
   - Unpublished draft creation for review workflow
-- **OpenAI Usage Monitoring**: Daily API usage tracking and cost optimization
-  - New model: `sc.openai.usage.snapshot`
-  - Usage dashboard with historical data and graphs
-  - Manual and automatic data synchronization
-  - Cost tracking and optimization insights
+- **AI-Powered Image Generation**: Professional blog cover images using gpt-image-1 model
+  - OpenAI Direct Images API integration (not Responses API)
+  - Advanced image generation parameters (size, quality, format, background)
+  - Dynamic format support (PNG, JPEG, WebP)
+  - Web-accessible static file storage with proper URL generation
+  - Integration with content generation workflow
+- **Enhanced OpenAI Usage Monitoring**: Comprehensive API usage tracking and optimization
+  - Enhanced model: `sc.openai.usage.snapshot` with persistent data storage
+  - Advanced usage dashboard with daily breakdown analysis
+  - Image generation cost tracking and monitoring
+  - Manual and automatic data synchronization with improved reliability
+  - Historical data retention and trend analysis
 
 ### Enhanced - Settings Architecture Refactor
 - **Centralized Settings**: Moved all configuration from General Settings to dedicated Marketing Automation section
   - New dedicated settings action and menu structure
   - Agent-specific configuration sections
+  - Image generation configuration with comprehensive options
   - Enhanced organization and usability
+- **OpenAI Direct Images API Integration**: Native gpt-image-1 model support
+  - Direct Images API implementation (client.images.generate())
+  - Advanced parameter mapping (quality, format, background, moderation)
+  - Static file management with web accessibility
+  - Error handling and recovery mechanisms
 - **OpenAI Agents SDK Integration**: Upgraded from basic OpenAI API to OpenAI Agents SDK (>=0.2.9)
   - WebSearchTool support for content research
   - Structured agent responses with defined schemas
@@ -43,16 +56,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Marketing Automation Menu**: New centralized navigation structure
   - Content Ideas management (All Ideas, Generation Tasks)
   - Content Generation management (Generation Tasks)
-  - OpenAI Usage monitoring dashboard
-  - Centralized settings access
+  - OpenAI Usage monitoring dashboard with enhanced daily breakdown
+  - Centralized settings access with image generation configuration
 - **Agent Configuration Wizards**: New user-friendly wizards for content pipeline
   - Research ideas wizard with search query customization
-  - Content generation wizard with blog integration
+  - Content generation wizard with blog integration and image generation options
   - Enhanced translation wizard with agent improvements
 - **Enhanced Task Management**: Improved status tracking across all agent types
   - Color-coded status indicators
   - Detailed error reporting and recovery
   - Task history and audit trails
+  - Image generation status tracking and error handling
 
 ### Migration - Settings and Data Preservation
 - **Automatic Settings Migration**: Seamless migration from General Settings to Marketing Automation
@@ -61,7 +75,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Configuration Upgrade**: Existing OpenAI credentials automatically migrated to new structure
 
 ### Technical - Architecture & Dependencies
-- **Agent Architecture**: Multi-agent system with specialized AI agents
+- **Multi-Agent Architecture**: Specialized AI agents with dedicated configurations
+  - Content Research Agent with WebSearchTool integration
+  - Content Generation Agent with blog post creation
+  - Image Generation Agent with gpt-image-1 Direct Images API
+  - Enhanced Translation Agent with OpenAI Agents SDK
+- **OpenAI Direct Images API**: Native gpt-image-1 model integration
+  - Static file management with web-accessible URLs
+  - Advanced parameter handling (quality, format, background)
+  - Error handling and recovery mechanisms
+- **Enhanced Data Models**: New and improved models for comprehensive content management
+  - Image generation metadata and status tracking
+  - Persistent usage data storage with daily breakdown
+  - Enhanced error logging and recovery information
 - **OpenAI Agents SDK**: External dependency upgrade to >=0.2.9
 - **Structured Responses**: JSON-based AI output processing with defined schemas
 - **Enhanced Security**: Agent-specific access controls and credential management

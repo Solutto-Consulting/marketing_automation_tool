@@ -7,13 +7,14 @@
 4. [Data Models](#data-models)
 5. [Integration Points](#integration-points)
 6. [OpenAI Agents SDK Implementation](#openai-agents-sdk-implementation)
-7. [Security Framework](#security-framework)
-8. [Configuration Management](#configuration-management)
-9. [Multi-Agent Background Processing](#multi-agent-background-processing)
-10. [Error Handling](#error-handling)
-11. [Version-Specific Implementation](#version-specific-implementation)
-12. [Development Guidelines](#development-guidelines)
-13. [Testing Framework](#testing-framework)
+7. [API Implementation](#api-implementation)
+8. [Security Framework](#security-framework)
+9. [Configuration Management](#configuration-management)
+10. [Multi-Agent Background Processing](#multi-agent-background-processing)
+11. [Error Handling](#error-handling)
+12. [Version-Specific Implementation](#version-specific-implementation)
+13. [Development Guidelines](#development-guidelines)
+14. [Testing Framework](#testing-framework)
 
 ---
 
@@ -31,10 +32,11 @@ The Content Management Tool for Odoo v18.0.1.0.1 implements a sophisticated **mu
 │ • Content Ideas │◄──►│   Agent         │◄──►│ • WebSearchTool │
 │ • Generation    │    │ • Generation    │    │ • Usage API     │
 │   Wizards       │    │   Agent         │    │ • Models API    │
-│ • Usage Monitor │    │ • Translation   │    └─────────────────┘
-│ • Task Mgmt     │    │   Agent         │             │
-└─────────────────┘    └─────────────────┘             │
-         │                       │                      │
+│ • Image Config  │    │ • Image Gen     │    │ • Direct Images │
+│ • Usage Monitor │    │   Agent         │    │   API (gpt-i-1) │
+│ • Task Mgmt     │    │ • Translation   │    └─────────────────┘
+└─────────────────┘    │   Agent         │             │
+         │              └─────────────────┘             │
          └───────────────────────┼──────────────────────┘
                                  │
                     ┌─────────────────┐
@@ -47,6 +49,8 @@ The Content Management Tool for Odoo v18.0.1.0.1 implements a sophisticated **mu
                     │ • sc.content    │
                     │   .generation   │
                     │   .task         │
+                    │ • Image Utils   │
+                    │ • Static Files  │
                     │ • sc.openai     │
                     │   .usage        │
                     │   .snapshot     │
@@ -56,10 +60,12 @@ The Content Management Tool for Odoo v18.0.1.0.1 implements a sophisticated **mu
 ```
 
 ### Key Design Principles (v18.0.1.0.1)
-- **Multi-Agent Architecture**: Specialized AI agents for research, generation, and translation
+- **Multi-Agent Architecture**: Specialized AI agents for research, generation, image creation, and translation
 - **OpenAI Agents SDK Integration**: Leveraging structured AI responses and WebSearchTool
+- **Direct Images API**: Native gpt-image-1 integration for advanced image generation
 - **Centralized Settings Architecture**: Dedicated Marketing Automation configuration section
 - **Asynchronous Multi-Agent Processing**: Independent cron jobs for each agent type
+- **Static File Management**: Web-accessible image storage and URL generation
 - **Structured AI Responses**: JSON-based content generation with defined schemas
 - **Enhanced Error Recovery**: Agent-specific error handling and recovery mechanisms
 - **Security First**: Enhanced credential storage and agent-specific access controls
@@ -91,6 +97,14 @@ CONTENT_GENERATION_AGENT = {
     'cron': 'Generation processor (every 5 minutes)'
 }
 
+IMAGE_GENERATION_AGENT = {
+    'purpose': 'AI-powered blog cover image creation',
+    'tools': ['OpenAI Direct Images API'],
+    'output': 'Generated images with web-accessible URLs',
+    'model': 'gpt-image-1 (latest image generation model)',
+    'integration': 'Embedded in content generation workflow'
+}
+
 TRANSLATION_AGENT = {
     'purpose': 'Enhanced blog post translation',
     'tools': ['OpenAI Agents SDK'],
@@ -108,6 +122,8 @@ Research Agent Output → Content Ideas Database
 User Selection + Generation Request
          ↓
 Generation Agent Input → Blog Post Creation
+         ↓
+Image Generation Agent → Cover Image Creation (if enabled)
          ↓
 Optional Translation → Multi-language Content
 ```
@@ -130,6 +146,18 @@ Each agent maintains isolated configuration to prevent cross-agent interference:
     <group name="generation_config">
         <field name="sc_generation_agent_model"/>
         <field name="sc_generation_agent_instructions"/>
+    </group>
+</page>
+
+<page string="Image Generation Settings">
+    <group name="image_config">
+        <field name="sc_enable_cover_image_generation"/>
+        <field name="sc_image_size"/>
+        <field name="sc_image_quality"/>
+        <field name="sc_image_output_format"/>
+        <field name="sc_image_background"/>
+        <field name="sc_image_moderation"/>
+        <field name="sc_image_partial_images"/>
     </group>
 </page>
 ```
@@ -400,6 +428,254 @@ def _get_fallback_models(self):
     "website_meta_description": "SEO description",
     "website_meta_keywords": "keyword1, keyword2"
 }
+```
+
+### Image Generation API Implementation
+
+#### OpenAI Direct Images API Integration
+
+The module implements **gpt-image-1** model integration using OpenAI's Direct Images API (not the Responses API). This provides access to the latest image generation capabilities.
+
+**API Endpoint**: `https://api.openai.com/v1/images/generations`  
+**Model**: `gpt-image-1` (latest image generation model)  
+**Implementation**: `utils/openai_responses_image_utils.py`
+
+#### Core Image Generation Class
+
+```python
+class OpenAIDirectImagesGenerator:
+    """
+    Direct Images API implementation for gpt-image-1 model.
+    
+    This implementation uses client.images.generate() directly
+    rather than the Responses API for maximum compatibility.
+    """
+    
+    def __init__(self, api_key, organization_id=None):
+        """Initialize Direct Images API client."""
+        self.client = openai.OpenAI(
+            api_key=api_key,
+            organization=organization_id
+        )
+    
+    def generate_image(self, prompt, **kwargs):
+        """
+        Generate image using gpt-image-1 model.
+        
+        Args:
+            prompt (str): Image description prompt
+            **kwargs: gpt-image-1 specific parameters
+            
+        Returns:
+            tuple: (image_data, web_url, file_path)
+        """
+        # Parameter mapping for gpt-image-1
+        params = self._get_image_generation_params(kwargs)
+        
+        try:
+            response = self.client.images.generate(
+                model="gpt-image-1",
+                prompt=prompt,
+                **params
+            )
+            
+            # Process response and save to static directory
+            return self._process_image_response(response, prompt)
+            
+        except Exception as e:
+            _logger.error(f"Image generation failed: {e}")
+            raise
+```
+
+#### Parameter Mapping and Validation
+
+```python
+def _get_image_generation_params(self, config):
+    """
+    Map configuration to gpt-image-1 API parameters.
+    
+    Args:
+        config (dict): User configuration from settings
+        
+    Returns:
+        dict: API-compatible parameters
+    """
+    # Size parameter mapping
+    size_mapping = {
+        '1024x1024': '1024x1024',
+        '1536x1024': '1536x1024', 
+        '1024x1536': '1024x1536',
+        '1792x1024': '1792x1024',  # gpt-image-1 specific
+    }
+    
+    # Quality parameter mapping (gpt-image-1 specific)
+    quality_mapping = {
+        'auto': 'auto',
+        'high': 'high',
+        'medium': 'medium',
+        'low': 'low',
+        'standard': 'standard'  # fallback for compatibility
+    }
+    
+    params = {
+        'size': size_mapping.get(config.get('size', '1024x1024'), '1024x1024'),
+        'quality': quality_mapping.get(config.get('quality', 'auto'), 'auto'),
+        'output_format': config.get('output_format', 'png'),
+        'background': config.get('background', 'auto'),
+        'moderation': config.get('moderation', 'auto'),
+    }
+    
+    # Handle partial_images parameter (0-3)
+    partial_images = config.get('partial_images', 0)
+    if 0 <= partial_images <= 3:
+        params['partial_images'] = partial_images
+        
+    return params
+```
+
+#### Static File Management
+
+The image generation system implements proper static file handling for web accessibility:
+
+```python
+def _save_image_to_disk(self, image_data, prompt, output_format):
+    """
+    Save generated image to module static directory.
+    
+    Args:
+        image_data (bytes): Raw image data
+        prompt (str): Generation prompt for filename
+        output_format (str): Image format (png, jpeg, webp)
+        
+    Returns:
+        tuple: (local_path, web_url)
+    """
+    # Create static directory structure
+    static_dir = os.path.join(
+        get_module_path('sc_marketing_automation_tool'),
+        'static', 'src', 'img', 'generated'
+    )
+    os.makedirs(static_dir, exist_ok=True)
+    
+    # Generate web-accessible filename
+    safe_prompt = self._sanitize_filename(prompt)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"blog_cover_{safe_prompt}_{timestamp}.{output_format}"
+    
+    # Save file with proper permissions
+    file_path = os.path.join(static_dir, filename)
+    with open(file_path, 'wb') as f:
+        f.write(image_data)
+    
+    # Generate web URL for Odoo static file serving
+    web_url = f"/sc_marketing_automation_tool/static/src/img/generated/{filename}"
+    
+    return file_path, web_url
+```
+
+#### Integration with Content Generation
+
+```python
+def _generate_and_save_cover_image(self):
+    """
+    Generate cover image as part of content generation workflow.
+    
+    Called from sc_content_generation_task model when
+    generate_cover_image is enabled.
+    """
+    if not self.generate_cover_image:
+        return
+        
+    try:
+        # Extract configuration from settings
+        config_settings = self.env['res.config.settings'].create({})
+        image_config = {
+            'size': config_settings.sc_image_size,
+            'quality': config_settings.sc_image_quality,
+            'output_format': config_settings.sc_image_output_format,
+            'background': config_settings.sc_image_background,
+            'moderation': config_settings.sc_image_moderation,
+            'partial_images': config_settings.sc_image_partial_images,
+        }
+        
+        # Generate descriptive prompt from blog content
+        image_prompt = self._create_image_prompt()
+        
+        # Use Direct Images API utility
+        generator = create_responses_image_generator()
+        image_data, web_url, file_path = generator.generate_image(
+            image_prompt, **image_config
+        )
+        
+        # Update blog post with generated image
+        if self.generated_blog_post_id:
+            self.generated_blog_post_id.cover_properties = json.dumps({
+                'background-image': f'url({web_url})',
+                'resize_class': 'o_record_has_cover'
+            })
+            
+        # Store generation metadata
+        self.write({
+            'image_generation_status': 'completed',
+            'generated_image_path': web_url,
+            'image_generation_prompt': image_prompt,
+        })
+        
+        _logger.info(f"Successfully generated cover image using gpt-image-1")
+        
+    except Exception as e:
+        self.write({
+            'image_generation_status': 'failed',
+            'image_generation_error': str(e)
+        })
+        _logger.error(f"Image generation failed: {e}")
+```
+
+#### Error Handling and Recovery
+
+```python
+class ImageGenerationError(Exception):
+    """Custom exception for image generation failures."""
+    pass
+
+def handle_image_generation_errors(func):
+    """Decorator for image generation error handling."""
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except openai.RateLimitError as e:
+            raise ImageGenerationError(f"API rate limit exceeded: {e}")
+        except openai.InvalidRequestError as e:
+            raise ImageGenerationError(f"Invalid request parameters: {e}")
+        except openai.AuthenticationError as e:
+            raise ImageGenerationError(f"Authentication failed: {e}")
+        except Exception as e:
+            raise ImageGenerationError(f"Unexpected error: {e}")
+    return wrapper
+```
+
+#### Usage Tracking Integration
+
+Image generation usage is tracked separately from text-based operations:
+
+```python
+def _track_image_generation_usage(self, response):
+    """
+    Track image generation usage for cost monitoring.
+    
+    Note: Image generation costs are typically per-image
+    rather than per-token like text operations.
+    """
+    usage_data = {
+        'operation_type': 'image_generation',
+        'model': 'gpt-image-1',
+        'images_generated': 1,
+        'estimated_cost': self._calculate_image_cost(response),
+        'timestamp': fields.Datetime.now(),
+    }
+    
+    # Integrate with existing usage monitoring
+    self.env['sc.openai.usage.snapshot']._record_usage(usage_data)
 ```
 
 ---

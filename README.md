@@ -13,15 +13,18 @@ The **Content Management Tool for Odoo v18.0.1.0.1** introduces powerful **agent
 ### 🤖 **Agent-Based Content Strategy** (NEW)
 - **Content Research Agent**: AI-powered topic discovery using web search capabilities
 - **Content Generation Agent**: Complete blog post creation from research ideas
+- **AI-Powered Image Generation**: Professional blog cover images using gpt-image-1 model
 - **Enhanced Translation Agent**: Improved translation capabilities with OpenAI Agents SDK
 
-### 📊 **Usage Monitoring & Optimization** (NEW)
-- **OpenAI Usage Tracking**: Daily API consumption monitoring with cost insights
-- **Usage Dashboard**: Historical data visualization and trend analysis
-- **Cost Optimization**: Token usage breakdown and optimization recommendations
+### 📊 **Usage Monitoring & Optimization** (ENHANCED)
+- **Comprehensive Usage Tracking**: Unified monitoring for text and image generation
+- **Advanced Usage Dashboard**: Interactive dashboard with daily breakdown and trends
+- **Cost Optimization**: Token usage breakdown and image generation cost tracking
+- **Persistent Data Storage**: Enhanced data retention and historical analysis
 
 ### ⚙️ **Centralized Configuration** (ENHANCED)
 - **Marketing Automation Settings**: Dedicated configuration section for all AI agents
+- **Image Generation Configuration**: Comprehensive settings for size, quality, format
 - **Agent-Specific Configuration**: Specialized settings for each AI agent type
 - **Enhanced Security**: Improved credential management and access controls
 
@@ -37,13 +40,17 @@ The **Content Management Tool for Odoo v18.0.1.0.1** introduces powerful **agent
 #### **Content Strategy Features**
 - **Content Research Agent**: WebSearchTool integration for topic discovery
 - **Content Generation Agent**: Complete blog post drafting from research ideas
-- **Usage Monitoring Dashboard**: Daily OpenAI API usage tracking and cost optimization
+- **AI-Powered Image Generation**: Professional blog cover images using gpt-image-1 model
+- **Advanced Usage Monitoring**: Enhanced dashboard with daily breakdown and persistent data
 - **Centralized Settings Architecture**: Dedicated Marketing Automation configuration section
 - **Multi-Agent Workflow**: End-to-end content pipeline from research to publication
 
 #### **Enhanced Technical Features**
 - **OpenAI Agents SDK Integration**: Upgrade to >=0.2.9 with WebSearchTool support
+- **gpt-image-1 Direct Images API**: Latest image generation model with advanced features
+- **Static File Management**: Web-accessible image storage with proper URL generation
 - **Structured AI Responses**: JSON-based content generation with defined schemas
+- **Enhanced Usage Monitoring**: Persistent data storage with daily breakdown analysis
 - **Placeholder Processing**: Dynamic content replacement ({today} support)
 - **Enhanced Background Processing**: Separate cron jobs for each agent type
 - **Improved Error Handling**: Agent-specific error patterns and recovery
@@ -56,10 +63,12 @@ The **Content Management Tool for Odoo v18.0.1.0.1** introduces powerful **agent
 
 ### 🔧 Technical Architecture (v18.0.1.0.1)
 - **Multi-Agent Architecture**: Specialized AI agents with dedicated configurations
+- **Direct Images API Integration**: Native gpt-image-1 support with advanced parameters
+- **Static File Management**: Module-based image storage with web accessibility
+- **Enhanced Data Models**: New models for content ideas, generation tasks, image metadata, and usage tracking
 - **Settings Migration**: Automatic migration from General Settings to Marketing Automation
 - **Backward Compatibility**: All existing translation functionality preserved and enhanced
 - **Enhanced Security Model**: Agent-specific access controls and credential management
-- **Improved Data Models**: New models for content ideas, generation tasks, and usage tracking
 
 ### ⚠️ Features Not Included in v18.0.1.0.1
 - **Advanced Analytics**: Comprehensive content performance metrics (planned for v18.0.1.1.0+)

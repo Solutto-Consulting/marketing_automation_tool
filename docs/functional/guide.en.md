@@ -6,12 +6,13 @@
 3. [AI Configuration](#ai-configuration)
 4. [Content Research Agent](#content-research-agent)
 5. [Content Generation Agent](#content-generation-agent)
-6. [Blog Translation Workflow](#blog-translation-workflow)
-7. [Usage Monitoring](#usage-monitoring)
-8. [Task Management](#task-management)
-9. [Troubleshooting](#troubleshooting)
-10. [Best Practices](#best-practices)
-11. [Version-Specific Features](#version-specific-features)
+6. [AI-Powered Blog Cover Images](#ai-powered-blog-cover-images)
+7. [Blog Translation Workflow](#blog-translation-workflow)
+8. [Usage Monitoring](#usage-monitoring)
+9. [Task Management](#task-management)
+10. [Troubleshooting](#troubleshooting)
+11. [Best Practices](#best-practices)
+12. [Version-Specific Features](#version-specific-features)
 
 ---
 
@@ -22,6 +23,7 @@ The Content Management Tool for Odoo v18.0.1.0.1 introduces powerful **agent-bas
 ### Key Features in v18.0.1.0.1
 - ✅ **Content Research Agent**: AI-powered topic discovery using web search
 - ✅ **Content Generation Agent**: Automated blog post creation from research ideas
+- ✅ **AI-Powered Image Generation**: Professional blog cover images using gpt-image-1
 - ✅ **OpenAI Usage Monitoring**: Daily usage tracking and cost optimization
 - ✅ **Centralized Settings**: Dedicated Marketing Automation configuration section
 - ✅ **Enhanced Translation System**: Improved with OpenAI Agents SDK
@@ -47,7 +49,8 @@ This documentation covers features available in **version 18.0.1.0.1** (Septembe
 2. ✅ Configure OpenAI API credentials in Marketing Automation settings
 3. ✅ Set up Content Research Agent configuration
 4. ✅ Configure Content Generation Agent settings
-5. ✅ Verify OpenAI Usage monitoring is functional
+5. ✅ Configure Image Generation preferences (size, quality, format)
+6. ✅ Verify OpenAI Usage monitoring is functional
 6. ✅ Test complete content pipeline from research to publication
 
 ### New in v18.0.1.0.1: Agent-Based Architecture
@@ -174,6 +177,165 @@ Generated blog posts include:
 
 ---
 
+## AI-Powered Blog Cover Images
+
+The Content Management Tool includes advanced image generation capabilities using OpenAI's **gpt-image-1** model, the latest in AI image generation technology. This feature automatically creates professional blog cover images that are perfectly aligned with your content.
+
+### Image Generation Overview
+
+When generating blog content, the system can automatically create custom cover images using:
+- **gpt-image-1 Model**: OpenAI's latest and most advanced image generation model
+- **Dynamic Format Support**: PNG, JPEG, and WebP formats
+- **Multiple Size Options**: Optimized for different blog layouts
+- **Quality Control**: Adjustable quality levels for performance vs. visual appeal
+- **Background Options**: Transparent, opaque, or automatic background handling
+
+### Configuring Image Generation
+
+#### Access Image Settings
+1. Navigate to **Settings → General Settings**
+2. Scroll to **Marketing Automation Tool** section
+3. Locate **"Image Generation Settings"** subsection
+
+#### Image Generation Options
+
+**Enable Cover Image Generation**
+- ✅ **Checked**: Automatically generates cover images for new blog posts
+- ❌ **Unchecked**: Skips image generation (content-only mode)
+
+**Image Size Selection**
+- **1024x1024**: Square format, ideal for social media sharing
+- **1536x1024**: Landscape format, perfect for blog headers
+- **1024x1536**: Portrait format, suitable for mobile-first designs
+
+**Quality Settings**
+- **Auto**: Balanced quality and generation speed (recommended)
+- **High**: Maximum visual quality, slower generation
+- **Medium**: Good quality with faster generation
+- **Low**: Basic quality, fastest generation time
+
+**Output Format**
+- **PNG**: Best for images with transparency, larger file sizes
+- **JPEG**: Optimal for photographs, smaller file sizes
+- **WebP**: Modern format with excellent compression and quality
+
+**Background Options**
+- **Auto**: AI decides the best background approach
+- **Opaque**: Solid background, no transparency
+- **Transparent**: Transparent background (PNG format recommended)
+
+**Content Moderation**
+- **Auto**: Standard content filtering (recommended)
+- **Low**: Minimal filtering for artistic content
+
+### Image Generation Workflow
+
+#### Automatic Generation During Content Creation
+1. **Content Generation**: When creating blog posts through the Content Generation Agent
+2. **Image Prompt Creation**: System automatically generates a descriptive prompt based on blog content
+3. **gpt-image-1 Processing**: OpenAI's advanced model creates the cover image
+4. **Web Integration**: Image is saved to your Odoo instance and automatically set as blog cover
+5. **Instant Preview**: Generated image appears immediately in the blog post
+
+#### Manual Image Generation
+You can also generate images independently:
+1. Open any blog post in edit mode
+2. Use the **"Generate Cover Image"** button
+3. Review and approve the generated image
+4. Image is automatically applied to your blog post
+
+### Understanding Image Generation Results
+
+#### Image Storage and URLs
+- **Storage Location**: Images are saved in your module's static directory
+- **Web Accessibility**: All generated images have proper web URLs for public viewing
+- **File Naming**: Descriptive names based on blog title and generation timestamp
+- **Format Consistency**: Generated images respect your configured format preferences
+
+#### Quality and Performance Considerations
+
+**High Quality Images**
+- Best visual appeal for professional blogs
+- Larger file sizes, slower page loading
+- Recommended for marketing and promotional content
+
+**Standard Quality Images**
+- Balanced approach for most use cases
+- Good visual quality with reasonable file sizes
+- Ideal for regular blog content
+
+**Performance-Optimized Images**
+- Smaller file sizes for faster loading
+- Suitable for high-traffic blogs
+- WebP format recommended for best compression
+
+### Image Generation Best Practices
+
+#### Content Alignment
+- **Descriptive Titles**: Clear blog titles produce better image prompts
+- **Topic Focus**: Specific content themes generate more relevant images
+- **Brand Consistency**: Use consistent style instructions across your blog
+
+#### Technical Optimization
+- **Format Selection**: Choose WebP for modern browsers, JPEG for compatibility
+- **Size Planning**: Select image dimensions that match your blog theme
+- **Quality Balance**: Use "Auto" quality for most cases, "High" for featured content
+
+#### Creative Guidelines
+- **Let AI Decide**: The gpt-image-1 model excels at creative interpretation
+- **Trust the Process**: Generated images are optimized for your specific content
+- **Review and Iterate**: You can regenerate images if the first result doesn't meet expectations
+
+### Troubleshooting Image Generation
+
+#### Common Issues and Solutions
+
+**Image Generation Failed**
+- **Check API Configuration**: Ensure OpenAI credentials are properly set
+- **Verify Account Credits**: Confirm sufficient OpenAI account balance
+- **Review Content**: Ensure blog content is appropriate for image generation
+
+**Poor Image Quality**
+- **Increase Quality Setting**: Switch from "Auto" to "High" quality
+- **Try Different Formats**: PNG often provides better quality than JPEG
+- **Regenerate**: AI image generation can vary; try generating again
+
+**Slow Generation Times**
+- **Lower Quality Setting**: Use "Medium" or "Low" for faster results
+- **Optimize Format**: WebP offers good compression with reasonable quality
+- **Check Network**: Ensure stable internet connection to OpenAI servers
+
+#### Error Messages and Solutions
+
+**"Image generation service unavailable"**
+- **Solution**: OpenAI API may be temporarily down; retry in a few minutes
+
+**"Invalid image configuration"**
+- **Solution**: Review image generation settings in Marketing Automation configuration
+
+**"Insufficient API credits"**
+- **Solution**: Add credits to your OpenAI account or upgrade your plan
+
+### Advanced Features
+
+#### Custom Image Prompts
+While the system automatically generates prompts from blog content, advanced users can:
+- Review generated prompts before image creation
+- Modify prompts for specific visual styles
+- Save successful prompt patterns for reuse
+
+#### Batch Image Generation
+- Generate images for multiple blog posts simultaneously
+- Consistent style across blog series
+- Efficient processing for content campaigns
+
+#### Integration with Translation Workflow
+- Regenerate images when translating blog posts to different languages
+- Culturally appropriate imagery for international content
+- Maintain visual consistency across language versions
+
+---
+
 ## Blog Translation Workflow
 
 ### Step 1: Select Blog Posts
@@ -269,47 +431,128 @@ From any blog post form:
 
 ## Usage Monitoring
 
-The Usage Monitoring feature provides insights into OpenAI API consumption, helping you track costs and optimize usage across all AI agents.
+The Usage Monitoring feature provides comprehensive insights into OpenAI API consumption across all AI agents, including content research, content generation, blog translation, and image generation. The enhanced dashboard offers persistent data storage and detailed daily breakdowns to help you track costs and optimize usage.
 
 ### Accessing Usage Dashboard
 
 **Navigation**: Marketing Automation → OpenAI Usage
 
-### Dashboard Features
+### Enhanced Dashboard Features
 
-#### 1. Usage Statistics
-- **Daily Token Consumption**: Prompt tokens, completion tokens, and totals
-- **Cost Tracking**: Monitor API spending patterns
-- **Usage Trends**: 30-day historical view with graphs
+#### 1. Persistent Usage Statistics
+- **Real-time Data**: Current usage statistics with automatic updates
+- **Historical Persistence**: Data stored permanently in your Odoo database
+- **30-Day Rolling View**: Comprehensive view of recent usage patterns
+- **Daily Breakdown**: Detailed day-by-day usage analysis
 
-#### 2. Manual Data Sync
-- **Fetch Latest Data** button: Manually refresh usage statistics
-- **Automatic Sync**: Daily cron job updates usage data automatically
-- **Data Range**: Up to 90 days of historical usage data
+#### 2. Comprehensive Usage Metrics
+- **Total Token Consumption**: Combined view across all AI operations
+- **Agent-Specific Breakdown**: Usage separated by:
+  - Content Research Agent
+  - Content Generation Agent  
+  - Blog Translation System
+  - Image Generation (gpt-image-1)
+- **Cost Tracking**: Real-time cost calculations based on OpenAI pricing
+- **Usage Trends**: Visual representation of consumption patterns
 
-#### 3. Usage Analysis
-- **Breakdown by Agent**: See which agents consume the most tokens
-- **Cost Optimization**: Identify opportunities to reduce API costs
-- **Usage Patterns**: Track peak usage times and trends
+#### 3. Advanced Data Management
+- **Manual Data Sync**: "Fetch Latest Data" button for immediate refresh
+- **Automatic Sync**: Daily cron job ensures data stays current
+- **Data Retention**: Up to 90 days of detailed historical data
+- **Export Capabilities**: Download usage data for external analysis
 
-### Understanding Usage Metrics
+#### 4. Interactive Dashboard Elements
+- **Daily View Toggle**: Switch between summary and detailed daily views
+- **Date Range Filters**: Focus on specific time periods
+- **Usage Alerts**: Visual indicators for unusual consumption patterns
+- **Performance Metrics**: Track AI operation success rates and response times
 
-#### Token Types
-- **Prompt Tokens**: Input text sent to OpenAI (your content and instructions)
-- **Completion Tokens**: AI-generated responses (translations, content, ideas)
-- **Total Tokens**: Sum of prompt and completion tokens for billing
+### Understanding Enhanced Usage Metrics
 
-#### Cost Management Tips
-- Monitor daily usage to stay within budget limits
-- Use gpt-3.5-turbo for cost-effective operations when quality allows
-- Optimize agent instructions to reduce prompt token usage
-- Review usage patterns to identify optimization opportunities
+#### Token Categories
+- **Prompt Tokens**: Input text sent to OpenAI APIs
+  - Research queries and instructions
+  - Content generation prompts
+  - Translation source text
+  - Image generation descriptions
+- **Completion Tokens**: AI-generated responses
+  - Research summaries and ideas
+  - Generated blog content
+  - Translated text
+  - Image generation metadata
+- **Total Tokens**: Combined prompt and completion tokens for accurate billing
+
+#### Image Generation Costs
+- **gpt-image-1 Usage**: Separate tracking for image generation API calls
+- **Format Impact**: Cost variations between PNG, JPEG, and WebP formats
+- **Quality Settings**: Cost differences between Auto, High, Medium, and Low quality
+- **Size Considerations**: Pricing impact of different image dimensions
+
+#### Daily Breakdown Analysis
+- **Peak Usage Times**: Identify when AI operations are most active
+- **Agent Performance**: Compare efficiency across different AI agents
+- **Cost Attribution**: Understand which features drive API costs
+- **Usage Optimization**: Spot opportunities to reduce unnecessary consumption
+
+### Cost Management and Optimization
+
+#### Budget Planning
+- **Daily Cost Tracking**: Monitor spending to stay within budget limits
+- **Monthly Projections**: Estimate future costs based on usage trends
+- **Agent Efficiency**: Compare cost-per-operation across different AI agents
+- **Model Selection**: Make informed decisions about gpt-4 vs gpt-3.5-turbo usage
+
+#### Performance Optimization
+- **Prompt Engineering**: Optimize instructions to reduce token consumption
+- **Batch Operations**: Group similar tasks for more efficient processing
+- **Quality vs Cost**: Balance AI quality settings with budget constraints
+- **Usage Patterns**: Identify and eliminate inefficient usage patterns
+
+#### Image Generation Cost Control
+- **Format Selection**: Choose optimal formats for your use case and budget
+- **Quality Management**: Use appropriate quality settings for different content types
+- **Size Optimization**: Select image dimensions that balance quality and cost
+- **Generation Strategy**: Understand when to regenerate vs accept first results
+
+### Dashboard Troubleshooting
+
+#### Common Dashboard Issues
+
+**Data Not Updating**
+- **Check Cron Jobs**: Ensure automatic sync is running properly
+- **Manual Refresh**: Use "Fetch Latest Data" button
+- **API Connectivity**: Verify OpenAI API credentials are valid
+- **Permissions**: Confirm user has access to usage monitoring features
+
+**Missing Daily Breakdown**
+- **Data Sync Status**: Check last successful sync timestamp
+- **Historical Limits**: OpenAI provides limited historical data access
+- **Database Health**: Verify usage data tables are functioning correctly
+
+**Incorrect Cost Calculations**
+- **Pricing Updates**: OpenAI pricing may change; verify current rates
+- **Token Counting**: Ensure accurate token consumption reporting
+- **Currency Settings**: Check if cost display matches your billing currency
 
 ### Usage Monitoring Best Practices
-- Check usage dashboard weekly to track spending
-- Set up internal alerts based on daily token consumption
-- Review agent efficiency and optimize instructions regularly
-- Use usage data to make informed decisions about model selection
+
+#### Regular Monitoring
+- **Weekly Reviews**: Check dashboard weekly to track spending trends
+- **Monthly Analysis**: Conduct detailed monthly usage and cost analysis
+- **Alert Thresholds**: Set internal alerts based on daily consumption limits
+- **Performance Tracking**: Monitor AI operation efficiency and success rates
+
+#### Optimization Strategies
+- **Agent Tuning**: Regularly review and optimize AI agent instructions
+- **Model Selection**: Use appropriate models for different task complexity levels
+- **Batch Processing**: Group similar operations for more efficient API usage
+- **Feature Management**: Enable only necessary AI features to control costs
+
+#### Reporting and Analysis
+- **Export Data**: Regular export of usage data for external analysis
+- **Trend Analysis**: Identify seasonal or cyclical usage patterns
+- **ROI Assessment**: Measure AI feature value against operational costs
+- **Budget Planning**: Use historical data for accurate budget forecasting
 
 ---
 
