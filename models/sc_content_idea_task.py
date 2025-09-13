@@ -78,15 +78,27 @@ class ScContentIdeaTask(models.Model):
         help="Task execution duration in minutes"
     )
     
-    # Agent configuration at execution time
+    # Agent configuration
+    agent_config_id = fields.Many2one(
+        'sc.ai.agent.config',
+        string="AI Agent Configuration",
+        help="The agent configuration used for this task"
+    )
+    
+    user_prompt = fields.Text(
+        string="User Custom Instructions",
+        help="Additional user instructions for this specific task"
+    )
+    
+    # Agent configuration at execution time (for history)
     agent_model = fields.Char(
         string="Agent Model Used",
-        help="OpenAI model used for this task"
+        help="OpenAI model used for this task (stored for history)"
     )
     
     agent_instructions = fields.Text(
         string="Agent Instructions Used",
-        help="System instructions used for this task"
+        help="System instructions used for this task (stored for history)"
     )
     
     @api.depends('generated_ideas_ids')
@@ -177,6 +189,34 @@ class ScContentIdeaTask(models.Model):
         # Add more placeholders as needed in future versions
         
         return processed_query
+    
+    def _prepare_agent_config(self):
+        """Prepare agent configuration for execution"""
+        self.ensure_one()
+        
+        # If we have an agent_config_id, use it
+        if self.agent_config_id:
+            # Store configuration for history
+            self.write({
+                'agent_model': self.agent_config_id.model,
+                'agent_instructions': self.agent_config_id.instructions,
+            })
+            
+            # Combine system instructions with user prompt
+            combined_instructions = self.agent_config_id.instructions
+            if self.user_prompt:
+                combined_instructions += f"\n\nAdditional user instructions:\n{self.user_prompt}"
+            
+            return {
+                'model': self.agent_config_id.model,
+                'instructions': combined_instructions,
+            }
+        
+        # Fallback to legacy fields if no agent_config_id
+        return {
+            'model': self.agent_model or 'gpt-4o',
+            'instructions': self.agent_instructions or 'You are a content research agent.',
+        }
     
     def _mark_in_progress(self):
         """Mark task as in progress"""

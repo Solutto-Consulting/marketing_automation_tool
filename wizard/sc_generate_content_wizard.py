@@ -50,7 +50,7 @@ class ScGenerateContentWizard(models.TransientModel):
     agent_config_id = fields.Many2one(
         'sc.ai.agent.config',
         string="AI Agent Configuration",
-        domain=[('active', '=', True)],
+        domain=[('active', '=', True), ('agent_type', '=', 'generation')],
         help="Select the AI agent configuration to use for content generation"
     )
     
@@ -264,8 +264,9 @@ class ScGenerateContentWizard(models.TransientModel):
         # Get default values from generation agent configuration
         agent_config = self.env['sc.ai.agent.config'].get_default_agent('generation')
         
-        default_agent_model = agent_config.model if agent_config else 'gpt-4o'
-        default_instructions = agent_config.instructions if agent_config else ''
+        # Set default agent configuration
+        if agent_config and 'agent_config_id' in fields_list:
+            defaults['agent_config_id'] = agent_config.id
         
         # Set default blog if only one exists
         if 'blog_id' in fields_list:
@@ -276,11 +277,6 @@ class ScGenerateContentWizard(models.TransientModel):
         # Get content idea from context
         if 'content_idea_id' in fields_list and self.env.context.get('default_content_idea_id'):
             defaults['content_idea_id'] = self.env.context['default_content_idea_id']
-        
-        if 'agent_model' in fields_list:
-            defaults['agent_model'] = default_agent_model  
-        if 'agent_instructions' in fields_list:
-            defaults['agent_instructions'] = default_instructions
             
         # Set default values for gpt-image-1 fields from configuration
         config_params = self.env['ir.config_parameter'].sudo()
@@ -315,6 +311,13 @@ class ScGenerateContentWizard(models.TransientModel):
             )
             
         return defaults
+    
+    @api.constrains('agent_config_id')
+    def _check_agent_config(self):
+        """Validate agent configuration selection"""
+        for record in self:
+            if not record.agent_config_id:
+                raise ValidationError(_("Please select an AI Agent Configuration"))
     
     @api.constrains('target_word_count')
     def _check_target_word_count(self):
@@ -447,6 +450,23 @@ class ScGenerateContentWizard(models.TransientModel):
             'res_id': self.generated_blog_post_id.id,
             'view_mode': 'form',
             'target': 'current',
+        }
+    
+    def action_open_agent_config(self):
+        """Open the agent configuration form"""
+        if not self.agent_config_id:
+            return
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Agent Configuration'),
+            'res_model': 'sc.ai.agent.config',
+            'res_id': self.agent_config_id.id,
+            'view_mode': 'form',
+            'target': 'new',  # Open in modal
+            'context': {
+                'form_view_initial_mode': 'edit',
+            }
         }
     
     @api.model

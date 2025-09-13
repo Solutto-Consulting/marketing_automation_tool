@@ -24,9 +24,23 @@
                                 <field name="num_ideas" required="1"/>
                             </group>
                             <group string="Agent Configuration">
-                                <field name="agent_model" required="1"/>
-                                <field name="agent_instructions" 
-                                       placeholder="Custom instructions for the content research agent..."/>
+                                <field name="agent_config_id" required="1" 
+                                       domain="[('active', '=', True), ('agent_type', '=', 'research')]"/>
+                                <label for="agent_model" string="Agent Model"/>
+                                <div class="d-flex align-items-center">
+                                    <field name="agent_model" readonly="1" nolabel="1"
+                                           style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;"/>
+                                    <button name="action_open_agent_config" type="object" 
+                                            string="Configure" class="btn btn-sm btn-outline-secondary ms-2"
+                                            invisible="not agent_config_id"
+                                            title="Open agent configuration"/>
+                                </div>
+                                <field name="agent_instructions" readonly="1" 
+                                       string="Agent Instructions (Preview)"
+                                       widget="text"
+                                       style="max-height: 100px; overflow-y: auto; resize: vertical;"/>
+                                <field name="custom_agent_instructions" 
+                                       placeholder="Additional custom instructions for this research task..."/>
                             </group>
                         </group>
                         

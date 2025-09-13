@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <data noupdate="1">
     <!-- Default AI Agent Configurations -->
     <record id="default_research_agent" model="sc.ai.agent.config">
         <field name="name">Default Research Agent</field>
@@ -131,5 +132,6 @@ Content Guidelines:
 Return your response as a JSON object with title, subtitle, content, hashtags, and platform_recommendations.</field>
         <field name="notes">Optimized for social media content generation - engaging, shareable, platform-specific formatting.</field>
     </record>
+    </data>
 
 </odoo>

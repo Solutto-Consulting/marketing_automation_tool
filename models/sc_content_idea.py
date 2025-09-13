@@ -152,7 +152,9 @@ class ScContentIdea(models.Model):
         """Compute the blog posts generated from this idea"""
         for record in self:
             blog_posts = record.generation_tasks_ids.mapped('generated_blog_post_id')
-            record.generated_blog_posts_ids = blog_posts.ids
+            # Filter out empty records (in case some tasks don't have blog posts yet)
+            blog_posts = blog_posts.filtered(lambda p: p.exists())
+            record.generated_blog_posts_ids = blog_posts
     
     @api.depends('generation_tasks_ids')
     def _compute_generation_tasks_count(self):

@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <form string="Generate Blog Content">
                     <header>
-                        <field name="state" widget="statusbar" statusbar_visible="draft,processing,done"/>
+                        <field name="state" widget="statusbar" invisible="1" statusbar_visible="draft,processing,done"/>
                     </header>
                     <sheet>
                         <div class="oe_title">
@@ -29,15 +29,33 @@
                                        placeholder="Detailed instructions for content generation..."
                                        invisible="content_idea_id"/>
                             </group>
-                            <group string="Generation Settings">
+                        </group>
+
+                        <group string="Generation Settings">
+                            <group>
                                 <field name="blog_id" required="1" 
                                        domain="[('active', '=', True)]"/>
                                 <field name="target_lang_id" required="1"/>
                                 <field name="target_word_count" required="1"/>
                                 <field name="agent_config_id" required="1" 
-                                       domain="[('active', '=', True)]"/>
-                                <field name="agent_model" readonly="1"/>
-                                <field name="agent_instructions" readonly="1"/>
+                                       domain="[('active', '=', True), ('agent_type', '=', 'generation')]"/>
+                            </group>
+                            <group>
+                                <label for="agent_model" string="Agent Model"/>
+                                <div class="d-flex align-items-center">
+                                    <field name="agent_model" readonly="1" nolabel="1"
+                                           style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;"/>
+                                    <button name="action_open_agent_config" type="object" 
+                                            string="Configure" 
+                                            class="btn btn-sm btn-outline-secondary ms-2" 
+                                            icon="fa-cog"
+                                            title="Open Agent Configuration"
+                                            invisible="not agent_config_id"/>
+                                </div>
+                                <field name="agent_instructions" readonly="1" 
+                                       widget="text" 
+                                       options="{'max_height': 100}"
+                                       style="max-height: 100px; overflow-y: auto; resize: vertical;"/>
                                 <field name="custom_agent_instructions" 
                                        placeholder="Additional custom instructions for this generation..."/>
                             </group>
