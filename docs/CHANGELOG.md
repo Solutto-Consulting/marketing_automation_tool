@@ -5,7 +5,68 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [18.0.1.0.1] - 2025-09-12
+## [18.0.1.0.1] - 2025-09-13 (Latest Updates)
+
+### Fixed - Critical Image Generation Issues
+- **gpt-image-1 API Integration**: Fixed critical error with OpenAI client initialization
+  - Resolved `property 'default_headers' of 'OpenAI' object has no setter` error
+  - Updated client initialization to use proper `organization` parameter during OpenAI client creation
+  - Validated gpt-image-1 model usage with official OpenAI API documentation
+  - Confirmed support for all gpt-image-1 specific parameters: background, moderation, output_format, partial_images
+- **Image Generation Reliability**: Enhanced error handling and recovery mechanisms
+  - Improved error logging with specific failure details
+  - Better status tracking for image generation processes
+  - Fallback handling when image generation fails
+
+### Enhanced - Wizard User Experience
+- **Consistent Agent Selection Patterns**: Implemented unified agent selection across all wizards
+  - Content Research Wizard: Filters to research-type agents only
+  - Content Generation Wizard: Filters to generation-type agents only
+  - Translation Wizard: Enhanced with consistent agent selection patterns
+- **Improved Field Display**: Enhanced wizard layouts for better usability
+  - Truncated agent model and instructions fields with ellipsis for long text
+  - Added "Configure" buttons next to agent selection for quick access to agent configuration
+  - Improved visual spacing and grouping of related fields
+- **Enhanced Agent Configuration**: Better integration between wizards and agent settings
+  - Direct navigation from wizards to agent configuration forms
+  - Improved preview of agent instructions within wizards
+  - Better validation and error messages for agent selection
+
+### Enhanced - Multiple Article Generation
+- **Content Idea Reusability**: Implemented capability to generate multiple blog posts from single content ideas
+  - Added `generation_tasks_count` computed field to track generated articles
+  - Enhanced content idea model to support multiple generation tasks
+  - Updated views to show usage statistics and generated article counts
+- **Task Management**: Improved tracking and organization of generation tasks
+  - Better linking between content ideas and their generated articles
+  - Enhanced task history and audit trails
+  - Improved status tracking across multiple generations from same idea
+
+### Enhanced - Action Button User Experience
+- **Automatic Page Refresh**: Eliminated need for manual page refresh after task actions
+  - Updated all action methods in task models to return reload actions
+  - Implemented `{'type': 'ir.actions.client', 'tag': 'reload'}` pattern
+  - Enhanced user notifications with automatic state updates
+- **Improved Task Actions**: Better feedback and workflow for all task operations
+  - Content Generation Tasks: Execute, retry, and status change actions now auto-refresh
+  - Content Idea Tasks: All status transitions now update immediately
+  - Translation Tasks: Enhanced action feedback with immediate state updates
+- **Enhanced Error Handling**: Better error display and recovery options
+  - Improved error messages with actionable suggestions
+  - Better integration with notification system
+  - Enhanced logging for debugging and support
+
+### Technical - Code Quality & Maintenance
+- **XML View Compliance**: Fixed all Odoo 18.0 XML validation errors
+  - Removed invalid `editable="false"` attributes from list views
+  - Eliminated forbidden OWL directives (`t-esc`) from field definitions
+  - Updated all views to comply with Odoo 18.0 standards
+- **Field Assignment Corrections**: Fixed computed field assignment issues
+  - Corrected `_compute_generated_blog_posts` to assign recordset instead of .ids
+  - Fixed related field calculations in content idea model
+  - Improved data consistency across all models
+
+## [18.0.1.0.1] - 2025-09-12 (Initial Release)
 
 ### Added - Agent-Based Content Strategy
 - **Content Research Agent**: AI-powered topic discovery using WebSearchTool integration

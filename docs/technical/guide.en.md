@@ -73,6 +73,98 @@ The Content Management Tool for Odoo v18.0.1.0.1 implements a sophisticated **mu
 
 ---
 
+## User Experience Enhancements (v18.0.1.0.1)
+
+The latest version introduces significant improvements to the user interface and workflow experience, focusing on consistency, usability, and immediate feedback.
+
+### Wizard Experience Improvements
+
+#### Consistent Agent Selection Patterns
+- **Agent Type Filtering**: All wizards now implement domain filtering for appropriate agent types
+  - Research wizards filter to `agent_type='research'` only
+  - Generation wizards filter to `agent_type='generation'` only
+  - Translation wizards use enhanced agent selection patterns
+
+#### Enhanced Field Display
+- **Truncated Display**: Long agent model names and instructions are truncated with ellipsis
+  - Prevents layout breaking with very long configuration text
+  - Maintains visual consistency across different agent configurations
+  - Uses CSS styling for proper overflow handling: `style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"`
+
+#### Direct Configuration Access
+- **Configure Buttons**: Added quick access buttons next to agent selection fields
+  - Opens agent configuration form in new window/tab
+  - Provides immediate access to modify agent settings without losing wizard context
+  - Implements standard Odoo button styling: `class="btn btn-sm btn-outline-secondary ms-2"`
+
+### Enhanced Action Button Experience
+
+#### Automatic Page Refresh Implementation
+```python
+def action_execute_immediately(self):
+    """Execute task with automatic page refresh"""
+    try:
+        # Process the task
+        self._process_task()
+        
+        # Return reload action instead of boolean
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload'
+        }
+    except Exception as e:
+        # Return reload with error notification
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+            'params': {
+                'next': {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Task Execution Failed'),
+                        'message': str(e),
+                        'type': 'danger'
+                    }
+                }
+            }
+        }
+```
+
+#### Benefits of Auto-Refresh Pattern
+- **Eliminates Manual Refresh**: Users no longer need to manually refresh pages to see task status updates
+- **Immediate Feedback**: Task state changes are visible immediately after action completion
+- **Better User Experience**: Reduces friction in task management workflows
+- **Consistent Behavior**: Same pattern implemented across all task models (content generation, ideas, translation)
+
+### Multiple Article Generation from Content Ideas
+
+#### Enhanced Content Idea Reusability
+```python
+class ScContentIdea(models.Model):
+    _name = 'sc.content.idea'
+    
+    generation_tasks_count = fields.Integer(
+        string="Generation Tasks",
+        compute='_compute_generation_tasks_count',
+        help="Number of blog posts generated from this idea"
+    )
+    
+    generated_blog_posts = fields.One2many(
+        'blog.post',
+        'source_content_idea_id',
+        string="Generated Blog Posts",
+        help="Blog posts generated from this content idea"
+    )
+```
+
+#### Technical Implementation
+- **Task Counting**: Computed fields track how many articles have been generated from each idea
+- **Usage Statistics**: Enhanced views show utilization metrics for content ideas
+- **Workflow Integration**: Seamless integration between content ideas and generation tasks
+
+---
+
 ## Agent-Based Architecture
 
 ### Agent Specialization Pattern
@@ -439,6 +531,38 @@ The module implements **gpt-image-1** model integration using OpenAI's Direct Im
 **API Endpoint**: `https://api.openai.com/v1/images/generations`  
 **Model**: `gpt-image-1` (latest image generation model)  
 **Implementation**: `utils/openai_responses_image_utils.py`
+
+#### Critical Fixes Applied (v18.0.1.0.1)
+
+**OpenAI Client Initialization Fix**
+
+The previous implementation had a critical error when initializing the OpenAI client with organization settings:
+
+```python
+# ❌ Previous incorrect implementation (caused setter error)
+self._client = OpenAI(api_key=api_key)
+if org_id:
+    self._client.default_headers = {"OpenAI-Organization": str(org_id)}  # ERROR: no setter
+```
+
+**Root Cause**: The `default_headers` property in newer versions of the OpenAI Python library does not have a setter, causing the error: `property 'default_headers' of 'OpenAI' object has no setter`
+
+**Resolution Applied**: 
+```python
+# ✅ Corrected implementation (v18.0.1.0.1)
+if org_id:
+    self._client = OpenAI(
+        api_key=api_key,
+        organization=str(org_id)  # Pass during initialization
+    )
+else:
+    self._client = OpenAI(api_key=api_key)
+```
+
+**Validation with Official OpenAI Documentation**
+- Confirmed `gpt-image-1` is a valid and recommended model for image generation
+- Validated all gpt-image-1 specific parameters: `background`, `moderation`, `output_format`, `partial_images`
+- Ensured compliance with official OpenAI API examples and best practices
 
 #### Core Image Generation Class
 

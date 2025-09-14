@@ -175,6 +175,40 @@ Generated blog posts include:
 - Customize generation agent instructions for consistent brand voice
 - Use generation tasks to track content creation pipeline
 
+### Multiple Article Generation from Content Ideas (v18.0.1.0.1)
+
+One of the key enhancements in v18.0.1.0.1 is the ability to generate multiple blog articles from a single content idea, maximizing the value of your research.
+
+#### How It Works
+- **Content Idea Reusability**: Each research idea can be used to generate multiple different blog posts
+- **Usage Tracking**: The system tracks how many articles have been generated from each idea
+- **Unique Content**: Each generation produces distinct content even from the same source idea
+- **Status Monitoring**: View generation tasks and their relationship to source ideas
+
+#### Content Idea Usage Statistics
+When viewing content ideas, you'll see:
+- **Generation Tasks Count**: Number of blog posts generated from this idea
+- **Generated Blog Posts**: List of all articles created from this idea
+- **Usage Status**: Visual indicators showing idea utilization
+
+#### Workflow for Multiple Generations
+1. **First Generation**: Use content idea wizard to create initial blog post
+2. **Additional Generations**: Return to the same content idea and generate again
+3. **Varied Approaches**: Use different user prompts to create diverse content angles
+4. **Track Results**: Monitor all generated content in the content idea view
+
+#### Benefits of Multiple Generation
+- **Content Series**: Create related articles covering different aspects of a topic
+- **Audience Targeting**: Generate versions for different reader personas
+- **Content Depth**: Explore various angles of trending topics
+- **ROI Maximization**: Get more value from quality research ideas
+
+#### Example Use Case
+From a single research idea about "AI in Healthcare":
+- **Article 1**: "10 Ways AI is Transforming Healthcare in 2025" (user prompt: focus on current applications)
+- **Article 2**: "The Future of AI in Medical Diagnosis" (user prompt: focus on future predictions)
+- **Article 3**: "How Healthcare Providers Can Implement AI Solutions" (user prompt: focus on implementation guide)
+
 ---
 
 ## AI-Powered Blog Cover Images
@@ -418,6 +452,40 @@ Click on any task to view detailed information:
 - **Effect**: Changes status back to "Draft" for reprocessing
 
 **Note**: Use this action when OpenAI API issues are resolved or configuration is corrected.
+
+### Enhanced Task Action Experience (v18.0.1.0.1)
+
+The latest version introduces significant improvements to task action buttons, eliminating the need for manual page refreshes and providing immediate feedback.
+
+#### Automatic Page Refresh
+All task action buttons now automatically refresh the page after completion, providing immediate visual feedback:
+
+**Content Generation Tasks**:
+- **Execute Immediately**: Starts task processing and auto-refreshes to show updated status
+- **Retry**: Resets failed tasks and auto-refreshes to show draft status
+- **View Blog Post**: Opens generated content without losing current context
+
+**Content Idea Tasks**:
+- **Reset to Draft**: Changes status and immediately shows the update
+- **Mark Complete**: Updates status with instant visual feedback
+- **Generate Content**: Opens generation wizard while maintaining task context
+
+**Translation Tasks**:
+- **Reset to Draft**: Allows retrying failed translations with immediate status update
+- **Process Translation**: Starts translation and shows progress without manual refresh
+- **Emergency Fix**: Applies corrections and updates status automatically
+
+#### User Experience Benefits
+- **No Manual Refresh Required**: Status changes are visible immediately after clicking action buttons
+- **Improved Workflow**: Users can work continuously without interruption
+- **Better Error Handling**: Error states are displayed immediately with actionable suggestions
+- **Consistent Behavior**: Same auto-refresh pattern across all task types
+
+#### Technical Implementation
+The system now returns reload actions instead of simple boolean responses:
+- Successful actions trigger automatic page reload
+- Error conditions display notifications and refresh to show error state
+- Status transitions are immediately visible to users
 
 ### Task History
 

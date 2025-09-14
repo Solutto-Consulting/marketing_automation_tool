@@ -57,18 +57,35 @@ The **Content Management Tool for Odoo v18.0.1.0.1** introduces powerful **agent
 
 #### **User Interface Enhancements**
 - **Marketing Automation Menu**: Centralized navigation for all content features
-- **Agent Configuration Wizards**: User-friendly interfaces for research and generation
+- **Agent Configuration Wizards**: User-friendly interfaces with consistent agent selection patterns
 - **Usage Monitoring Views**: Dashboard with graphs and historical data
-- **Enhanced Task Management**: Color-coded status tracking across all agents
+- **Enhanced Task Management**: Color-coded status tracking with automatic page refresh
+- **Improved Wizard Experience**: Truncated fields, Configure buttons, and better usability
+- **Multiple Article Generation**: Generate multiple blog posts from single content ideas
+
+#### **Latest UX Improvements (September 2025)**
+- **Automatic Action Button Refresh**: Eliminated need for manual page refresh after task actions
+- **Consistent Agent Selection**: Unified agent filtering patterns across all wizards (research/generation)
+- **Enhanced Field Display**: Truncated agent model/instruction fields with ellipsis for better layout
+- **Direct Configuration Access**: Quick "Configure" buttons next to agent selection for immediate settings access
+- **Multiple Content Generation**: Reuse content ideas to create multiple articles with different approaches
+- **Improved Error Handling**: Better error display with actionable suggestions and immediate feedback
 
 ### 🔧 Technical Architecture (v18.0.1.0.1)
 - **Multi-Agent Architecture**: Specialized AI agents with dedicated configurations
-- **Direct Images API Integration**: Native gpt-image-1 support with advanced parameters
+- **gpt-image-1 API Integration**: Native support with official OpenAI client initialization patterns
 - **Static File Management**: Module-based image storage with web accessibility
 - **Enhanced Data Models**: New models for content ideas, generation tasks, image metadata, and usage tracking
 - **Settings Migration**: Automatic migration from General Settings to Marketing Automation
 - **Backward Compatibility**: All existing translation functionality preserved and enhanced
 - **Enhanced Security Model**: Agent-specific access controls and credential management
+
+#### **Critical Fixes Applied (September 2025)**
+- **OpenAI Client Initialization**: Fixed `property 'default_headers' of 'OpenAI' object has no setter` error
+- **gpt-image-1 Model Validation**: Confirmed and documented proper usage of gpt-image-1 with all supported parameters
+- **XML View Compliance**: Fixed all Odoo 18.0 XML validation errors (removed invalid attributes and OWL directives)
+- **Field Assignment Corrections**: Fixed computed field assignment issues in content idea models
+- **Action Method Returns**: Updated all task action methods to return proper reload actions instead of boolean values
 
 ### ⚠️ Features Not Included in v18.0.1.0.1
 - **Advanced Analytics**: Comprehensive content performance metrics (planned for v18.0.1.1.0+)
