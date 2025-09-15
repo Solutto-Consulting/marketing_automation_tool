@@ -5,7 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [18.0.1.0.1] - 2025-09-13 (Latest Updates)
+## [18.0.1.0.1] - 2025-09-15 (Latest Updates)
+
+### Enhanced - Agent Security Architecture
+- **JSON Specifications Separation**: Implemented critical security enhancement for AI agent system
+  - Separated user-editable instructions from hardcoded JSON format specifications
+  - Added `get_runtime_instructions()` method that automatically appends technical requirements
+  - Added `_get_research_json_specifications()` and `_get_generation_json_specifications()` methods
+  - Updated `get_agent_instructions()` to use runtime instructions instead of raw instructions
+  - Ensures system reliability regardless of user instruction modifications
+- **Configuration Data Cleanup**: Cleaned agent configuration XML data
+  - Removed JSON format specifications from user-editable instruction fields
+  - Preserved all functional user instruction content
+  - Technical specifications now added automatically at runtime
+
+### Fixed - View Reference Errors
+- **Dashboard Placeholder Method Cleanup**: Eliminated remaining placeholder method references
+  - Removed invalid `action_fetch_latest_data` and `action_refresh_dashboard` references from views
+  - Updated OpenAI usage dashboard views to only include implemented functionality
+  - Fixed module installation errors caused by missing method references
+- **XML View Validation**: Enhanced XML view consistency and error handling
+  - All view references now point to existing, implemented methods
+  - Improved error messages and user feedback for dashboard operations
+
+### Enhanced - Code Quality and Documentation
+- **Comprehensive Documentation Audit**: Completed full documentation consistency review
+  - Validated all markdown files against implemented functionality
+  - Verified all internal links and file references
+  - Updated version information across all documentation files
+  - Created comprehensive documentation audit report (`docs/DOCUMENTATION_AUDIT.md`)
+
+## [18.0.1.0.1] - 2025-09-13 (Previous Updates)
 
 ### Fixed - Critical Image Generation Issues
 - **gpt-image-1 API Integration**: Fixed critical error with OpenAI client initialization

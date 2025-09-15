@@ -1,23 +1,39 @@
-# Functional Documentation: Content Management Tool
+# Documentación Funcional: Content Management Tool v18.0.1.0.1
 
-## Overview
+## 📚 Documentos Disponibles
 
-The Content Management Tool for Odoo provides marketing teams with AI-powered content translation capabilities, enabling efficient and automated translation of blog posts using OpenAI's advanced language models.
+### Guías de Usuario
+- 🇺🇸 **[Guía Funcional Completa (Inglés)](guide.en.md)** - Manual completo para usuarios finales
+- 🇪🇸 **[Guía Funcional Completa (Español)](guide.es.md)** - Manual completo para usuarios finales en español
 
-## Key Benefits
+### Navegación Rápida
+- 📖 **[Índice Principal](../README.md)** - Volver al índice principal de documentación
+- ⚙️ **[Documentación Técnica](../technical/README.md)** - Para desarrolladores
+- 📑 **[CHANGELOG](../CHANGELOG.md)** - Registro de cambios y versiones
 
-- **Time Savings**: Automate blog post translation instead of manual translation workflows
-- **Quality Consistency**: Leverage professional AI translation models for consistent quality
-- **Scalability**: Handle multiple blog posts simultaneously with background processing
-- **Flexibility**: Customize AI instructions for specific tone and style requirements
-- **Tracking**: Complete visibility into translation progress and history
+## Resumen del Módulo v18.0.1.0.1
 
-## User Roles and Permissions
+### Capacidades Principales
+- 🤖 **Agente de Investigación de Contenido**: Descubrimiento de temas con IA usando búsqueda web
+- ✍️ **Agente de Generación de Contenido**: Creación automatizada de artículos de blog
+- 🖼️ **Generación de Imágenes con IA**: Imágenes profesionales para portadas de blog
+- 📊 **Monitoreo de Uso**: Dashboard para seguimiento de costos y uso de OpenAI
+- ⚙️ **Configuración Centralizada**: Sección dedicada de Marketing Automation
+- 🌐 **Sistema de Traducción**: Traducción mejorada con OpenAI Agents SDK
+
+### Beneficios Clave
+- ⏰ **Ahorro de Tiempo**: Automatización de creación y traducción de contenido
+- 🎯 **Consistencia de Calidad**: Modelos de IA profesionales para calidad consistente
+- 📈 **Escalabilidad**: Manejo de múltiples tareas simultáneamente con procesamiento en segundo plano
+- 🔧 **Flexibilidad**: Instrucciones personalizables para tono y estilo específicos
+- 📋 **Seguimiento**: Visibilidad completa del progreso e historial de tareas
+
+## Roles de Usuario y Permisos
 
 ### Marketing Manager
-- Full access to all translation features
-- Can configure OpenAI settings
-- Can manage and delete translation tasks
+- Acceso completo a todas las funcionalidades
+- Puede configurar ajustes de OpenAI y agentes
+- Puede gestionar y eliminar tareas de todos los tipos
 - Can retry failed translations
 
 ### Marketing User

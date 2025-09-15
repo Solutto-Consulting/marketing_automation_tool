@@ -122,9 +122,9 @@ class ScAiAgentConfig(models.Model):
     
     @api.model
     def get_agent_instructions(self, agent_type):
-        """Get instructions for the default agent of given type"""
+        """Get complete runtime instructions for the default agent of given type"""
         agent = self.get_default_agent(agent_type)
-        return agent.instructions if agent else ""
+        return agent.get_runtime_instructions() if agent else ""
     
     @api.model
     def get_agent_model(self, agent_type):
@@ -266,3 +266,85 @@ Return your response as a JSON object with the specified structure containing ti
             })
         
         _logger.info("Default AI agent configurations created successfully")
+
+    def get_runtime_instructions(self, context=None):
+        """
+        Get complete instructions with hardcoded JSON specifications appended.
+        This ensures the system always gets the expected response format regardless
+        of how users modify the editable instructions.
+        """
+        self.ensure_one()
+        
+        # Start with user-editable instructions
+        runtime_instructions = self.instructions or ""
+        
+        # Append hardcoded technical specifications based on agent type
+        if self.agent_type == 'research':
+            runtime_instructions += self._get_research_json_specifications()
+        elif self.agent_type == 'generation':
+            runtime_instructions += self._get_generation_json_specifications()
+        
+        return runtime_instructions
+    
+    def _get_research_json_specifications(self):
+        """
+        Hardcoded JSON format specifications for research agents.
+        These specifications are critical for system functionality and should never be modified by users.
+        """
+        return """
+
+CRITICAL RESPONSE FORMAT REQUIREMENTS:
+You MUST return your response as a valid JSON list. Each item in the list must be an object with these exact field names:
+
+Required JSON structure:
+[
+    {
+        "name": "Article title here",
+        "url": "https://full-url-to-article.com",
+        "publish_date": "YYYY-MM-DD or null if not available",
+        "summary": "Concise summary of the article and its value for content creation"
+    }
+]
+
+IMPORTANT TECHNICAL NOTES:
+- Return ONLY the JSON list, no additional text or formatting
+- Use double quotes for all strings
+- Ensure all URLs are complete and valid
+- If publish_date is unknown, use null (not "null" or empty string)
+- Each object must contain all four fields: name, url, publish_date, summary
+- Do not wrap the JSON in markdown code blocks
+- Ensure the JSON is properly formatted and parseable
+
+The system expects this exact structure to process your response correctly."""
+
+    def _get_generation_json_specifications(self):
+        """
+        Hardcoded JSON format specifications for generation agents.
+        These specifications are critical for system functionality and should never be modified by users.
+        """
+        return """
+
+CRITICAL RESPONSE FORMAT REQUIREMENTS:
+You MUST return your response as a valid JSON object with these exact field names:
+
+Required JSON structure:
+{
+    "title": "Engaging blog post title here",
+    "subtitle": "Optional subtitle that complements the main title",
+    "content": "Complete HTML formatted blog post content",
+    "meta_description": "SEO optimized meta description (150-160 characters)",
+    "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"]
+}
+
+IMPORTANT TECHNICAL NOTES:
+- Return ONLY the JSON object, no additional text or formatting
+- Use double quotes for all strings
+- The "content" field should contain properly formatted HTML
+- The "keywords" field must be an array of strings (5-8 keywords recommended)
+- The "subtitle" field is optional but recommended
+- Ensure meta_description is between 150-160 characters
+- Do not wrap the JSON in markdown code blocks
+- Ensure the JSON is properly formatted and parseable
+- All HTML in content should be properly escaped within the JSON string
+
+The system expects this exact structure to process your response correctly."""

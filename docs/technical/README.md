@@ -1,23 +1,39 @@
-# Technical Documentation: sc_marketing_automation_tool
+# Documentación Técnica: sc_marketing_automation_tool v18.0.1.0.1
 
-## Overview
+## 📚 Documentos Técnicos Disponibles
 
-The `sc_marketing_automation_tool` module provides AI-powered content translation capabilities for Odoo blog posts using OpenAI's language models through the openai-agents SDK.
+### Guías Principales
+- 🇺🇸 **[Guía Técnica Completa (Inglés)](guide.en.md)** - Documentación técnica completa
+- 🇪🇸 **[Guía Técnica Completa (Español)](guide.es.md)** - Documentación técnica completa en español
 
-## Architecture
+### Documentos Especializados
+- 🔧 **[Implementación de Configuraciones](settings-implementation.md)** - Detalles de configuraciones centralizadas
+- 🌐 **[Sistema de Traducción](translation-system-guide.md)** - Arquitectura del sistema de traducción
+- 🔗 **[Integración de Idiomas Web](website-language-integration.md)** - Integración con idiomas del sitio web
 
-### Core Components
+### Navegación
+- 📖 **[Índice Principal](../README.md)** - Volver al índice principal de documentación
+- 📋 **[Documentación Funcional](../functional/README.md)** - Para usuarios finales
+- 📊 **[Plan de Implementación](../plan/PLAN.md)** - Plan de desarrollo v18.0.1.0.1
 
-1. **Models**
-   - `sc.translation.task`: Manages translation requests and status tracking
-   - `blog.post` (extended): Adds translation tracking capabilities
-   - `res.config.settings` (extended): OpenAI configuration management
-   - `openai.utils`: Utility class for OpenAI integration
+## Resumen de Arquitectura v18.0.1.0.1
 
-2. **Views**
-   - Configuration settings view (inherits from base_setup)
-   - Translation task management views (list, form, kanban)
-   - Blog post form extension with translation history
+### Arquitectura Multi-Agente
+El módulo implementa una arquitectura sofisticada de múltiples agentes de IA para gestión integral de contenido:
+
+1. **Content Research Agent**: Descubrimiento de temas usando WebSearchTool
+2. **Content Generation Agent**: Creación automatizada de artículos de blog  
+3. **Translation Agent**: Sistema de traducción mejorado con OpenAI Agents SDK
+
+### Componentes Principales
+
+#### **Modelos de Datos**
+- `sc.ai.agent.config`: Configuración y gestión de agentes de IA
+- `sc.content.idea`: Almacenamiento de ideas de contenido generadas
+- `sc.content.idea.task`: Seguimiento de tareas de investigación de contenido
+- `sc.content.generation.task`: Gestión de tareas de generación de artículos
+- `sc.openai.usage.snapshot`: Monitoreo de uso y costos de OpenAI API
+- `sc.translation.task`: Gestión de tareas de traducción (heredado de v18.0.1.0.0)
    - Translation wizard for user input
 
 3. **Background Processing**

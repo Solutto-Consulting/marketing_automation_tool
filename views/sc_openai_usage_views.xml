@@ -76,12 +76,6 @@
             <field name="model">sc.openai.dashboard</field>
             <field name="arch" type="xml">
                 <form string="OpenAI Usage Dashboard">
-                    <header>
-                        <button name="action_fetch_latest_data" string="Fetch Latest Data" 
-                                type="object" class="btn-primary" icon="fa-download"/>
-                        <button name="action_refresh_dashboard" string="Refresh Dashboard" 
-                                type="object" class="btn-secondary" icon="fa-refresh"/>
-                    </header>
                     <sheet>
                         <div class="row">
                             <div class="col-lg-12">
@@ -154,13 +148,13 @@
                             <div class="col-lg-12">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h4>Quick Actions</h4>
+                                        <h4>Information</h4>
                                     </div>
                                     <div class="card-body">
-                                        <button name="action_view_all_records" string="View All Usage Records" 
-                                                type="object" class="btn btn-outline-primary me-3" icon="fa-list"/>
-                                        <button name="action_fetch_latest_data" string="Fetch Latest Data" 
-                                                type="object" class="btn btn-outline-success" icon="fa-download"/>
+                                        <p class="text-muted">
+                                            This dashboard displays OpenAI API usage statistics. 
+                                            Data is automatically collected and updated by the system.
+                                        </p>
                                     </div>
                                 </div>
                             </div>

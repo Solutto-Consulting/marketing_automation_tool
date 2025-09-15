@@ -178,7 +178,7 @@ See [LICENSE](LICENSE) for more details.
 
 ## Version Information
 
-- **Module Version**: 18.0.1.0.0
+- **Module Version**: 18.0.1.0.1
 - **Odoo Version**: 18.0 Community
 - **Last Updated**: September 2025
 

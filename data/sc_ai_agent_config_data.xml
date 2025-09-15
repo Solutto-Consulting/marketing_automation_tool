@@ -22,9 +22,7 @@ Focus on:
 - Recent articles (preferably within the last 6 months)
 - Authoritative sources and industry publications
 - Trending topics and emerging insights
-- Actionable information that can inspire blog content
-
-Return your findings as a JSON list with the specified structure.</field>
+- Actionable information that can inspire blog content</field>
         <field name="default_query">Find recent articles about digital marketing trends and best practices published after {today}</field>
         <field name="notes">Default configuration for content research tasks. Optimized for finding high-quality marketing content ideas.</field>
     </record>
@@ -69,9 +67,7 @@ Visual Enhancement Elements:
 - Include blockquotes with proper attribution structure
 - Add informational alerts or callouts for key insights
 - Use proper list formatting for actionable steps
-- Apply semantic HTML5 elements where appropriate
-
-Return your response as a JSON object with the specified structure containing title, subtitle, content, meta_description, and keywords.</field>
+- Apply semantic HTML5 elements where appropriate</field>
         <field name="notes">Default configuration for blog content generation. Optimized for professional business content with SEO focus.</field>
     </record>
 
@@ -96,9 +92,7 @@ Focus on:
 - Recent technical articles (preferably within the last 3 months)
 - Authoritative technical blogs, documentation sites, and industry publications
 - Implementation guides and case studies
-- Technical trends and emerging technologies
-
-Return your findings as a JSON list with detailed technical analysis.</field>
+- Technical trends and emerging technologies</field>
         <field name="default_query">Find recent technical articles about {topic} with implementation details and best practices published after {today}</field>
         <field name="notes">Specialized for technical content research - development, IT, cybersecurity, emerging tech.</field>
     </record>
@@ -127,9 +121,7 @@ Content Guidelines:
 - Include questions to encourage engagement
 - Optimize for mobile reading
 - Focus on immediate value and shareability
-- Include relevant emojis where appropriate
-
-Return your response as a JSON object with title, subtitle, content, hashtags, and platform_recommendations.</field>
+- Include relevant emojis where appropriate</field>
         <field name="notes">Optimized for social media content generation - engaging, shareable, platform-specific formatting.</field>
     </record>
     </data>
