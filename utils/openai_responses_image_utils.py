@@ -90,9 +90,61 @@ class OpenAIDirectImagesGenerator:
             # Get generation parameters for direct API
             params = self._get_image_generation_params(prompt, **generation_options)
             
-            # Make the API call using direct Images API
+            # Make the API call using direct Images API with monitoring
             _logger.info(f"Generating image using Direct Images API with gpt-image-1")
-            response = self.client.images.generate(**params)
+            start_time = datetime.now()
+            
+            try:
+                response = self.client.images.generate(**params)
+                
+                # Calculate response time
+                end_time = datetime.now()
+                response_time_ms = int((end_time - start_time).total_seconds() * 1000)
+                
+                # Extract usage information if available
+                input_tokens = 0
+                output_tokens = 0
+                total_tokens = 0
+                
+                if hasattr(response, 'usage') and response.usage:
+                    input_tokens = getattr(response.usage, 'input_tokens', 0)
+                    output_tokens = getattr(response.usage, 'output_tokens', 0)
+                    total_tokens = getattr(response.usage, 'total_tokens', input_tokens + output_tokens)
+                
+                # Log the successful request using centralized logging
+                self.env['sc.openai.request.log'].sudo().create_log_entry(
+                    model_name='gpt-image-1',
+                    operation_type='image_generation',
+                    prompt_tokens=input_tokens,
+                    completion_tokens=output_tokens,
+                    response_time_ms=response_time_ms,
+                    status='success',
+                    related_model='blog.post',
+                    related_record_name=article_title[:100]  # Truncate if needed
+                )
+                
+                _logger.info(f"Image generation logged: {total_tokens} tokens, {response_time_ms}ms response time")
+                
+            except Exception as api_error:
+                # Calculate response time for failed request
+                end_time = datetime.now()
+                response_time_ms = int((end_time - start_time).total_seconds() * 1000)
+                
+                # Log the failed request
+                self.env['sc.openai.request.log'].sudo().create_log_entry(
+                    model_name='gpt-image-1',
+                    operation_type='image_generation',
+                    prompt_tokens=0,
+                    completion_tokens=0,
+                    response_time_ms=response_time_ms,
+                    status='error',
+                    error_message=str(api_error)[:500],  # Truncate error message
+                    related_model='blog.post',
+                    related_record_name=article_title[:100]
+                )
+                
+                # Re-raise the exception to maintain original behavior
+                raise api_error
             
             # Get output format for filename extension
             output_format = generation_options.get('output_format', 'png')

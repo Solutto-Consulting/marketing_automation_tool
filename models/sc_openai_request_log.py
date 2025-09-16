@@ -39,6 +39,7 @@ class ScOpenaiRequestLog(models.Model):
     operation_type = fields.Selection([
         ('translation', 'Content Translation'),
         ('generation', 'Content Generation'),
+        ('image_generation', 'Image Generation'),
         ('analysis', 'Content Analysis'),
         ('research', 'Web Research'),
         ('other', 'Other Operation'),
