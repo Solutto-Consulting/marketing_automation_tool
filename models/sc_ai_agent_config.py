@@ -90,16 +90,15 @@ class ScAiAgentConfig(models.Model):
     
     @api.model
     def _get_openai_models(self):
-        """Get available OpenAI models from settings"""
+        """Get available OpenAI models from centralized configuration"""
         try:
-            config_settings = self.env['res.config.settings']
-            return config_settings._get_openai_models()
+            openai_models = self.env['sc.openai.models']
+            return openai_models.get_text_models()
         except:
-            # Fallback models if settings not available
+            # Fallback models if centralized config not available
             return [
                 ('gpt-4o', 'GPT-4o'),
-                ('gpt-4-turbo', 'GPT-4 Turbo'),
-                ('gpt-3.5-turbo', 'GPT-3.5 Turbo'),
+                ('gpt-4o-mini', 'GPT-4o Mini'),
             ]
     
     @api.model

@@ -7,7 +7,7 @@ from odoo import api, fields, models
 _logger = logging.getLogger(__name__)
 
 class OpenAIUtils(models.AbstractModel):
-    """Utility class for OpenAI integration using openai-agents SDK"""
+    """Utility class for OpenAI integration using openai-agents SDK with monitoring"""
     _name = 'openai.utils'
     _description = 'OpenAI Integration Utilities'
 
@@ -47,21 +47,28 @@ class OpenAIUtils(models.AbstractModel):
         ]
     
     @api.model
-    async def perform_ai_translation(self, model_name, system_instructions, prompt):
+    async def perform_ai_translation(self, model_name, system_instructions, prompt, 
+                                   related_model=None, related_record_id=None, related_record_name=None):
         """
-        Performs translation using the OpenAI Agents SDK.
+        Performs translation using the OpenAI Agents SDK with automatic monitoring.
         
         Args:
             model_name (str): The OpenAI model to use
             system_instructions (str): Instructions for the AI agent
             prompt (str): The translation prompt
+            related_model (str): Optional related Odoo model for tracking
+            related_record_id (int): Optional related record ID for tracking
+            related_record_name (str): Optional related record name for tracking
             
         Returns:
             str: The translated content from the AI
         """
         try:
             # Import here to avoid import errors if package not installed
-            from agents import Agent, Runner
+            from agents import Agent
+            
+            # Setup monitoring on first use
+            self._setup_openai_monitoring()
             
             # Create agent with enhanced instructions for HTML consistency
             enhanced_instructions = f"""You are a professional translator specializing in web content translation. 
@@ -90,8 +97,15 @@ SPECIFIC REQUIREMENTS FOR HTML CONTENT:
                 model=model_name,
             )
             
-            # Execute translation
-            result = await Runner.run(agent, prompt)
+            # Execute translation with monitoring
+            result = await self._monitored_ai_request(
+                agent, 
+                prompt,
+                model_name,
+                related_model=related_model,
+                related_record_id=related_record_id,
+                related_record_name=related_record_name
+            )
             return result.final_output
             
         except ImportError:
@@ -171,12 +185,19 @@ Respond ONLY with the translated JSON object, maintaining the exact same key str
 JSON to translate:
 {json.dumps(source_content, ensure_ascii=False, indent=2)}"""
         
-        # Execute translation asynchronously
+        # Execute translation asynchronously with monitoring
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
             translated_content_str = loop.run_until_complete(
-                self.perform_ai_translation(model_name, system_instructions, prompt)
+                self.perform_ai_translation(
+                    model_name, 
+                    system_instructions, 
+                    prompt,
+                    related_model='blog.post',
+                    related_record_id=blog_post.id,
+                    related_record_name=blog_post.name
+                )
             )
         finally:
             loop.close()
@@ -248,16 +269,46 @@ Focus on finding:
 Return ONLY the JSON array, no additional text or explanation.
 """
             
-            # Execute research
-            result = await Runner.run(agent, prompt)
+            # Execute research with monitoring
+            result = await self._monitored_ai_request(
+                agent, 
+                prompt, 
+                model_name,
+                related_model='sc.content.idea.task',
+                related_record_name=f'Content Research: {search_query[:50]}'
+            )
             
             # Parse the JSON response
             try:
                 response_text = result.final_output.strip()
+                _logger.info("Raw agent response: %s", response_text[:200] + "..." if len(response_text) > 200 else response_text)
+                
+                # Handle markdown JSON blocks
                 if response_text.startswith('```json'):
                     response_text = response_text[7:]
                 if response_text.endswith('```'):
                     response_text = response_text[:-3]
+                
+                # Handle markdown JSON blocks without language specification
+                if response_text.startswith('```'):
+                    response_text = response_text[3:]
+                if response_text.endswith('```'):
+                    response_text = response_text[:-3]
+                
+                # Clean up any extra whitespace
+                response_text = response_text.strip()
+                
+                # Try to extract JSON from mixed content
+                if not response_text.startswith('[') and not response_text.startswith('{'):
+                    # Look for JSON array in the response
+                    import re
+                    json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
+                    if json_match:
+                        response_text = json_match.group(0)
+                    else:
+                        raise ValueError("No valid JSON array found in response")
+                
+                _logger.info("Cleaned response for parsing: %s", response_text[:200] + "..." if len(response_text) > 200 else response_text)
                 
                 ideas = json.loads(response_text)
                 
@@ -382,8 +433,14 @@ Content Requirements:
 Return ONLY the JSON object, no additional text or explanation.
 """
             
-            # Execute content generation
-            result = await Runner.run(agent, prompt)
+            # Execute content generation with monitoring
+            result = await self._monitored_ai_request(
+                agent, 
+                prompt,
+                model_name,
+                related_model='sc.content.generation.task',
+                related_record_name=f'Content Generation: {content_idea.get("name", "Custom Content")[:50]}'
+            )
             
             # Parse the JSON response
             try:
@@ -572,3 +629,173 @@ Return ONLY the JSON object, no additional text or explanation.
         except Exception as e:
             _logger.error("Content generation failed: %s", str(e))
             raise Exception(f"Content generation failed: {str(e)}")
+
+    # Monitoring Methods
+    @api.model
+    def _setup_openai_monitoring(self):
+        """Setup OpenAI monitoring if not already configured"""
+        try:
+            # Import monitoring logger
+            from . import openai_request_logger
+            
+            # Initialize monitoring
+            openai_request_logger.setup_monitoring()
+            
+        except ImportError:
+            _logger.warning("OpenAI request logger not available")
+        except Exception as e:
+            _logger.warning("Failed to setup OpenAI monitoring: %s", str(e))
+
+    @api.model
+    async def _monitored_ai_request(self, agent, prompt, model_name, related_model=None, related_record_id=None, related_record_name=None):
+        """Execute AI request with monitoring and logging"""
+        import time
+        import tiktoken
+        
+        start_time = time.time()
+        request_data = {
+            'model': model_name,
+            'prompt': prompt,
+            'related_model': related_model,
+            'related_record_id': related_record_id,
+            'related_record_name': related_record_name,
+            'start_time': start_time
+        }
+        
+        try:
+            # Import Runner for execution
+            from agents import Runner
+            
+            # Execute the agent request
+            result = await Runner.run(agent, prompt)
+            
+            # Calculate metrics
+            end_time = time.time()
+            response_time = end_time - start_time
+            
+            # Count tokens using tiktoken
+            try:
+                encoding = tiktoken.encoding_for_model(model_name)
+                input_tokens = len(encoding.encode(prompt))
+                output_tokens = len(encoding.encode(result.final_output))
+            except Exception:
+                # Fallback token counting
+                input_tokens = len(prompt.split()) * 1.3  # Rough estimate
+                output_tokens = len(result.final_output.split()) * 1.3
+            
+            # Log successful request
+            self._log_openai_request(
+                model=model_name,
+                input_tokens=int(input_tokens),
+                output_tokens=int(output_tokens),
+                total_tokens=int(input_tokens + output_tokens),
+                response_time_ms=int(response_time * 1000),
+                success=True,
+                operation_type='generation',  # Default to generation for content creation
+                error_message=None,
+                related_model=related_model,
+                related_record_id=related_record_id,
+                related_record_name=related_record_name
+            )
+            
+            return result
+            
+        except Exception as e:
+            # Log failed request
+            end_time = time.time()
+            response_time = end_time - start_time
+            
+            self._log_openai_request(
+                model=model_name,
+                input_tokens=0,
+                output_tokens=0,
+                total_tokens=0,
+                response_time_ms=int(response_time * 1000),
+                success=False,
+                operation_type='generation',  # Default to generation for content creation
+                error_message=str(e),
+                related_model=related_model,
+                related_record_id=related_record_id,
+                related_record_name=related_record_name
+            )
+            
+            raise
+
+    @api.model
+    def _log_openai_request(self, model, input_tokens, output_tokens, total_tokens, 
+                           response_time_ms, success, operation_type='generation', error_message=None,
+                           related_model=None, related_record_id=None, related_record_name=None):
+        """Log OpenAI request to database"""
+        try:
+            # Calculate cost estimation (rough pricing for common models)
+            cost_per_1k_input = 0.03 if 'gpt-4' in model else 0.001  # USD
+            cost_per_1k_output = 0.06 if 'gpt-4' in model else 0.002  # USD
+            
+            estimated_cost = (
+                (input_tokens / 1000) * cost_per_1k_input +
+                (output_tokens / 1000) * cost_per_1k_output
+            )
+            
+            # Create request log record
+            self.env['sc.openai.request.log'].sudo().create({
+                'model_used': model,
+                'operation_type': operation_type,
+                'prompt_tokens': input_tokens,
+                'completion_tokens': output_tokens,
+                'total_tokens': total_tokens,
+                'estimated_cost': estimated_cost,
+                'response_time_ms': response_time_ms,
+                'status': 'success' if success else 'error',
+                'error_message': error_message,
+                'related_model': related_model,
+                'related_record_id': related_record_id,
+                'related_record_name': related_record_name,
+            })
+            
+            # Update model statistics
+            self._update_model_statistics(model, input_tokens, output_tokens, estimated_cost, success)
+            
+        except Exception as e:
+            _logger.warning("Failed to log OpenAI request: %s", str(e))
+
+    @api.model 
+    def _update_model_statistics(self, model, input_tokens, output_tokens, cost, success):
+        """Update aggregated model statistics"""
+        try:
+            today = fields.Date.today()
+            
+            # Find or create statistics record for today
+            stats = self.env['sc.openai.model.statistics'].sudo().search([
+                ('model_name', '=', model),
+                ('date', '=', today)
+            ], limit=1)
+            
+            if not stats:
+                stats = self.env['sc.openai.model.statistics'].sudo().create({
+                    'model_name': model,
+                    'date': today,
+                    'total_requests': 0,
+                    'successful_requests': 0,
+                    'failed_requests': 0,
+                    'total_prompt_tokens': 0,
+                    'total_completion_tokens': 0,
+                    'total_cost': 0.0,
+                    'avg_response_time': 0.0
+                })
+            
+            # Update statistics
+            new_total_requests = stats.total_requests + 1
+            new_successful = stats.successful_requests + (1 if success else 0)
+            new_failed = stats.failed_requests + (0 if success else 1)
+            
+            stats.write({
+                'total_requests': new_total_requests,
+                'successful_requests': new_successful,
+                'failed_requests': new_failed,
+                'total_prompt_tokens': stats.total_prompt_tokens + input_tokens,
+                'total_completion_tokens': stats.total_completion_tokens + output_tokens,
+                'total_cost': stats.total_cost + cost,
+            })
+            
+        except Exception as e:
+            _logger.warning("Failed to update model statistics: %s", str(e))

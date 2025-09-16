@@ -8,5 +8,9 @@ from . import sc_content_idea
 from . import sc_content_idea_task
 from . import sc_content_generation_task
 from . import sc_openai_usage_snapshot
+from . import sc_openai_request_log
+from . import sc_openai_model_statistics
+from . import openai_request_logger
 from . import sc_openai_dashboard
 from . import sc_usage_statistics
+from . import sc_openai_models

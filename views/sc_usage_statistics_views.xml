@@ -113,6 +113,122 @@
                             </div>
                         </page>
                         
+                        <!-- NEW: Model Breakdown Tab -->
+                        <page string="Model Breakdown" name="model_breakdown" invisible="state != 'loaded'">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">Usage by OpenAI Model</h5>
+                                            <button name="action_refresh_model_statistics" 
+                                                    string="Refresh Model Stats" 
+                                                    type="object" 
+                                                    class="btn btn-sm btn-outline-primary"/>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- Model statistics will be loaded here -->
+                                            <div class="alert alert-info" role="alert">
+                                                <strong>Model-Specific Analytics:</strong>
+                                                <ul class="mb-0 mt-2">
+                                                    <li>Request count per model</li>
+                                                    <li>Token usage (input/output) breakdown</li>
+                                                    <li>Cost analysis by model</li>
+                                                    <li>Performance metrics comparison</li>
+                                                </ul>
+                                            </div>
+                                            <div class="row mt-3">
+                                                <div class="col-md-6">
+                                                    <button name="%(action_sc_openai_model_statistics)d" 
+                                                            string="View Model Statistics" 
+                                                            type="action" 
+                                                            class="btn btn-primary btn-block"/>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <button name="%(action_sc_openai_model_analytics)d" 
+                                                            string="Model Analytics Dashboard" 
+                                                            type="action" 
+                                                            class="btn btn-outline-primary btn-block"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+                        
+                        <!-- NEW: Request History Tab -->
+                        <page string="Request History" name="request_history" invisible="state != 'loaded'">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Detailed Request Logging</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="alert alert-info" role="alert">
+                                                <strong>Individual Request Tracking:</strong>
+                                                <ul class="mb-0 mt-2">
+                                                    <li>Real-time logging of every OpenAI API call</li>
+                                                    <li>Token count and cost tracking per request</li>
+                                                    <li>Response time and performance monitoring</li>
+                                                    <li>Error tracking and debugging information</li>
+                                                    <li>Links to related Odoo records (blog posts, etc.)</li>
+                                                </ul>
+                                            </div>
+                                            <div class="row mt-3">
+                                                <div class="col-md-4">
+                                                    <button name="%(action_sc_openai_request_log)d" 
+                                                            string="View Request History" 
+                                                            type="action" 
+                                                            class="btn btn-primary btn-block"/>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <button name="%(action_sc_openai_request_analytics)d" 
+                                                            string="Request Analytics" 
+                                                            type="action" 
+                                                            class="btn btn-outline-primary btn-block"/>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <button name="action_view_recent_requests" 
+                                                            string="Recent Requests (Today)" 
+                                                            type="object" 
+                                                            class="btn btn-outline-secondary btn-block"/>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Quick stats for current period -->
+                                            <div class="row mt-4">
+                                                <div class="col-md-3">
+                                                    <div class="border rounded p-3 text-center">
+                                                        <h6 class="text-muted">Total Requests</h6>
+                                                        <h4 class="mb-0" id="total_requests_count">-</h4>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="border rounded p-3 text-center">
+                                                        <h6 class="text-muted">Total Tokens</h6>
+                                                        <h4 class="mb-0" id="total_tokens_count">-</h4>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="border rounded p-3 text-center">
+                                                        <h6 class="text-muted">Avg Response Time</h6>
+                                                        <h4 class="mb-0" id="avg_response_time">-</h4>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="border rounded p-3 text-center">
+                                                        <h6 class="text-muted">Success Rate</h6>
+                                                        <h4 class="mb-0" id="success_rate">-</h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+                        
                         <page string="Error Details" name="error_details" invisible="state != 'error'">
                             <group>
                                 <field name="error_message" readonly="1" widget="text"/>

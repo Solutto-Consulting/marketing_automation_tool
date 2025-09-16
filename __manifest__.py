@@ -48,7 +48,7 @@ Technical Requirements:
         'mail',
     ],
     'external_dependencies': {
-        'python': ['asyncio'],
+        'python': ['asyncio', 'tiktoken', 'python-dateutil'],
     },
     'data': [
         # Security must come first
@@ -66,6 +66,9 @@ Technical Requirements:
         'views/sc_content_idea_task_views.xml',
         'views/sc_content_generation_task_views.xml',
         'views/sc_openai_usage_views.xml',
+        # OpenAI monitoring views - actions MUST load before usage statistics
+        'views/sc_openai_request_log_views.xml',
+        'views/sc_openai_model_statistics_views.xml',
         'views/sc_usage_statistics_views.xml',
         'views/blog_post_views.xml',
         # Wizard views (contain actions referenced by menus)

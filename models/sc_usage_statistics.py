@@ -281,6 +281,60 @@ class ScUsageStatistics(models.Model):
                 'success': False,
                 'error': str(e)
             }
+    
+    def action_refresh_model_statistics(self):
+        """Refresh model statistics for the current period"""
+        self.ensure_one()
+        
+        try:
+            # Update daily statistics for recent days
+            stats_model = self.env['sc.openai.model.statistics']
+            stats_model.generate_missing_statistics(days_back=7)
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Success'),
+                    'message': _('Model statistics refreshed successfully.'),
+                    'type': 'success',
+                }
+            }
+            
+        except Exception as e:
+            _logger.error(f"Error refreshing model statistics: {str(e)}")
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Error'),
+                    'message': str(e),
+                    'type': 'danger',
+                }
+            }
+    
+    def action_view_recent_requests(self):
+        """View recent requests for today"""
+        self.ensure_one()
+        
+        from datetime import datetime, timedelta
+        today = fields.Date.today()
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Today\'s OpenAI Requests'),
+            'res_model': 'sc.openai.request.log',
+            'view_mode': 'list,kanban,form',
+            'target': 'current',
+            'domain': [
+                ('timestamp', '>=', today),
+                ('timestamp', '<', today + timedelta(days=1)),
+            ],
+            'context': {
+                'search_default_group_by_model': 1,
+                'search_default_successful': 1,
+            }
+        }
 
 
 class ScUsageStatisticsDaily(models.Model):

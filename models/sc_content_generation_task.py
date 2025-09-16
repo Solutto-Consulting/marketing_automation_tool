@@ -468,6 +468,29 @@ class ScContentGenerationTask(models.Model):
         except Exception as e:
             _logger.error(f"Error in content generation task cron job: {str(e)}")
 
+    def _prepare_agent_config(self):
+        """Prepare agent configuration for execution"""
+        self.ensure_one()
+        
+        # If we have an agent_config_id, use it
+        if self.agent_config_id:
+            # Store configuration for history
+            self.write({
+                'agent_model': self.agent_config_id.model,
+                'agent_instructions': self.agent_config_id.instructions,
+            })
+            
+            return {
+                'model': self.agent_config_id.model,
+                'instructions': self.agent_config_id.instructions,
+            }
+        
+        # Fallback to legacy fields if no agent_config_id
+        return {
+            'model': self.agent_model or 'gpt-4o',
+            'instructions': self.agent_instructions or 'You are a content generation agent.',
+        }
+
     def _process_task(self):
         """Process individual content generation task"""
         self.ensure_one()
@@ -479,18 +502,8 @@ class ScContentGenerationTask(models.Model):
             # Mark as in progress
             self._mark_in_progress()
             
-            # Get AI agent configuration from task or fallback to active one
-            agent_config = self.agent_config_id
-            if not agent_config:
-                agent_config = self.env['sc.ai.agent.config'].search([('active', '=', True)], limit=1)
-                if not agent_config:
-                    raise Exception(_("No AI agent configuration available"))
-            
-            # Store agent configuration used
-            self.write({
-                'agent_model': agent_config.model,
-                'agent_instructions': agent_config.instructions,
-            })
+            # Get agent configuration from the selected agent_config_id or fallback
+            agent_config_data = self._prepare_agent_config()
             
             # Prepare content source data with full article content
             if self.content_idea_id:
@@ -533,7 +546,7 @@ class ScContentGenerationTask(models.Model):
                 }
                 user_instructions = self.user_prompt or ''
             
-            # Add target word count to instructions
+            # Add target word count to user instructions
             if self.target_word_count:
                 word_count_instruction = f"Target word count: approximately {self.target_word_count} words. "
                 user_instructions = word_count_instruction + user_instructions
@@ -541,8 +554,8 @@ class ScContentGenerationTask(models.Model):
             # Perform content generation using OpenAI utils
             openai_utils = self.env['openai.utils']
             content_data = openai_utils.generate_content(
-                agent_config.model,
-                agent_config.instructions,
+                agent_config_data['model'],
+                agent_config_data['instructions'],
                 content_source,
                 user_instructions
             )

@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Actions for OpenAI Model Statistics -->
+    <record id="action_sc_openai_model_statistics" model="ir.actions.act_window">
+        <field name="name">Model Statistics</field>
+        <field name="res_model">sc.openai.model.statistics</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No OpenAI model statistics found!
+            </p>
+            <p>
+                Statistics are automatically generated when OpenAI requests are made.
+                Use the "Update Today's Statistics" button to refresh data.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_sc_openai_model_analytics" model="ir.actions.act_window">
+        <field name="name">Model Analytics Dashboard</field>
+        <field name="res_model">sc.openai.model.statistics</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_group_by_model': 1}</field>
+        <field name="domain">[]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No model analytics data available!
+            </p>
+            <p>
+                Analytics data will appear here once OpenAI requests are made.
+            </p>
+        </field>
+    </record>
+
+    <!-- OpenAI Model Statistics Search View -->
+    <record id="view_sc_openai_model_statistics_search" model="ir.ui.view">
+        <field name="name">sc.openai.model.statistics.search</field>
+        <field name="model">sc.openai.model.statistics</field>
+        <field name="arch" type="xml">
+            <search string="Search Model Statistics">
+                <!-- Search Fields -->
+                <field name="model_name" string="OpenAI Model"/>
+                <field name="date" string="Date"/>
+                
+                <!-- Filters -->
+                <filter name="today" string="Today" domain="[('date', '=', context_today())]"/>
+                <filter name="yesterday" string="Yesterday" domain="[('date', '=', (context_today() - datetime.timedelta(days=1)))]"/>
+                <filter name="this_week" string="This Week" 
+                        domain="[('date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())))]"/>
+                <filter name="this_month" string="This Month" 
+                        domain="[('date', '&gt;=', context_today().replace(day=1))]"/>
+                
+                <separator/>
+                <filter name="high_usage" string="High Usage (&gt; 1000 tokens)" domain="[('total_tokens', '&gt;', 1000)]"/>
+                <filter name="high_cost" string="High Cost (&gt; $1.00)" domain="[('total_cost', '&gt;', 1.00)]"/>
+                <filter name="many_requests" string="Many Requests (&gt; 10)" domain="[('total_requests', '&gt;', 10)]"/>
+                
+                <separator/>
+                <filter name="gpt4_models" string="GPT-4 Models" domain="[('model_name', 'ilike', 'gpt-4')]"/>
+                <filter name="gpt35_models" string="GPT-3.5 Models" domain="[('model_name', 'ilike', 'gpt-3.5')]"/>
+                
+                <!-- Group By -->
+                <group expand="0" string="Group By">
+                    <filter name="group_by_model" string="Model" context="{'group_by': 'model_name'}"/>
+                    <filter name="group_by_date" string="Date" context="{'group_by': 'date'}"/>
+                    <filter name="group_by_month" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- OpenAI Model Statistics List View -->
+    <record id="view_sc_openai_model_statistics_list" model="ir.ui.view">
+        <field name="name">sc.openai.model.statistics.list</field>
+        <field name="model">sc.openai.model.statistics</field>
+        <field name="arch" type="xml">
+            <list string="OpenAI Model Statistics" create="false" edit="false">
+                <header>
+                    <button name="update_daily_statistics" string="Update Today's Statistics" 
+                            type="object" class="btn-primary"/>
+                    <button name="generate_missing_statistics" string="Generate Missing Statistics" 
+                            type="object" class="btn-secondary"/>
+                </header>
+                <field name="date"/>
+                <field name="model_name"/>
+                <field name="total_requests" sum="Total"/>
+                <field name="total_tokens" sum="Total"/>
+                <field name="total_cost" sum="Total Cost"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="success_rate"/>
+                <field name="avg_response_time"/>
+                <field name="avg_cost_per_request"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- OpenAI Model Statistics Form View -->
+    <record id="view_sc_openai_model_statistics_form" model="ir.ui.view">
+        <field name="name">sc.openai.model.statistics.form</field>
+        <field name="model">sc.openai.model.statistics</field>
+        <field name="arch" type="xml">
+            <form string="OpenAI Model Statistics" create="false" edit="false">
+                <header>
+                    <button name="action_view_request_logs" string="View Request Logs" 
+                            type="object" class="btn-primary" icon="fa-list"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group name="basic_info" string="Basic Information">
+                            <field name="date"/>
+                            <field name="model_name"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group name="summary_stats" string="Summary Statistics">
+                            <field name="total_requests"/>
+                            <field name="successful_requests"/>
+                            <field name="failed_requests"/>
+                            <field name="success_rate" widget="percentage"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Token Usage" name="token_usage">
+                            <group>
+                                <group name="token_breakdown" string="Token Breakdown">
+                                    <field name="total_prompt_tokens"/>
+                                    <field name="total_completion_tokens"/>
+                                    <field name="total_tokens"/>
+                                </group>
+                                <group name="token_averages" string="Per Request Averages">
+                                    <field name="avg_prompt_tokens_display" readonly="1"/>
+                                    <field name="avg_completion_tokens_display" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Cost Analysis" name="cost_analysis">
+                            <group>
+                                <group name="cost_totals" string="Cost Totals">
+                                    <field name="total_cost"/>
+                                    <field name="currency_id"/>
+                                </group>
+                                <group name="cost_averages" string="Cost Averages">
+                                    <field name="avg_cost_per_request"/>
+                                    <field name="avg_cost_per_token"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Performance" name="performance">
+                            <group>
+                                <group name="response_times" string="Response Times">
+                                    <field name="avg_response_time"/>
+                                    <field name="min_response_time"/>
+                                    <field name="max_response_time"/>
+                                </group>
+                                <group name="efficiency_metrics" string="Efficiency Metrics">
+                                    <field name="tokens_per_second_display" readonly="1"/>
+                                    <field name="cost_per_1k_tokens_display" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Operation Breakdown" name="operation_breakdown" 
+                              invisible="not operation_breakdown">
+                            <group>
+                                <label for="operation_breakdown" string="Operations"/>
+                                <field name="operation_breakdown" widget="text" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- OpenAI Model Statistics Kanban View -->
+    <record id="view_sc_openai_model_statistics_kanban" model="ir.ui.view">
+        <field name="name">sc.openai.model.statistics.kanban</field>
+        <field name="model">sc.openai.model.statistics</field>
+        <field name="arch" type="xml">
+            <kanban string="Model Statistics" default_group_by="model_name" create="false" edit="false">
+                <field name="model_name"/>
+                <field name="date"/>
+                <field name="total_requests"/>
+                <field name="successful_requests"/>
+                <field name="failed_requests"/>
+                <field name="total_tokens"/>
+                <field name="total_cost"/>
+                <field name="currency_id"/>
+                <field name="success_rate"/>
+                <field name="avg_response_time"/>
+                <field name="avg_cost_per_request"/>
+                
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <!-- Header with model name and date -->
+                                <div class="row">
+                                    <div class="col-8">
+                                        <strong t-esc="record.model_name.value"/>
+                                        <br/>
+                                        <small class="text-muted" t-esc="record.date.value"/>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <span class="badge badge-info">
+                                            <t t-esc="record.total_requests.value"/> req
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Success rate indicator -->
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar bg-success" 
+                                                 t-att-style="'width:' + record.success_rate.value + '%'">
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">
+                                            Success Rate: <t t-esc="record.success_rate.value"/>%
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Key metrics -->
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <small class="text-muted">Total Tokens:</small>
+                                        <br/>
+                                        <strong t-esc="record.total_tokens.value"/>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Total Cost:</small>
+                                        <br/>
+                                        <strong>$<t t-esc="record.total_cost.value"/></strong>
+                                    </div>
+                                </div>
+                                
+                                <!-- Performance metrics -->
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <small class="text-muted">Avg Response:</small>
+                                        <br/>
+                                        <span t-esc="record.avg_response_time.value"/>ms
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Cost/Request:</small>
+                                        <br/>
+                                        <span>$<t t-esc="record.avg_cost_per_request.value"/></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Request breakdown -->
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <small class="text-success">
+                                            ✓ <t t-esc="record.successful_requests.value"/> success
+                                        </small>
+                                        <span t-if="record.failed_requests.value > 0" class="text-danger ml-2">
+                                            ✗ <t t-esc="record.failed_requests.value"/> failed
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Performance indicator -->
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <span t-if="record.avg_response_time.value &lt; 3000" class="badge badge-success">Fast</span>
+                                        <span t-elif="record.avg_response_time.value &lt; 10000" class="badge badge-warning">Normal</span>
+                                        <span t-else="" class="badge badge-danger">Slow</span>
+                                        
+                                        <span t-if="record.total_cost.value &lt; 0.50" class="badge badge-success ml-1">Low Cost</span>
+                                        <span t-elif="record.total_cost.value &lt; 2.00" class="badge badge-warning ml-1">Medium Cost</span>
+                                        <span t-else="" class="badge badge-danger ml-1">High Cost</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- OpenAI Model Statistics Search View -->
+    <record id="view_sc_openai_model_statistics_search" model="ir.ui.view">
+        <field name="name">sc.openai.model.statistics.search</field>
+        <field name="model">sc.openai.model.statistics</field>
+        <field name="arch" type="xml">
+            <search string="Search Model Statistics">
+                <field name="model_name"/>
+                <field name="date"/>
+                
+                <!-- Date filters -->
+                <filter name="today" string="Today" 
+                        domain="[('date', '=', context_today())]"/>
+                <filter name="yesterday" string="Yesterday"
+                        domain="[('date', '=', context_today() - datetime.timedelta(days=1))]"/>
+                <filter name="last_7_days" string="Last 7 Days"
+                        domain="[('date', '&gt;=', context_today() - datetime.timedelta(days=7))]"/>
+                <filter name="last_30_days" string="Last 30 Days"
+                        domain="[('date', '&gt;=', context_today() - datetime.timedelta(days=30))]"/>
+                <filter name="current_month" string="Current Month"
+                        domain="[('date', '&gt;=', datetime.datetime.now().replace(day=1).date()),
+                                ('date', '&lt;=', context_today())]"/>
+                
+                <separator/>
+                
+                <!-- Model filters -->
+                <filter name="gpt4o" string="GPT-4o" domain="[('model_name', '=', 'gpt-4o')]"/>
+                <filter name="gpt4turbo" string="GPT-4 Turbo" domain="[('model_name', '=', 'gpt-4-turbo')]"/>
+                <filter name="gpt35" string="GPT-3.5 Turbo" domain="[('model_name', '=', 'gpt-3.5-turbo')]"/>
+                
+                <separator/>
+                
+                <!-- Performance filters -->
+                <filter name="high_volume" string="High Volume (&gt;50 requests)" 
+                        domain="[('total_requests', '&gt;', 50)]"/>
+                <filter name="expensive_days" string="Expensive Days (&gt;$5)" 
+                        domain="[('total_cost', '&gt;', 5.0)]"/>
+                <filter name="slow_performance" string="Slow Performance (&gt;5s avg)" 
+                        domain="[('avg_response_time', '&gt;', 5000)]"/>
+                <filter name="low_success_rate" string="Low Success Rate (&lt;95%)" 
+                        domain="[('success_rate', '&lt;', 95.0)]"/>
+                
+                <!-- Group by options -->
+                <group expand="0" string="Group By">
+                    <filter name="group_by_model" string="Model" context="{'group_by': 'model_name'}"/>
+                    <filter name="group_by_date" string="Date" context="{'group_by': 'date'}"/>
+                    <filter name="group_by_month" string="Month" context="{'group_by': 'date:month'}"/>
+                    <filter name="group_by_week" string="Week" context="{'group_by': 'date:week'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- OpenAI Model Statistics Kanban View -->
+    <record id="view_sc_openai_model_statistics_kanban" model="ir.ui.view">
+        <field name="name">sc.openai.model.statistics.kanban</field>
+        <field name="model">sc.openai.model.statistics</field>
+        <field name="arch" type="xml">
+            <kanban string="Model Statistics" default_group_by="model_name" create="false" edit="false">
+                <field name="id"/>
+                <field name="date"/>
+                <field name="model_name"/>
+                <field name="total_requests"/>
+                <field name="total_tokens"/>
+                <field name="total_cost"/>
+                <field name="success_rate"/>
+                <field name="avg_response_time"/>
+                
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong><field name="date"/></strong>
+                                    </div>
+                                    <div class="o_secondary">
+                                        <field name="model_name" class="badge badge-info"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_content">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div><strong>Requests:</strong> <field name="total_requests"/></div>
+                                        <div><strong>Tokens:</strong> <field name="total_tokens"/></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div><strong>Cost:</strong> $<field name="total_cost"/></div>
+                                        <div><strong>Success:</strong> <field name="success_rate"/>%</div>
+                                    </div>
+                                </div>
+                                <div class="row mt-1">
+                                    <div class="col-12">
+                                        <div><strong>Avg Response:</strong> <field name="avg_response_time"/>ms</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- OpenAI Model Statistics Action -->
+    <record id="action_sc_openai_model_statistics" model="ir.actions.act_window">
+        <field name="name">Model Usage Statistics</field>
+        <field name="res_model">sc.openai.model.statistics</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="target">current</field>
+        <field name="context">{
+            'search_default_last_30_days': 1,
+            'search_default_group_by_model': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No model statistics available yet!
+            </p>
+            <p>
+                This view shows aggregated statistics for each OpenAI model by date.
+                <br/>
+                Statistics are automatically generated from individual request logs.
+                <br/>
+                Use the "Update Today's Statistics" button to refresh current data.
+            </p>
+        </field>
+    </record>
+
+    <!-- Model Statistics Analytics Action -->
+    <record id="action_sc_openai_model_analytics" model="ir.actions.act_window">
+        <field name="name">Model Analytics</field>
+        <field name="res_model">sc.openai.model.statistics</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="context">{
+            'search_default_last_30_days': 1
+        }</field>
+    </record>
+
+    <!-- Pivot View for Model Analytics -->
+    <record id="view_sc_openai_model_statistics_pivot" model="ir.ui.view">
+        <field name="name">sc.openai.model.statistics.pivot</field>
+        <field name="model">sc.openai.model.statistics</field>
+        <field name="arch" type="xml">
+            <pivot string="Model Statistics Analytics">
+                <field name="model_name" type="row"/>
+                <field name="date" type="col" interval="week"/>
+                <field name="total_requests" type="measure"/>
+                <field name="total_tokens" type="measure"/>
+                <field name="total_cost" type="measure"/>
+                <field name="success_rate" type="measure"/>
+                <field name="avg_response_time" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View for Model Analytics -->
+    <record id="view_sc_openai_model_statistics_graph" model="ir.ui.view">
+        <field name="name">sc.openai.model.statistics.graph</field>
+        <field name="model">sc.openai.model.statistics</field>
+        <field name="arch" type="xml">
+            <graph string="Model Usage Trends">
+                <field name="date" type="row" interval="day"/>
+                <field name="model_name" type="row"/>
+                <field name="total_cost" type="measure"/>
+                <field name="total_tokens" type="measure"/>
+            </graph>
+        </field>
+    </record>
+</odoo>

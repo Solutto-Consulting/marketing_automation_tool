@@ -302,25 +302,17 @@ class ScContentIdeaTask(models.Model):
             # Mark as in progress
             self._mark_in_progress()
             
-            # Get AI agent configuration
-            agent_config = self.env['sc.ai.agent.config'].search([('active', '=', True)], limit=1)
-            if not agent_config:
-                raise Exception(_("No active AI agent configuration found"))
+            # Get agent configuration from the selected agent_config_id or fallback
+            agent_config_data = self._prepare_agent_config()
             
             # Process placeholders in search query
             processed_query = self._process_placeholders(self.search_query)
             
-            # Store agent configuration used
-            self.write({
-                'agent_model': agent_config.model,
-                'agent_instructions': agent_config.instructions,
-            })
-            
             # Perform content research using OpenAI utils
             openai_utils = self.env['openai.utils']
             ideas_data = openai_utils.research_content_ideas(
-                agent_config.model,
-                agent_config.instructions,
+                agent_config_data['model'],
+                agent_config_data['instructions'],
                 processed_query,
                 self.requested_ideas
             )
