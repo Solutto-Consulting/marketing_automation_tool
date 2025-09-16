@@ -192,52 +192,6 @@ class ScTranslationTask(models.Model):
                     }
                 }
     
-    @api.model
-    def cron_process_translation_tasks(self):
-        """Cron job method to process pending translation tasks automatically"""
-        _logger.info("Cron job: Checking for pending translation tasks...")
-        
-        # Get tasks that are in draft state and ready for processing
-        pending_tasks = self.search([
-            ('state', '=', 'draft')
-        ], limit=5, order='create_date asc')  # Process max 5 tasks per run
-        
-        if not pending_tasks:
-            _logger.info("No pending translation tasks found.")
-            return
-        
-        _logger.info(f"Found {len(pending_tasks)} pending translation tasks. Processing...")
-        
-        for task in pending_tasks:
-            try:
-                # Set task to in progress
-                task.action_set_in_progress()
-                
-                # Perform translation
-                openai_utils = self.env['openai.utils']
-                translated_content = openai_utils.translate_blog_content(
-                    task.blog_post_id,
-                    task.target_lang_id,
-                    task.system_instructions
-                )
-                
-                # Update translations using proven approach
-                task._update_blog_post_translations(translated_content)
-                
-                # Mark task as done
-                task.action_set_done()
-                
-                _logger.info(f"Successfully processed translation task {task.id}")
-                
-            except Exception as e:
-                # Log error and mark task as failed
-                error_msg = str(e)
-                _logger.error(f"Translation task {task.id} failed: {error_msg}", exc_info=True)
-                task.action_set_error(error_msg)
-            
-            # Commit after each task to avoid long transactions
-            self.env.cr.commit()
-    
     def _validate_html_structure_consistency(self, original_html, translated_html):
         """
         Validate that translated HTML maintains the same structure as the original.
