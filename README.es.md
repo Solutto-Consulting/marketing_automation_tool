@@ -26,9 +26,14 @@ La **Herramienta de Gestión de Contenido para Odoo** mejora y automatiza las ac
 - **Versión de Python**: 3.9+ (requerido por openai-agents)
 
 ### Modelos Principales
+- **sc.content.idea**: Gestiona ideas de contenido generadas por el agente de investigación
+- **sc.content.generation.task**: Rastrea tareas de generación de contenido de blog
+- **sc.openai.request.log**: Monitoreo integral de uso de API de OpenAI
+- **sc.openai.model.statistics**: Estadísticas agregadas de uso por modelo
+- **sc.openai.models**: Gestión centralizada de modelos OpenAI disponibles
 - **sc.translation.task**: Rastrea solicitudes de traducción y su estado
 - **blog.post** (extendido): Mejorado con capacidades de seguimiento de traducción
-- **res.config.settings** (extendido): Gestión de configuración de OpenAI
+- **res.config.settings** (extendido): Gestión centralizada de configuración de Automatización de Marketing
 
 ## Instalación
 

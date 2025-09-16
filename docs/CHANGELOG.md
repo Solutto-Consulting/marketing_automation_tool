@@ -5,7 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [18.0.1.0.1] - 2025-09-15 (Latest Updates)
+## [18.0.1.0.1] - 2025-09-16 (Critical Monitoring Fixes)
+
+### Fixed - Image Generation Monitoring
+- **Operation Type Support**: Added 'image_generation' to sc.openai.request.log operation_type field
+  - Fixed critical error: "Wrong value for sc.openai.request.log.operation_type: 'image_generation'"
+  - Image generation operations now properly logged in monitoring dashboard
+  - Complete tracking for gpt-image-1 API calls with token usage and timing
+- **Enhanced Image Monitoring Integration**: Comprehensive logging implementation
+  - Added precise timing measurement for image generation performance analysis
+  - Token usage extraction from OpenAI API responses (input_tokens, output_tokens, total_tokens)
+  - Error tracking for failed image generation attempts
+  - Blog post attribution for content-specific monitoring
+
+### Enhanced - Static Model Management
+- **Centralized Model Configuration**: Implemented sc.openai.models AbstractModel
+  - Single source of truth for all OpenAI models across the system
+  - Separated text models (GPT-5, GPT-4.1, GPT-4o series) from image models (gpt-image-1)
+  - Eliminated external API dependencies for model selection
+  - Consistent model options across all configuration screens
+- **Unified Model Selection**: Updated all Selection fields to use centralized definitions
+  - sc.openai.request.log model selection now uses static definitions
+  - sc.ai.agent.config model selection updated with centralized method
+  - res.config.settings model selections use unified approach
+  - sc.openai.model.statistics model selection integrated with central system
+- **Performance and Reliability Improvements**:
+  - Faster form loading without external API calls
+  - Predictable behavior independent of OpenAI API availability
+  - Version-controlled model definitions in code repository
+
+### Enhanced - Documentation
+- **Comprehensive Documentation Audit**: Updated all documentation to reflect recent changes
+  - Functional guides updated with static model management and image monitoring
+  - Technical guides enhanced with new architecture details and implementation patterns
+  - README files updated with latest features and capabilities
+  - Spanish documentation synchronized with English versions
+- **External References Documentation**: Added references to core Odoo examples
+  - Documented local core examples used for settings view implementation
+  - Added validation notes for stable anchors and view inheritance patterns
+
+## [18.0.1.0.1] - 2025-09-15 (Previous Updates)
 
 ### Enhanced - Agent Security Architecture
 - **JSON Specifications Separation**: Implemented critical security enhancement for AI agent system

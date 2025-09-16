@@ -452,52 +452,88 @@ ODOO_CONF_FILE=/path/to/odoo.conf
 
 ## API Implementation
 
-### Dynamic Model Selection
+### Static Model Management (v18.0.1.0.1)
 
-**Endpoint**: OpenAI v1/models API  
-**Purpose**: Populate available models in configuration dropdown
+**Architecture**: Centralized static model definitions  
+**Purpose**: Provide consistent, reliable model selection across all components
 
 ```python
-def _get_openai_models(self):
+# models/sc_openai_models.py
+class ScOpenaiModels(models.AbstractModel):
     """
-    Fetch available OpenAI models from API.
+    Centralized OpenAI Models Configuration
     
-    Returns:
-        list: Tuples of (model_id, model_name) for Selection field
+    This class provides a single source of truth for all OpenAI models
+    supported by the Marketing Automation Tool. It ensures consistency
+    across all model selection fields throughout the system.
     """
-    try:
-        api_key = self.env['ir.config_parameter'].sudo().get_param(
-            'sc_marketing_automation_tool.openai_api_key'
-        )
-        
-        if not api_key:
-            return self._get_fallback_models()
-            
-        # API call implementation
-        headers = {
-            'Authorization': f'Bearer {api_key}',
-            'Content-Type': 'application/json'
-        }
-        
-        response = requests.get(
-            'https://api.openai.com/v1/models',
-            headers=headers,
-            timeout=10
-        )
-        
-        if response.status_code == 200:
-            models = response.json().get('data', [])
-            gpt_models = [
-                (model['id'], model['id']) 
-                for model in models 
-                if model['id'].startswith('gpt-')
-            ]
-            return sorted(gpt_models)
-            
-    except Exception as e:
-        _logger.warning(f"Failed to fetch OpenAI models: {e}")
-        
-    return self._get_fallback_models()
+    _name = 'sc.openai.models'
+    _description = 'OpenAI Models Configuration'
+
+    @api.model
+    def get_text_models(self):
+        """Get supported text models for content generation and research."""
+        return [
+            ('gpt-5', 'GPT-5'),
+            ('gpt-5-mini', 'GPT-5 Mini'),
+            ('gpt-5-nano', 'GPT-5 Nano'),
+            ('gpt-4.1', 'GPT-4.1'),
+            ('gpt-4.1-mini', 'GPT-4.1 Mini'),
+            ('gpt-4.1-nano', 'GPT-4.1 Nano'),
+            ('gpt-4o', 'GPT-4o'),
+            ('gpt-4o-mini', 'GPT-4o Mini'),
+        ]
+
+    @api.model
+    def get_image_models(self):
+        """Get supported image generation models."""
+        return [
+            ('gpt-image-1', 'GPT Image-1'),
+        ]
+
+    @api.model
+    def get_all_models(self):
+        """Get all supported models (text + image)."""
+        return self.get_text_models() + self.get_image_models()
+```
+
+### Integration Pattern
+
+All model selection fields throughout the system use centralized methods:
+
+```python
+# Usage in any model
+class SomeModel(models.Model):
+    _name = 'some.model'
+    
+    def _get_model_selection(self):
+        """Get model selection from centralized configuration."""
+        return self.env['sc.openai.models'].get_text_models()
+    
+    model_field = fields.Selection(
+        selection='_get_model_selection',
+        string='AI Model',
+        required=True,
+        default='gpt-4o'
+    )
+```
+
+### Benefits of Static Model Management
+
+#### Reliability
+- **No API Dependencies**: Model selection doesn't require external API calls
+- **Consistent Performance**: No delays from network requests during configuration
+- **Failure Resistant**: Works regardless of OpenAI API availability
+
+#### Consistency
+- **Unified Selection**: Same model options across all configuration screens
+- **Version Control**: Model definitions tracked in code repository
+- **Predictable Behavior**: No variation based on API response differences
+
+#### Maintenance
+- **Centralized Updates**: Single location to add/remove supported models
+- **Easy Testing**: Reliable model lists for development and testing environments
+- **Performance**: Faster form loading without external API calls
 
 def _get_fallback_models(self):
     """Fallback models when API is unavailable."""
@@ -778,29 +814,96 @@ def handle_image_generation_errors(func):
     return wrapper
 ```
 
-#### Usage Tracking Integration
+#### Usage Tracking Integration (Enhanced v18.0.1.0.1)
 
-Image generation usage is tracked separately from text-based operations:
+Image generation usage is now fully integrated with the centralized monitoring system:
 
 ```python
-def _track_image_generation_usage(self, response):
+def generate_image_with_context(self, prompt, article_title="", **options):
     """
-    Track image generation usage for cost monitoring.
+    Generate image with comprehensive monitoring integration.
     
-    Note: Image generation costs are typically per-image
-    rather than per-token like text operations.
+    This method now includes complete request logging with timing,
+    token usage, and error tracking.
     """
-    usage_data = {
-        'operation_type': 'image_generation',
-        'model': 'gpt-image-1',
-        'images_generated': 1,
-        'estimated_cost': self._calculate_image_cost(response),
-        'timestamp': fields.Datetime.now(),
-    }
+    start_time = time.time()
     
-    # Integrate with existing usage monitoring
-    self.env['sc.openai.usage.snapshot']._record_usage(usage_data)
+    try:
+        # Generate image using OpenAI API
+        response = self.client.images.generate(
+            model='gpt-image-1',
+            prompt=prompt,
+            **options
+        )
+        
+        # Calculate response time
+        end_time = time.time()
+        response_time_ms = int((end_time - start_time) * 1000)
+        
+        # Extract token usage from response
+        usage = response.get('usage', {})
+        input_tokens = usage.get('input_tokens', 0)
+        output_tokens = usage.get('output_tokens', 0)
+        total_tokens = input_tokens + output_tokens
+        
+        # Log successful generation
+        self.env['sc.openai.request.log'].sudo().create_log_entry(
+            model_name='gpt-image-1',
+            operation_type='image_generation',
+            prompt_tokens=input_tokens,
+            completion_tokens=output_tokens,
+            response_time_ms=response_time_ms,
+            status='success',
+            related_model='blog.post',
+            related_record_name=article_title[:100]
+        )
+        
+        return response
+        
+    except Exception as e:
+        # Calculate response time for failed request
+        end_time = time.time()
+        response_time_ms = int((end_time - start_time) * 1000)
+        
+        # Log failed generation
+        self.env['sc.openai.request.log'].sudo().create_log_entry(
+            model_name='gpt-image-1',
+            operation_type='image_generation',
+            prompt_tokens=0,
+            completion_tokens=0,
+            response_time_ms=response_time_ms,
+            status='error',
+            error_message=str(e)[:500],
+            related_model='blog.post',
+            related_record_name=article_title[:100]
+        )
+        
+        raise
 ```
+
+#### Operation Type Configuration Fix
+
+The monitoring system required an update to support image generation tracking:
+
+```python
+# models/sc_openai_request_log.py
+operation_type = fields.Selection([
+    ('translation', 'Content Translation'),
+    ('generation', 'Content Generation'),
+    ('image_generation', 'Image Generation'),  # Added in v18.0.1.0.1
+    ('analysis', 'Content Analysis'),
+    ('research', 'Web Research'),
+    ('other', 'Other Operation'),
+], string='Operation Type', required=True, index=True)
+```
+
+#### Benefits of Enhanced Image Monitoring
+
+- **Complete Tracking**: All image generation operations logged with detailed metrics
+- **Performance Analysis**: Response time measurement for optimization
+- **Cost Attribution**: Token usage and cost tracking for budget management
+- **Error Analysis**: Comprehensive error logging for troubleshooting
+- **Content Integration**: Direct linking to blog posts for context
 
 ---
 

@@ -22,8 +22,10 @@ La Herramienta de Gestión de Contenido para Odoo v18.0.1.0.1 introduce potentes
 ### Características Principales en v18.0.1.0.1
 - ✅ **Agente de Investigación de Contenido**: Descubrimiento de temas impulsado por IA usando búsqueda web
 - ✅ **Agente de Generación de Contenido**: Creación automatizada de publicaciones de blog a partir de ideas de investigación
-- ✅ **Monitoreo de Uso de OpenAI**: Seguimiento diario de uso y optimización de costos
-- ✅ **Configuración Centralizada**: Sección dedicada de configuración de Automatización de Marketing
+- ✅ **Generación de Imágenes Impulsada por IA**: Imágenes de portada profesionales usando el modelo gpt-image-1
+- ✅ **Monitoreo Integral de Uso**: Seguimiento completo para generación de texto e imágenes
+- ✅ **Gestión Centralizada de Modelos**: Definiciones estáticas de modelos con selección unificada
+- ✅ **Configuración Mejorada**: Sección dedicada de configuración de Automatización de Marketing
 - ✅ **Sistema de Traducción Mejorado**: Mejorado con OpenAI Agents SDK
 - ✅ **Procesamiento Multi-Agente en Segundo Plano**: Trabajos cron separados para cada agente
 - ✅ **Respuestas de IA Estructuradas**: Generación de contenido basada en JSON con esquemas definidos

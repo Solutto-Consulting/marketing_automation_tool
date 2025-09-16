@@ -19,11 +19,13 @@ The **Content Management Tool for Odoo v18.0.1.0.1** introduces powerful **agent
 ### 📊 **Usage Monitoring & Optimization** (ENHANCED)
 - **Comprehensive Usage Tracking**: Unified monitoring for text and image generation
 - **Advanced Usage Dashboard**: Interactive dashboard with daily breakdown and trends
-- **Cost Optimization**: Token usage breakdown and image generation cost tracking
+- **Enhanced Cost Optimization**: Token usage breakdown and image generation cost tracking
 - **Persistent Data Storage**: Enhanced data retention and historical analysis
+- **Operation-Specific Tracking**: Dedicated monitoring for content research, generation, translation, and image generation
 
 ### ⚙️ **Centralized Configuration** (ENHANCED)
 - **Marketing Automation Settings**: Dedicated configuration section for all AI agents
+- **Static Model Management**: Centralized, reliable model definitions independent of API calls
 - **Image Generation Configuration**: Comprehensive settings for size, quality, format
 - **Agent-Specific Configuration**: Specialized settings for each AI agent type
 - **Enhanced Security**: Improved credential management and access controls
@@ -73,7 +75,9 @@ The **Content Management Tool for Odoo v18.0.1.0.1** introduces powerful **agent
 
 ### 🔧 Technical Architecture (v18.0.1.0.1)
 - **Multi-Agent Architecture**: Specialized AI agents with dedicated configurations
+- **Static Model Management**: Centralized model definitions with unified selection across all components
 - **gpt-image-1 API Integration**: Native support with official OpenAI client initialization patterns
+- **Comprehensive Usage Monitoring**: Complete tracking for text and image generation with operation-specific logging
 - **Static File Management**: Module-based image storage with web accessibility
 - **Enhanced Data Models**: New models for content ideas, generation tasks, image metadata, and usage tracking
 - **Settings Migration**: Automatic migration from General Settings to Marketing Automation

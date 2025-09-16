@@ -24,8 +24,9 @@ The Content Management Tool for Odoo v18.0.1.0.1 introduces powerful **agent-bas
 - ✅ **Content Research Agent**: AI-powered topic discovery using web search
 - ✅ **Content Generation Agent**: Automated blog post creation from research ideas
 - ✅ **AI-Powered Image Generation**: Professional blog cover images using gpt-image-1
-- ✅ **OpenAI Usage Monitoring**: Daily usage tracking and cost optimization
-- ✅ **Centralized Settings**: Dedicated Marketing Automation configuration section
+- ✅ **Comprehensive Usage Monitoring**: Complete tracking for text and image generation
+- ✅ **Centralized Model Management**: Static model definitions with unified selection
+- ✅ **Enhanced Settings**: Dedicated Marketing Automation configuration section
 - ✅ **Enhanced Translation System**: Improved with OpenAI Agents SDK
 - ✅ **Multi-Agent Background Processing**: Separate cron jobs for each agent
 - ✅ **Structured AI Responses**: JSON-based content generation with defined schemas
@@ -93,12 +94,26 @@ This new centralized approach provides better organization and dedicated configu
 - **Generation Agent Model**: Specific model for blog post creation
 - **Generation Agent Instructions**: System instructions for blog writing style and structure
 
-### Dynamic Model Loading
-The system automatically fetches available OpenAI models when you have a valid API key configured. Each agent can use different models optimized for their specific tasks.
+### Static Model Management (v18.0.1.0.1)
+The system uses a centralized, static model definition system that ensures consistency across all features without requiring API calls for model validation.
+
+#### Available Text Models
+- **GPT-5 Series**: GPT-5, GPT-5 Mini, GPT-5 Nano (Latest generation)
+- **GPT-4.1 Series**: GPT-4.1, GPT-4.1 Mini, GPT-4.1 Nano
+- **GPT-4o Series**: GPT-4o, GPT-4o Mini (Optimized for various tasks)
+
+#### Available Image Models  
+- **gpt-image-1**: Primary image generation model for blog cover images
+
+#### Benefits of Static Model Management
+- **Reliability**: No dependency on external API calls for model selection
+- **Consistency**: Same model options across all configuration screens
+- **Performance**: Faster loading times without API requests
+- **Predictability**: Stable model selections independent of API changes
 
 ### Configuration Tips
 - Use **gpt-4o** for highest quality research and generation
-- Use **gpt-3.5-turbo** for faster, cost-effective operations
+- Use **gpt-4o-mini** for faster, cost-effective operations
 - Customize agent instructions to match your brand voice and content style
 
 ---
@@ -555,6 +570,15 @@ The Usage Monitoring feature provides comprehensive insights into OpenAI API con
 - **Format Impact**: Cost variations between PNG, JPEG, and WebP formats
 - **Quality Settings**: Cost differences between Auto, High, Medium, and Low quality
 - **Size Considerations**: Pricing impact of different image dimensions
+
+#### Image Generation Monitoring (Enhanced in v18.0.1.0.1)
+The system now provides complete tracking for all image generation operations:
+- **Full Request Logging**: Every gpt-image-1 API call is tracked with detailed metrics
+- **Operation Type Tracking**: Dedicated 'image_generation' operation type in monitoring
+- **Response Time Measurement**: Precise timing for image generation performance analysis
+- **Token Usage Extraction**: Complete token usage data including input/output tokens
+- **Error Tracking**: Comprehensive logging of failed image generation attempts
+- **Blog Post Integration**: Image generation linked to specific blog posts for content attribution
 
 #### Daily Breakdown Analysis
 - **Peak Usage Times**: Identify when AI operations are most active
