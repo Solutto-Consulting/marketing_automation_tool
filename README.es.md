@@ -5,18 +5,33 @@
 
 ## Descripción General
 
-La **Herramienta de Gestión de Contenido para Odoo** mejora y automatiza las actividades de marketing dentro del ecosistema Odoo mediante la integración de Inteligencia Artificial para procesos de traducción de contenido. Este módulo proporciona a los administradores herramientas poderosas para optimizar los flujos de trabajo de traducción de artículos de blog utilizando los modelos de lenguaje avanzados de OpenAI.
+La **Herramienta de Gestión de Contenido para Odoo** es una plataforma integral de **automatización de contenido impulsada por IA** que cuenta con agentes de IA especializados para la investigación y generación de contenido. Esta herramienta optimiza el flujo de trabajo de creación de contenido desde la ideación hasta la publicación.
 
-## Características Principales (v18.0.1.0.0)
+## Características Principales (v18.0.1.0.1)
 
-- **Integración OpenAI**: Configuración centralizada para credenciales de API OpenAI y selección de modelos
-- **Traducción Masiva de Blogs**: Acción de servidor en publicaciones de blog para traducción simultánea de múltiples artículos  
-- **Traducción Impulsada por IA**: Aprovecha los modelos de lenguaje de OpenAI para traducción de contenido de alta calidad
-- **Asistente Fácil de Usar**: Interfaz intuitiva para seleccionar idiomas objetivo y proporcionar instrucciones de IA
-- **Procesamiento Asíncrono**: Procesamiento de traducción en segundo plano para evitar bloqueo de UI
-- **Gestión de Tareas**: Seguimiento integral y gestión de estado para solicitudes de traducción
-- **Manejo de Errores**: Gestión robusta de errores con capacidades de reinicio manual de tareas
-- **Soporte Multi-idioma**: Internacionalización incorporada con soporte de traducción al español
+### 🤖 **Estrategia de Contenido Basada en Agentes**
+- **Agente de Investigación de Contenido**: Descubrimiento de temas impulsado por IA usando capacidades de búsqueda web
+- **Agente de Generación de Contenido**: Creación completa de publicaciones de blog a partir de ideas de investigación
+- **Generación de Imágenes con IA**: Imágenes profesionales de portada de blog usando el modelo gpt-image-1
+
+### 📊 **Monitoreo y Optimización de Uso**
+- **Seguimiento Integral de Uso**: Monitoreo unificado para generación de texto e imágenes
+- **Panel de Control Avanzado**: Panel interactivo con desglose diario y tendencias
+- **Optimización de Costos Mejorada**: Desglose de uso de tokens y seguimiento de costos de generación de imágenes
+- **Almacenamiento de Datos Persistente**: Retención de datos mejorada y análisis histórico
+- **Seguimiento Específico por Operación**: Monitoreo dedicado para investigación, generación y generación de imágenes de contenido
+
+### ⚙️ **Configuración Centralizada**
+- **Configuraciones de Automatización de Marketing**: Sección de configuración dedicada para todos los agentes de IA
+- **Gestión de Modelos Estática**: Definiciones de modelos centralizadas y confiables independientes de llamadas API
+- **Configuración de Generación de Imágenes**: Configuraciones integrales para tamaño, calidad, formato
+- **Configuración Específica por Agente**: Configuraciones especializadas para cada tipo de agente de IA
+- **Seguridad Mejorada**: Gestión mejorada de credenciales y controles de acceso
+
+### 🔄 **Procesamiento Multi-Agente en Segundo Plano**
+- **Trabajos Cron Especializados**: Procesamiento independiente para investigación y generación
+- **Gestión de Tareas Mejorada**: Seguimiento integral de estado en todos los tipos de agentes
+- **Manejo de Errores Mejorado**: Patrones de error específicos por agente y mecanismos de recuperación
 
 ## Especificaciones Técnicas
 
@@ -31,8 +46,6 @@ La **Herramienta de Gestión de Contenido para Odoo** mejora y automatiza las ac
 - **sc.openai.request.log**: Monitoreo integral de uso de API de OpenAI
 - **sc.openai.model.statistics**: Estadísticas agregadas de uso por modelo
 - **sc.openai.models**: Gestión centralizada de modelos OpenAI disponibles
-- **sc.translation.task**: Rastrea solicitudes de traducción y su estado
-- **blog.post** (extendido): Mejorado con capacidades de seguimiento de traducción
 - **res.config.settings** (extendido): Gestión centralizada de configuración de Automatización de Marketing
 
 ## Instalación

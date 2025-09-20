@@ -61,13 +61,7 @@
         <field name="sequence" eval="20"/>
     </record>
 
-    <!-- Translation Tasks Menu (moved to Task Management) -->
-    <record id="menu_translation_tasks" model="ir.ui.menu">
-        <field name="name">Translation Tasks</field>
-        <field name="parent_id" ref="menu_task_management"/>
-        <field name="action" ref="sc_translation_task_action"/>
-        <field name="sequence" eval="30"/>
-    </record>
+
 
     <!-- Analytics Sub-menu -->
     <record id="menu_analytics" model="ir.ui.menu">

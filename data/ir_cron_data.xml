@@ -26,18 +26,5 @@
             <field name="active">True</field>
             <field name="priority">5</field>
         </record>
-
-        <!-- Cron job to process AI translation tasks -->
-        <record id="cron_process_translation_tasks" model="ir.cron">
-            <field name="name">Process AI Translation Tasks</field>
-            <field name="model_id" ref="model_sc_translation_task"/>
-            <field name="state">code</field>
-            <field name="code">model.cron_process_translation_tasks()</field>
-            <field name="interval_number">5</field>
-            <field name="interval_type">minutes</field>
-            <field name="nextcall" eval="(datetime.now() + timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S')"/>
-            <field name="active">True</field>
-            <field name="priority">5</field>
-        </record>
     </data>
 </odoo>

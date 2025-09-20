@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Server Action: Translate with AI -->
-    <record id="action_translate_blog_posts" model="ir.actions.server">
-        <field name="name">Translate with AI</field>
-        <field name="model_id" ref="website_blog.model_blog_post"/>
-        <field name="binding_model_id" ref="website_blog.model_blog_post"/>
-        <field name="binding_view_types">list</field>
-        <field name="state">code</field>
-        <field name="code">action = records.action_translate_with_ai()</field>
-    </record>
+    <!-- Server actions can be added here in the future -->
 </odoo>

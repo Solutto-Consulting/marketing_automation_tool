@@ -15,7 +15,6 @@ Key Features (v18.0.1.0.1):
 * Content Generation Agent: Automated blog post creation from research ideas
 * OpenAI usage monitoring and cost tracking dashboard
 * Centralized settings in dedicated Marketing Automation section
-* Legacy translation features with proven corruption-free methods
 * Asynchronous background processing with cron jobs
 * Task tracking and status management
 * Comprehensive error handling and recovery
@@ -61,7 +60,6 @@ Technical Requirements:
         # AI agent config views MUST load before settings views (action dependency)
         'views/sc_ai_agent_config_views.xml',
         'views/res_config_settings_views.xml',
-        'views/sc_translation_task_views.xml',
         'views/sc_content_idea_views.xml',
         'views/sc_content_idea_task_views.xml',
         'views/sc_content_generation_task_views.xml',
@@ -70,10 +68,7 @@ Technical Requirements:
         'views/sc_openai_request_log_views.xml',
         'views/sc_openai_model_statistics_views.xml',
         'views/sc_usage_statistics_views.xml',
-        'views/blog_post_views.xml',
         # Wizard views (contain actions referenced by menus)
-        'wizard/sc_translate_blog_post_wizard_views.xml',
-        'wizard/sc_translation_diagnosis_wizard_views.xml',
         'views/sc_generate_ideas_wizard_views.xml',
         'views/sc_generate_content_wizard_views.xml',
         'views/sc_content_preview_wizard_views.xml',

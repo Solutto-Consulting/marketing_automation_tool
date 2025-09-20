@@ -7,18 +7,17 @@
 4. [Content Research Agent](#content-research-agent)
 5. [Content Generation Agent](#content-generation-agent)
 6. [AI-Powered Blog Cover Images](#ai-powered-blog-cover-images)
-7. [Blog Translation Workflow](#blog-translation-workflow)
-8. [Usage Monitoring](#usage-monitoring)
-9. [Task Management](#task-management)
-10. [Troubleshooting](#troubleshooting)
-11. [Best Practices](#best-practices)
-12. [Version-Specific Features](#version-specific-features)
+7. [Usage Monitoring](#usage-monitoring)
+8. [Task Management](#task-management)
+9. [Troubleshooting](#troubleshooting)
+10. [Best Practices](#best-practices)
+11. [Version-Specific Features](#version-specific-features)
 
 ---
 
 ## Overview
 
-The Content Management Tool for Odoo v18.0.1.0.1 introduces powerful **agent-based content strategy** capabilities, moving beyond simple translation to proactive content research and generation. This version represents a major evolution in AI-powered content management for Odoo.
+The Content Management Tool for Odoo v18.0.1.0.1 is a comprehensive **AI-powered content automation platform** featuring specialized AI agents for content research and generation. This tool streamlines the entire content creation workflow from ideation to publication.
 
 ### Key Features in v18.0.1.0.1
 - ✅ **Content Research Agent**: AI-powered topic discovery using web search
@@ -27,12 +26,11 @@ The Content Management Tool for Odoo v18.0.1.0.1 introduces powerful **agent-bas
 - ✅ **Comprehensive Usage Monitoring**: Complete tracking for text and image generation
 - ✅ **Centralized Model Management**: Static model definitions with unified selection
 - ✅ **Enhanced Settings**: Dedicated Marketing Automation configuration section
-- ✅ **Enhanced Translation System**: Improved with OpenAI Agents SDK
 - ✅ **Multi-Agent Background Processing**: Separate cron jobs for each agent
 - ✅ **Structured AI Responses**: JSON-based content generation with defined schemas
 
 ### Version Context
-This documentation covers features available in **version 18.0.1.0.1** (September 2025). This represents a significant expansion from the translation-focused v18.0.1.0.0 to a comprehensive content strategy platform.
+This documentation covers features available in **version 18.0.1.0.1** (September 2025). This represents the comprehensive content automation platform focused on AI-powered research and generation capabilities.
 
 ---
 
@@ -59,7 +57,6 @@ This version introduces two specialized AI agents that work together to create a
 
 - **Content Research Agent**: Discovers trending topics and generates content ideas
 - **Content Generation Agent**: Creates complete blog post drafts from research ideas
-- **Enhanced Translation Agent**: Improved translation capabilities with better error handling
 
 ---
 
@@ -83,7 +80,7 @@ This new centralized approach provides better organization and dedicated configu
 #### 1. General OpenAI Configuration
 - **OpenAI API Key** (Required): Authenticates all requests to OpenAI services
 - **OpenAI Organization ID** (Optional): Links requests to your organization for usage tracking
-- **OpenAI Model** (Required): Default model for translation tasks (gpt-4o recommended)
+- **OpenAI Model** (Required): Default model for content generation tasks (gpt-4o recommended)
 
 #### 2. Content Research Agent Configuration
 - **Research Agent Model**: Specific model for content research tasks
@@ -378,143 +375,11 @@ While the system automatically generates prompts from blog content, advanced use
 - Consistent style across blog series
 - Efficient processing for content campaigns
 
-#### Integration with Translation Workflow
-- Regenerate images when translating blog posts to different languages
-- Culturally appropriate imagery for international content
-- Maintain visual consistency across language versions
-
----
-
-## Blog Translation Workflow
-
-### Step 1: Select Blog Posts
-
-1. Navigate to **Website → Blogs → Blog Posts**
-2. Use the list view to see all available blog posts
-3. Select one or more blog posts using checkboxes
-4. Click **Action** dropdown in the top menu
-
-### Step 2: Launch Translation Wizard
-
-1. From the Action menu, select **"Translate with AI"**
-2. The translation wizard opens in a modal dialog
-3. Wizard shows context of selected blog posts
-
-### Step 3: Configure Translation
-
-#### Target Language Selection
-- **Field**: Target Language
-- **Options**: Only languages published on the website
-- **Requirement**: At least one language must be active
-
-#### System Instructions (Optional)
-- **Field**: System Instructions
-- **Purpose**: Guide AI translation style and tone
-- **Examples**:
-  - "Maintain professional business tone"
-  - "Use casual, friendly language"
-  - "Preserve technical terminology"
-  - "Adapt cultural references for local audience"
-
-### Step 4: Execute Translation
-
-1. Click **"Translate"** button to start the process
-2. Wizard closes and returns to blog post list
-3. Translation tasks are created in "Draft" status
-4. Background processing begins automatically
-
-### Step 5: Monitor Progress
-
-Translation tasks are processed asynchronously:
-
-- **Draft**: Task created, waiting for processing
-- **In Progress**: AI translation is running
-- **Done**: Translation completed successfully
-- **Error**: Translation failed (see error details)
-
----
-
-## Task Management
-
-### Accessing Translation Tasks
-
-**Navigation**: Marketing Automation → Content Translation → Translation Tasks
-
-### Task List View
-
-The task list displays:
-- **Task Name**: Descriptive name with blog post and language
-- **Blog Post**: Link to the original blog post
-- **Target Language**: Destination language for translation
-- **Status**: Current task state with color coding
-  - 🔵 Draft/In Progress (Blue)
-  - 🟢 Done (Green)  
-  - 🔴 Error (Red)
-
-### Task Details
-
-Click on any task to view detailed information:
-- Complete task configuration
-- Error messages (if applicable)
-- Creation and completion timestamps
-- System instructions used
-
-### Task Actions
-
-#### Reset to Draft
-- **Available**: Only for tasks in "Error" status
-- **Purpose**: Allows retrying failed translations
-- **Effect**: Changes status back to "Draft" for reprocessing
-
-**Note**: Use this action when OpenAI API issues are resolved or configuration is corrected.
-
-### Enhanced Task Action Experience (v18.0.1.0.1)
-
-The latest version introduces significant improvements to task action buttons, eliminating the need for manual page refreshes and providing immediate feedback.
-
-#### Automatic Page Refresh
-All task action buttons now automatically refresh the page after completion, providing immediate visual feedback:
-
-**Content Generation Tasks**:
-- **Execute Immediately**: Starts task processing and auto-refreshes to show updated status
-- **Retry**: Resets failed tasks and auto-refreshes to show draft status
-- **View Blog Post**: Opens generated content without losing current context
-
-**Content Idea Tasks**:
-- **Reset to Draft**: Changes status and immediately shows the update
-- **Mark Complete**: Updates status with instant visual feedback
-- **Generate Content**: Opens generation wizard while maintaining task context
-
-**Translation Tasks**:
-- **Reset to Draft**: Allows retrying failed translations with immediate status update
-- **Process Translation**: Starts translation and shows progress without manual refresh
-- **Emergency Fix**: Applies corrections and updates status automatically
-
-#### User Experience Benefits
-- **No Manual Refresh Required**: Status changes are visible immediately after clicking action buttons
-- **Improved Workflow**: Users can work continuously without interruption
-- **Better Error Handling**: Error states are displayed immediately with actionable suggestions
-- **Consistent Behavior**: Same auto-refresh pattern across all task types
-
-#### Technical Implementation
-The system now returns reload actions instead of simple boolean responses:
-- Successful actions trigger automatic page reload
-- Error conditions display notifications and refresh to show error state
-- Status transitions are immediately visible to users
-
-### Task History
-
-From any blog post form:
-1. Open the blog post record
-2. Navigate to **"Translation History"** tab
-3. View all translation attempts for that post
-4. Track translation status over time
-
 ---
 
 ## Usage Monitoring
 
-The Usage Monitoring feature provides comprehensive insights into OpenAI API consumption across all AI agents, including content research, content generation, blog translation, and image generation. The enhanced dashboard offers persistent data storage and detailed daily breakdowns to help you track costs and optimize usage.
+The Usage Monitoring feature provides comprehensive insights into OpenAI API consumption across all AI agents, including content research, content generation, and image generation. The enhanced dashboard offers persistent data storage and detailed daily breakdowns to help you track costs and optimize usage.
 
 ### Accessing Usage Dashboard
 
@@ -533,7 +398,6 @@ The Usage Monitoring feature provides comprehensive insights into OpenAI API con
 - **Agent-Specific Breakdown**: Usage separated by:
   - Content Research Agent
   - Content Generation Agent  
-  - Blog Translation System
   - Image Generation (gpt-image-1)
 - **Cost Tracking**: Real-time cost calculations based on OpenAI pricing
 - **Usage Trends**: Visual representation of consumption patterns
@@ -556,12 +420,156 @@ The Usage Monitoring feature provides comprehensive insights into OpenAI API con
 - **Prompt Tokens**: Input text sent to OpenAI APIs
   - Research queries and instructions
   - Content generation prompts
-  - Translation source text
+
+  - Content generation prompts
+- **Completion Tokens**: AI-generated responses
+  - Generated content and blog posts
+  - AI research results
+- **Total Tokens**: Combined prompt + completion tokens
+
+#### Cost Analysis
+- **GPT-4o**: Premium model pricing for highest quality content
+- **GPT-4o Mini**: Optimized model for faster, cost-effective operations
+- **Image Generation**: Fixed pricing per image (1024x1024, HD quality)
+
+#### Performance Tracking
+- **Success Rate**: Percentage of successful API calls
+- **Average Response Time**: Time taken for content generation
+- **Error Rate**: Failed requests and retry attempts
+
+### Cost Optimization Strategies
+
+#### 1. Model Selection
+- Use **GPT-4o Mini** for research tasks and idea generation
+- Reserve **GPT-4o** for final content generation and complex tasks
+- Balance quality needs with cost considerations
+
+#### 2. Prompt Optimization
+- Create efficient prompts that minimize token usage
+- Use structured output formats to reduce unnecessary text
+- Cache successful prompt patterns for reuse
+
+#### 3. Batch Processing
+- Group related content requests together
+- Process multiple tasks in single sessions
+- Schedule operations during off-peak hours
+
+---
+
+## Task Management
+
+### Accessing Content Tasks
+
+**Navigation**: Marketing Automation → Content Management → Content Tasks
+
+### Task List View
+
+The task list displays all content-related tasks:
+- **Task Name**: Descriptive name with content type and status
+- **Content Type**: Research Ideas or Blog Generation tasks
+- **Status**: Current task state with color coding
+  - 🔵 Draft/In Progress (Blue)
+  - 🟢 Done (Green)  
+  - 🔴 Error (Red)
+- Error messages (if applicable)
+- Creation and completion timestamps
+- Agent instructions used
+
+### Task Actions
+
+#### Reset to Draft
+- **Available**: Only for tasks in "Error" status
+- **Purpose**: Allows retrying failed content generation
+- **Effect**: Changes status back to "Draft" for reprocessing
+
+**Note**: Use this action when OpenAI API issues are resolved or configuration is corrected.
+
+### Enhanced Task Action Experience (v18.0.1.0.1)
+
+The latest version introduces significant improvements to task action buttons, eliminating the need for manual page refreshes and providing immediate feedback.
+
+#### Automatic Page Refresh
+All task action buttons now automatically refresh the page after completion, providing immediate visual feedback:
+
+**Content Generation Tasks**:
+- **Execute Immediately**: Starts task processing and auto-refreshes to show updated status
+- **Retry**: Resets failed tasks and auto-refreshes to show draft status
+- **View Blog Post**: Opens generated content without losing current context
+
+**Content Idea Tasks**:
+- **Reset to Draft**: Changes status and immediately shows the update
+- **Mark Complete**: Updates status with instant visual feedback
+- **Generate Content**: Opens generation wizard while maintaining task context
+
+#### User Experience Benefits
+- **No Manual Refresh Required**: Status changes are visible immediately after clicking action buttons
+- **Improved Workflow**: Users can work continuously without interruption
+- **Better Error Handling**: Error states are displayed immediately with actionable suggestions
+- **Consistent Behavior**: Same auto-refresh pattern across all task types
+
+#### Technical Implementation
+The system now returns reload actions instead of simple boolean responses:
+- Successful actions trigger automatic page reload
+- Error conditions display notifications and refresh to show error state
+- Status transitions are immediately visible to users
+
+### Task History
+
+From any blog post form:
+1. Open the blog post record
+2. Navigate to **"Content History"** tab
+3. View all content generation attempts for that post
+4. Track content creation status over time
+
+---
+
+## Usage Monitoring
+
+The Usage Monitoring feature provides comprehensive insights into OpenAI API consumption across all AI agents, including content research, content generation, and image generation. The enhanced dashboard offers persistent data storage and detailed daily breakdowns to help you track costs and optimize usage.
+
+### Accessing Usage Dashboard
+
+**Navigation**: Marketing Automation → OpenAI Usage
+
+### Enhanced Dashboard Features
+
+#### 1. Persistent Usage Statistics
+- **Real-time Data**: Current usage statistics with automatic updates
+- **Historical Persistence**: Data stored permanently in your Odoo database
+- **30-Day Rolling View**: Comprehensive view of recent usage patterns
+- **Daily Breakdown**: Detailed day-by-day usage analysis
+
+#### 2. Comprehensive Usage Metrics
+- **Total Token Consumption**: Combined view across all AI operations
+- **Agent-Specific Breakdown**: Usage separated by:
+  - Content Research Agent
+  - Content Generation Agent  
+  - Image Generation (gpt-image-1)
+- **Cost Tracking**: Real-time cost calculations based on OpenAI pricing
+- **Usage Trends**: Visual representation of consumption patterns
+
+#### 3. Advanced Data Management
+- **Manual Data Sync**: "Fetch Latest Data" button for immediate refresh
+- **Automatic Sync**: Daily cron job ensures data stays current
+- **Data Retention**: Up to 90 days of detailed historical data
+- **Export Capabilities**: Download usage data for external analysis
+
+#### 4. Interactive Dashboard Elements
+- **Daily View Toggle**: Switch between summary and detailed daily views
+- **Date Range Filters**: Focus on specific time periods
+- **Usage Alerts**: Visual indicators for unusual consumption patterns
+- **Performance Metrics**: Track AI operation success rates and response times
+
+### Understanding Enhanced Usage Metrics
+
+#### Token Categories
+- **Prompt Tokens**: Input text sent to OpenAI APIs
+  - Research queries and instructions
+  - Content generation prompts
   - Image generation descriptions
 - **Completion Tokens**: AI-generated responses
   - Research summaries and ideas
   - Generated blog content
-  - Translated text
   - Image generation metadata
 - **Total Tokens**: Combined prompt and completion tokens for accurate billing
 
@@ -652,7 +660,7 @@ The system now provides complete tracking for all image generation operations:
 
 ### Common Issues
 
-#### 1. Translation Tasks Stuck in "Draft"
+#### 1. Content Tasks Stuck in "Draft"
 **Symptoms**: Tasks remain in draft status for extended periods
 
 **Possible Causes**:
@@ -667,34 +675,34 @@ The system now provides complete tracking for all image generation operations:
 - Restart Odoo server to reset cron jobs
 - Check server logs for specific errors
 
-#### 2. Translation Fails with API Errors
+#### 2. Content Generation Fails with API Errors
 **Symptoms**: Tasks move to "Error" status with API-related messages
 
 **Possible Causes**:
 - API rate limits exceeded
 - Insufficient OpenAI credits
 - Invalid model selection
-- Content too large for processing
+- Research prompts too large for processing
 
 **Solutions**:
 - Wait for rate limit reset (typically 1 minute)
 - Add credits to OpenAI account
 - Switch to available model (gpt-3.5-turbo)
-- Break large content into smaller posts
+- Refine research prompts to be more specific
 
-#### 3. Poor Translation Quality
-**Symptoms**: Translations are incorrect or inappropriate
+#### 3. Poor Content Quality
+**Symptoms**: Generated content is incorrect or inappropriate
 
 **Possible Causes**:
-- Suboptimal system instructions
+- Suboptimal agent instructions
 - Wrong model selection
-- Complex source content
+- Unclear research context
 
 **Solutions**:
-- Refine system instructions with specific guidance
+- Refine agent instructions with specific guidance
 - Upgrade to gpt-4o model for better quality
-- Test with simpler content first
-- Provide context-specific instructions
+- Test with clearer research prompts first
+- Provide more context-specific instructions
 
 ### Error Messages Reference
 
@@ -703,62 +711,73 @@ The system now provides complete tracking for all image generation operations:
 | "API key not configured" | OpenAI credentials missing | Configure API key in Settings |
 | "Model not available" | Selected model unavailable | Choose different model |
 | "Rate limit exceeded" | Too many API requests | Wait and retry |
-| "Content too long" | Blog post exceeds API limits | Reduce content length |
+| "Content too long" | Research result exceeds API limits | Reduce prompt complexity |
 
 ---
 
 ## Best Practices
 
-### Content Preparation
-1. **Review Source Content**: Ensure original blog posts are complete and well-formatted
-2. **Optimize Length**: Keep posts under 4000 words for best results
-3. **Clean Formatting**: Remove excessive HTML or special characters
-4. **Test Incrementally**: Start with shorter posts to validate configuration
+### Content Research Preparation
+1. **Define Clear Objectives**: Set specific goals for content research and generation
+2. **Optimize Search Queries**: Create targeted search terms for better research results
+3. **Test Agent Instructions**: Validate agent configurations with sample requests
+4. **Review Results**: Always review generated content before publication
 
-### Translation Strategy
-1. **Language Planning**: Prioritize target languages based on audience needs
-2. **Batch Processing**: Group similar content for consistent translations
-3. **Quality Review**: Always review AI translations before publishing
-4. **Backup Original**: Keep original content safe (automatic in this version)
+### Content Generation Strategy
+1. **Topic Planning**: Plan content themes and series for consistency
+2. **Batch Processing**: Group related content requests for efficient processing
+3. **Quality Review**: Always review AI-generated content before publishing
+4. **SEO Optimization**: Ensure generated content includes relevant keywords and structure
 
-### System Instructions Guidelines
-1. **Be Specific**: Provide clear, detailed instructions
-2. **Include Context**: Mention industry, audience, and purpose
+### Agent Instructions Guidelines
+1. **Be Specific**: Provide clear, detailed instructions for each agent
+2. **Include Context**: Mention industry, audience, and content purpose
 3. **Set Tone**: Specify formal, casual, technical, or conversational style
-4. **Cultural Adaptation**: Request local cultural considerations
+4. **Content Standards**: Request specific formatting and structural requirements
 
 ### Performance Optimization
-1. **Schedule Translations**: Run during off-peak hours for faster processing
-2. **Monitor Resources**: Track API usage and costs
-3. **Batch Wisely**: Process 5-10 posts at a time for optimal performance
+1. **Schedule Operations**: Run content generation during off-peak hours for faster processing
+2. **Monitor Resources**: Track API usage and costs through the usage dashboard
+3. **Batch Wisely**: Process 5-10 content requests at a time for optimal performance
 4. **Regular Maintenance**: Reset failed tasks and clean up completed ones
 
 ---
 
 ## Version-Specific Features
 
-### New in v18.0.1.0.0 (September 2025)
-- **Initial Release**: First stable version with core translation functionality
-- **OpenAI Integration**: Complete integration with openai-agents SDK
-- **Background Processing**: Asynchronous translation with cron job management
-- **Task Tracking**: Comprehensive status management and error handling
+### New in v18.0.1.0.1 (September 2025)
+- **Content Automation Platform**: Complete AI-powered content research and generation system
+- **OpenAI Integration**: Advanced integration with openai-agents SDK v0.2.9+
+- **Dual Agent Architecture**: Specialized research and generation agents working in harmony
+- **Comprehensive Task Management**: Advanced status tracking and error handling for content operations
+- **Enhanced Image Generation**: Professional blog cover images with gpt-image-1 integration
+- **Advanced Usage Monitoring**: Persistent tracking with detailed analytics and cost management
+- **Centralized Configuration**: Dedicated Marketing Automation settings section
 - **Security Implementation**: Proper access controls and credential management
-- **Bilingual Support**: English and Spanish interface translations
-- **Documentation**: Complete functional and technical documentation
+- **Bilingual Support**: English and Spanish interface support
+- **Complete Documentation**: Comprehensive functional and technical guides
 
 ### Architecture Highlights
 - **Odoo 18.0 Compliance**: Uses modern `<list>` views and proper conditionals
-- **Mail Integration**: Chatter support for translation tasks
-- **Kanban Views**: Meaningful grouping by task status
+- **Mail Integration**: Chatter support for content tasks when applicable
+- **Kanban Views**: Meaningful grouping by task status and content type
 - **Stable Anchors**: Core settings inheritance from base_setup module
+- **Static Model Management**: Centralized, consistent model definitions across all features
 
-### Known Limitations in v18.0.1.0.0
-- Translation processing limited to 10 tasks per cron cycle
-- No automatic retry mechanism for API failures
-- Manual task reset required for error recovery
-- Basic error reporting without detailed diagnostics
+### Key Capabilities in v18.0.1.0.1
+- **Content Research Agent**: Web-powered topic discovery with configurable search parameters
+- **Content Generation Agent**: Complete blog post creation from research ideas
+- **AI Image Generation**: Professional cover images with customizable prompts
+- **Usage Analytics**: 90-day retention with detailed daily breakdowns
+- **Cost Optimization**: Multiple model options balancing quality and efficiency
 
-**Note**: Enhanced features and improvements are available in later versions (18.0.1.1.0+).
+### Known Limitations in v18.0.1.0.1
+- Content processing limited to configured batch sizes for optimal performance
+- Manual task management required for complex error recovery scenarios
+- Image generation limited to supported OpenAI formats (PNG, JPEG, WebP)
+- Usage monitoring requires manual sync for immediate data updates
+
+**Note**: This version represents a complete content automation platform focused on research and generation capabilities.
 
 ---
 
@@ -772,8 +791,8 @@ The system now provides complete tracking for all image generation operations:
 ### Official Documentation
 - **OpenAI Agents SDK**: https://github.com/openai/openai-agents-python
 - **OpenAI API Documentation**: https://platform.openai.com/docs
-- **Odoo 18.0 Translation System**: https://www.odoo.com/documentation/18.0/
+- **Odoo 18.0 Development**: https://www.odoo.com/documentation/18.0/
 
 ---
 
-*Documentation Version: 18.0.1.0.0 | Last Updated: September 2025*
+*Documentation Version: 18.0.1.0.1 | Last Updated: September 2025*
