@@ -8,46 +8,97 @@
 
 The **Content Management Tool for Odoo v18.0.1.0.1** is a comprehensive **AI-powered content automation platform** featuring specialized AI agents for content research and generation. This tool streamlines the content creation workflow from ideation to publication.
 
+**🌍 [Versión en Español](README.es.md) | 📚 [Documentación Completa](docs/)**
+
 ## Key Features (v18.0.1.0.1)
 
 ### 🤖 **Agent-Based Content Strategy**
 - **Content Research Agent**: AI-powered topic discovery using web search capabilities
-- **Content Generation Agent**: Complete blog post creation from research ideas
+- **Content Generation Agent**: Complete blog post creation from research ideas  
 - **AI-Powered Image Generation**: Professional blog cover images using gpt-image-1 model
+- **Configurable Instructions**: Customizable system prompts for each agent type
 
-### 📊 **Usage Monitoring & Optimization**
-- **Comprehensive Usage Tracking**: Unified monitoring for text and image generation
-- **Advanced Usage Dashboard**: Interactive dashboard with daily breakdown and trends
-- **Enhanced Cost Optimization**: Token usage breakdown and image generation cost tracking
-- **Persistent Data Storage**: Enhanced data retention and historical analysis
-- **Operation-Specific Tracking**: Dedicated monitoring for content research, generation, and image generation
+### 📊 **Usage Monitoring & Analytics**
+- **Comprehensive Usage Tracking**: Real-time monitoring for all OpenAI API operations
+- **Interactive Usage Dashboard**: Visual analytics with daily breakdowns and cost tracking
+- **Operation-Specific Monitoring**: Dedicated tracking for research, generation, and image creation
+- **Cost Optimization Tools**: Token usage analysis and budget monitoring
 
-### ⚙️ **Centralized Configuration**
-- **Marketing Automation Settings**: Dedicated configuration section for all AI agents
-- **Static Model Management**: Centralized, reliable model definitions independent of API calls
-- **Image Generation Configuration**: Comprehensive settings for size, quality, format
-- **Agent-Specific Configuration**: Specialized settings for each AI agent type
-- **Enhanced Security**: Improved credential management and access controls
+### ⚙️ **Enterprise Configuration**
+- **Centralized Settings**: Dedicated Marketing Automation configuration panel
+- **Static Model Management**: Reliable model definitions independent of API availability
+- **Security Framework**: Enhanced credential management and access controls
+- **Multi-Company Support**: Company-dependent configurations and data isolation
 
-### 🔄 **Multi-Agent Background Processing**
-- **Specialized Cron Jobs**: Independent processing for research and generation
-- **Enhanced Task Management**: Comprehensive status tracking across all agent types
-- **Improved Error Handling**: Agent-specific error patterns and recovery mechanisms
+### 🔄 **Background Processing**
+- **Asynchronous Task Processing**: Non-blocking execution for all content operations
+- **Intelligent Cron Jobs**: Separate processors for research and generation tasks
+- **Error Recovery**: Comprehensive error handling with retry mechanisms
+- **State Management**: Clear task states with audit trails
+
+## Documentation
+
+### 📖 User Guides
+- **[Functional User Guide (English)](docs/functional/guide.en.md)**: End-user workflows and features
+- **[Guía Funcional (Español)](docs/functional/guide.es.md)**: Flujos de trabajo y características para usuarios finales
+
+### 🔧 Technical Documentation  
+- **[Technical Developer Guide (English)](docs/technical/guide.en.md)**: Architecture, development patterns, and API integration
+- **[Guía Técnica para Desarrolladores (Español)](docs/technical/guide.es.md)**: Arquitectura, patrones de desarrollo e integración de APIs
+
+### 📋 Additional Resources
+- **[Feature Coverage Matrix](docs/coverage-matrix.md)**: Complete mapping of features to documentation
+- **[Version Changelog](docs/CHANGELOG.md)**: Detailed version history and feature updates
+- **[Development Plan](docs/plan/PLAN.md)**: Project roadmap and implementation status
+
+## Quick Start
+
+### 1. Installation
+```bash
+# Clone or copy module to custom addons directory
+cp -r sc_marketing_automation_tool /path/to/odoo/custom-addons/
+
+# Install Python dependencies
+pip install openai-agents>=0.2.9
+
+# Install module in Odoo
+./odoo-bin -d your_database -i sc_marketing_automation_tool
+```
+
+### 2. Configuration
+1. Navigate to **Settings > General Settings > Marketing Automation Tool**
+2. Enter your OpenAI API credentials
+3. Configure AI agent instructions for your content strategy
+4. Test the connection and start creating content
+
+### 3. Content Workflow
+1. **Research**: Create content research tasks to discover trending topics
+2. **Review**: Approve discovered content ideas for generation  
+3. **Generate**: Launch content generation for approved ideas
+4. **Publish**: Review and publish generated blog posts
 
 ## Version Features Matrix
 
-### ✅ Included in v18.0.1.0.1 (September 2025)
+### ✅ Current Features (v18.0.1.0.1)
 
-#### **Content Strategy Features**
-- **Content Research Agent**: WebSearchTool integration for topic discovery
-- **Content Generation Agent**: Complete blog post drafting from research ideas
-- **AI-Powered Image Generation**: Professional blog cover images using gpt-image-1 model
-- **Advanced Usage Monitoring**: Enhanced dashboard with daily breakdown and persistent data
-- **Centralized Settings Architecture**: Dedicated Marketing Automation configuration section
-- **Multi-Agent Workflow**: End-to-end content pipeline from research to publication
+#### **Content Strategy**
+- ✅ Content Research Agent with web search capabilities
+- ✅ Content Generation Agent for blog post creation
+- ✅ AI-powered image generation with gpt-image-1 model
+- ✅ Multi-agent workflow from research to publication
+- ✅ Content idea approval and review system
 
-#### **Enhanced Technical Features**
-- **OpenAI Agents SDK Integration**: Upgrade to >=0.2.9 with WebSearchTool support
+#### **Monitoring & Analytics**  
+- ✅ Comprehensive OpenAI usage tracking
+- ✅ Interactive usage dashboard with cost analytics
+- ✅ Daily breakdown reporting and trend analysis
+- ✅ Operation-specific monitoring (research/generation/images)
+
+#### **Technical Architecture**
+- ✅ OpenAI Agents SDK integration (v0.2.9+)
+- ✅ Asynchronous background processing
+- ✅ Centralized configuration management
+- ✅ Enhanced security and error handling
 - **gpt-image-1 Direct Images API**: Latest image generation model with advanced features
 - **Static File Management**: Web-accessible image storage with proper URL generation
 - **Structured AI Responses**: JSON-based content generation with defined schemas

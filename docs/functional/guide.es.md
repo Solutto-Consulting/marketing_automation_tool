@@ -4,353 +4,763 @@
 1. [Descripción General](#descripción-general)
 2. [Primeros Pasos](#primeros-pasos)
 3. [Configuración de IA](#configuración-de-ia)
-4. [Agente de Investigación de Contenido](#agente-de-investigación-de-contenido)
-5. [Agente de Generación de Contenido](#agente-de-generación-de-contenido)
-6. [Flujo de Trabajo de Traducción de Blogs](#flujo-de-trabajo-de-traducción-de-blogs)
-7. [Monitoreo de Uso](#monitoreo-de-uso)
-8. [Gestión de Tareas](#gestión-de-tareas)
+4. [Flujo de Trabajo de Investigación de Contenido](#flujo-de-trabajo-de-investigación-de-contenido)
+5. [Flujo de Trabajo de Generación de Contenido](#flujo-de-trabajo-de-generación-de-contenido)
+6. [Gestión de Tareas](#gestión-de-tareas)
+7. [Monitoreo y Análisis](#monitoreo-y-análisis)
+8. [Administración](#administración)
 9. [Solución de Problemas](#solución-de-problemas)
 10. [Mejores Prácticas](#mejores-prácticas)
-11. [Características Específicas de la Versión](#características-específicas-de-la-versión)
 
 ---
 
 ## Descripción General
 
-La Herramienta de Gestión de Contenido para Odoo v18.0.1.0.1 introduce potentes capacidades de **estrategia de contenido basada en agentes**, evolucionando más allá de la simple traducción hacia la investigación y generación proactiva de contenido. Esta versión representa una evolución importante en la gestión de contenido impulsada por IA para Odoo.
+La **Herramienta de Gestión de Contenido para Odoo v18.0.1.0.1** proporciona a los equipos de marketing capacidades de automatización de contenido impulsadas por IA, permitiendo una investigación eficiente de contenido, generación de ideas y creación de publicaciones de blog utilizando los modelos de lenguaje avanzados de OpenAI.
 
-### Características Principales en v18.0.1.0.1
-- ✅ **Agente de Investigación de Contenido**: Descubrimiento de temas impulsado por IA usando búsqueda web
-- ✅ **Agente de Generación de Contenido**: Creación automatizada de publicaciones de blog a partir de ideas de investigación
-- ✅ **Generación de Imágenes Impulsada por IA**: Imágenes de portada profesionales usando el modelo gpt-image-1
-- ✅ **Monitoreo Integral de Uso**: Seguimiento completo para generación de texto e imágenes
-- ✅ **Gestión Centralizada de Modelos**: Definiciones estáticas de modelos con selección unificada
-- ✅ **Configuración Mejorada**: Sección dedicada de configuración de Automatización de Marketing
-- ✅ **Sistema de Traducción Mejorado**: Mejorado con OpenAI Agents SDK
-- ✅ **Procesamiento Multi-Agente en Segundo Plano**: Trabajos cron separados para cada agente
-- ✅ **Respuestas de IA Estructuradas**: Generación de contenido basada en JSON con esquemas definidos
+### Beneficios Clave
 
-### Contexto de la Versión
-Esta documentación cubre las características disponibles en la **versión 18.0.1.0.1** (Septiembre 2025). Esto representa una expansión significativa desde la v18.0.1.0.0 centrada en traducción hacia una plataforma integral de estrategia de contenido.
+- **Ahorro de Tiempo**: Automatiza la investigación de contenido y la generación de publicaciones de blog en lugar de flujos de trabajo manuales de creación de contenido
+- **Consistencia de Calidad**: Aprovecha agentes de IA profesionales para contenido de calidad consistente
+- **Escalabilidad**: Maneja múltiples proyectos de contenido simultáneamente con procesamiento en segundo plano
+- **Flexibilidad**: Personaliza las instrucciones de los agentes de IA para tono, estilo y requisitos específicos de la industria
+- **Seguimiento**: Visibilidad completa del progreso e historial de generación de contenido
+- **Control de Costos**: Monitorea el uso de OpenAI y los costos con análisis detallados
+
+### Roles de Usuario y Permisos
+
+#### Gerente de Marketing
+- Acceso completo a todas las funciones de automatización de contenido
+- Puede configurar ajustes de OpenAI y agentes de IA
+- Puede gestionar y eliminar tareas de contenido
+- Puede reintentar operaciones fallidas
+- Acceso a análisis de uso y monitoreo de costos
+
+#### Usuario de Marketing
+- Puede iniciar investigación y generación de contenido
+- Puede ver y gestionar sus propias tareas de contenido
+- Puede aprobar/rechazar ideas de contenido
+- Limitado a permisos de lectura y creación
+- Sin acceso a configuración del sistema
 
 ---
 
 ## Primeros Pasos
 
 ### Requisitos Previos
-- Odoo 18.0 Community o Enterprise
-- Acceso de administrador para configurar los ajustes de OpenAI
-- Cuenta válida de OpenAI API con acceso a organización
-- Dependencia OpenAI Agents SDK (>=0.2.9)
-- Módulo de Blog instalado y configurado
+
+Antes de usar la Herramienta de Gestión de Contenido, asegúrese de tener:
+
+1. **Acceso a OpenAI API**: Clave API de OpenAI válida con créditos suficientes
+2. **Módulo de Blog**: El módulo Website Blog de Odoo debe estar instalado y configurado
+3. **Conexión a Internet**: Requerida para capacidades de búsqueda web
+4. **Permisos Apropiados**: Rol de Usuario de Marketing o Gerente asignado
 
 ### Lista de Verificación de Configuración Inicial
-1. ✅ Instalar el módulo de Herramienta de Gestión de Contenido
-2. ✅ Configurar las credenciales de OpenAI API en ajustes de Automatización de Marketing
-3. ✅ Configurar el Agente de Investigación de Contenido
-4. ✅ Configurar los ajustes del Agente de Generación de Contenido
-5. ✅ Verificar que el monitoreo de uso de OpenAI esté funcional
-6. ✅ Probar el pipeline completo de contenido desde investigación hasta publicación
 
-### Nuevo en v18.0.1.0.1: Arquitectura Basada en Agentes
-Esta versión introduce dos agentes de IA especializados que trabajan juntos para crear un pipeline completo de estrategia de contenido:
-
-- **Agente de Investigación de Contenido**: Descubre temas de tendencia y genera ideas de contenido
-- **Agente de Generación de Contenido**: Crea borradores completos de publicaciones de blog a partir de ideas de investigación
-- **Agente de Traducción Mejorado**: Capacidades de traducción mejoradas con mejor manejo de errores
+- [ ] Clave API de OpenAI configurada
+- [ ] Al menos un blog configurado en Odoo
+- [ ] Configuraciones de agentes de IA establecidas
+- [ ] Permisos de usuario verificados
+- [ ] Prueba de conexión a servicios de OpenAI
 
 ---
 
 ## Configuración de IA
 
-### Ubicación de Configuración Centralizada
-Toda la configuración de IA se ha trasladado de Ajustes Generales a una sección dedicada:
+### Acceso a Configuraciones
 
-**Navegación**: Ajustes → Automatización de Marketing
+1. Navegue a **Configuraciones > Configuraciones Generales**
+2. Desplácese a la sección **"Herramienta de Automatización de Marketing"**
+3. Configure los siguientes parámetros:
 
-Este nuevo enfoque centralizado proporciona mejor organización y configuración dedicada para cada agente de IA.
+### Configuración Básica de OpenAI
 
-### Acceso a los Ajustes de Configuración
+#### Clave API de OpenAI
+- **Ubicación**: Configuraciones > Configuraciones Generales > Herramienta de Automatización de Marketing
+- **Requerida**: Sí
+- **Formato**: `sk-...` (comienza con sk-)
+- **Seguridad**: Almacenada de forma segura, enmascarada en la interfaz
 
-**Navegación**: Ajustes → Ajustes Generales → Herramientas de Marketing IA
+#### ID de Organización de OpenAI
+- **Ubicación**: Misma sección
+- **Requerida**: Recomendada para cuentas de equipo
+- **Formato**: `org-...` (comienza con org-)
+- **Propósito**: Asegura facturación y seguimiento de uso apropiados
 
-**Nota**: Esta sección aparece en la página de Ajustes Generales después de instalar el módulo.
+#### Selección de Modelo Predeterminado
+- **Ubicación**: Configuraciones > Configuraciones Generales > Herramienta de Automatización de Marketing
+- **Opciones**: 
+  - `gpt-4o` (Recomendado para calidad)
+  - `gpt-4-turbo` (Buen equilibrio)
+  - `gpt-3.5-turbo` (Costo-efectivo)
 
-### Campos de Configuración
+### Configuración Avanzada (Opcional)
 
-#### 1. Clave API de OpenAI (Requerida)
-### Campos de Configuración
+#### Clave de Administrador para Estadísticas de Uso
+- **Propósito**: Monitorear uso y costos en toda la organización
+- **Permisos**: Requiere alcance organization:read
+- **Seguridad**: Almacenar por separado de la clave API regular
 
-#### 1. Configuración General de OpenAI
-- **Clave API de OpenAI** (Requerida): Autentica todas las solicitudes a los servicios de OpenAI
-- **ID de Organización OpenAI** (Opcional): Vincula las solicitudes a su organización para seguimiento de uso
-- **Modelo OpenAI** (Requerido): Modelo predeterminado para tareas de traducción (gpt-4o recomendado)
+#### ID de Proyecto
+- **Propósito**: Rastrear uso por proyecto
+- **Formato**: Identificador de proyecto del panel de OpenAI
+- **Beneficio**: Desglose detallado de costos y análisis
 
-#### 2. Configuración del Agente de Investigación de Contenido
-- **Modelo del Agente de Investigación**: Modelo específico para tareas de investigación de contenido
-- **Instrucciones del Agente de Investigación**: Instrucciones del sistema que guían el comportamiento de descubrimiento de temas
-- **Consulta de Búsqueda Predeterminada**: Plantilla de consulta de búsqueda prellenada con soporte de marcadores de posición
+### Configuración de Agentes de IA
 
-#### 3. Configuración del Agente de Generación de Contenido
-- **Modelo del Agente de Generación**: Modelo específico para creación de publicaciones de blog
-- **Instrucciones del Agente de Generación**: Instrucciones del sistema para estilo y estructura de escritura de blog
+#### Acceso a Configuraciones de Agentes
 
-### Carga Dinámica de Modelos
-El sistema obtiene automáticamente los modelos de OpenAI disponibles cuando tiene una clave API válida configurada. Cada agente puede usar diferentes modelos optimizados para sus tareas específicas.
+1. Navegue a **Automatización de Marketing > Configuración > Configuraciones de Agentes de IA**
+2. Revise agentes preconfigurados o cree personalizados
 
-### Consejos de Configuración
-- Use **gpt-4o** para investigación y generación de la más alta calidad
-- Use **gpt-3.5-turbo** para operaciones más rápidas y rentables
-- Personalice las instrucciones del agente para que coincidan con la voz de su marca y el estilo de contenido
+#### Configuración del Agente de Investigación
 
+**Propósito**: Encuentra y analiza contenido web para generación de ideas
+
+**Configuraciones Predeterminadas**:
+- **Nombre**: "Agente de Investigación de Contenido"
+- **Tipo**: Investigación
+- **Modelo**: gpt-4o
+- **Instrucciones**: Optimizado para búsqueda web y análisis de contenido
+
+**Opciones de Personalización**:
+- **Enfoque de Industria**: Especifique su industria (tecnología, salud, finanzas, etc.)
+- **Tipos de Contenido**: Publicaciones de blog, artículos de noticias, estudios de caso, etc.
+- **Comportamiento de Búsqueda**: Búsqueda conservadora vs. integral
+- **Preferencias de Idioma**: Idioma principal para investigación de contenido
+
+#### Configuración del Agente de Generación de Contenido
+
+**Propósito**: Crea publicaciones de blog a partir de ideas de investigación o temas personalizados
+
+**Configuraciones Predeterminadas**:
+- **Nombre**: "Agente de Generación de Contenido"
+- **Tipo**: Generación
+- **Modelo**: gpt-4o
+- **Instrucciones**: Optimizado para creación de publicaciones de blog
+
+**Opciones de Personalización**:
+- **Estilo de Escritura**: Profesional, casual, técnico, enfocado en marketing
+- **Estructura de Contenido**: Encabezados preferidos, secciones, llamadas a la acción
+- **Enfoque SEO**: Optimización de palabras clave, meta descripciones
+- **Voz de Marca**: Tono y mensajería específicos de la empresa
+4. ✅ Configurar los ajustes del Agente de Generación de Contenido
+5. ✅ Verificar que el monitoreo de uso de OpenAI esté funcional
 ---
 
-## Agente de Investigación de Contenido
+## Flujo de Trabajo de Investigación de Contenido
 
-El Agente de Investigación de Contenido utiliza capacidades de búsqueda web para descubrir temas de tendencia y generar ideas de contenido relevantes para su blog.
+### Descripción General
 
-### Flujo de Trabajo de Investigación
+El flujo de trabajo de Investigación de Contenido ayuda a descubrir temas de tendencia, analizar contenido de la competencia y generar ideas de contenido frescas utilizando búsqueda web impulsada por IA.
 
-#### Paso 1: Acceder a Ideas de Contenido
-1. Navegue a **Automatización de Marketing → Ideas de Contenido → Todas las Ideas**
-2. Haga clic en el botón **Generar Ideas de Contenido** para abrir el asistente
+### Paso 1: Iniciar Investigación de Contenido
 
-#### Paso 2: Configurar Solicitud de Investigación
-- **Consulta de Búsqueda**: Ingrese o modifique los términos de búsqueda (soporta marcador de posición {today})
-- **Número de Sugerencias**: Especifique cuántas ideas generar (predeterminado: 5)
-- **Consulta de Ejemplo**: "Últimas tendencias en marketing digital {today}"
+#### Método 1: Investigación Rápida (Recomendado)
+1. Navegue a **Automatización de Marketing > Generación de Contenido > Generar Ideas**
+2. Ingrese su tema de investigación o pregunta
+3. Seleccione el número de ideas a generar (5-20)
+4. Elija la configuración del agente de IA
+5. Haga clic en **"Generar Ideas"**
 
-#### Paso 3: Procesamiento en Segundo Plano
-- El sistema crea una tarea de investigación y la procesa en segundo plano
-- Monitoree el progreso en **Automatización de Marketing → Ideas de Contenido → Tareas de Generación**
-- Las tareas progresan a través de: Borrador → En Progreso → Hecho/Error
+#### Método 2: Configuración de Investigación Avanzada
+1. Navegue a **Automatización de Marketing > Generación de Contenido > Ideas de Contenido**
+2. Haga clic en **"Crear"** para configuración manual
+3. Configure parámetros de investigación
+4. Envíe para procesamiento en segundo plano
 
-#### Paso 4: Revisar Ideas Generadas
+### Paso 2: Configurar Parámetros de Investigación
+
+#### Directrices de Consulta de Búsqueda
+- **Sea Específico**: "Tendencias de IA en salud 2025" vs. "Tendencias de IA"
+- **Use Palabras Clave**: Incluya términos de la industria e indicadores de audiencia objetivo
+- **Considere la Intención**: Investigación, comparación, cómo hacer, noticias, etc.
+- **Incluya Contexto**: Calificadores geográficos, temporales o demográficos
+
+#### Ejemplos de Consultas Efectivas
+- "Estrategias de retención de clientes SaaS para pequeñas empresas"
+- "Tendencias de ciberseguridad que afectan políticas de trabajo remoto"
+- "Innovaciones en empaques sostenibles para e-commerce"
+- "Medición de ROI de automatización de marketing digital"
+
+#### Selección del Número de Ideas
+- **5 Ideas**: Investigación rápida, tema enfocado
+- **10 Ideas**: Visión general completa, múltiples ángulos
+- **15-20 Ideas**: Investigación extensa, planificación de campañas
+
+### Paso 3: Monitorear Progreso de Investigación
+
+#### Seguimiento de Estado de Tareas
+1. Navegue a **Automatización de Marketing > Gestión de Tareas > Tareas de Investigación**
+2. Monitoree el estado de las tareas:
+   - **Borrador**: En cola para procesamiento
+   - **En Progreso**: Agente de IA investigando activamente
+   - **Hecho**: Investigación completada exitosamente
+   - **Error**: Falló (ver detalles del error)
+
+#### Tiempo de Procesamiento Típico
+- **5 Ideas**: 2-5 minutos
+- **10 Ideas**: 5-10 minutos
+- **20 Ideas**: 10-15 minutos
+
+**Nota**: El tiempo de procesamiento depende de la complejidad de la consulta y los tiempos de respuesta de la API de OpenAI.
+
+### Paso 4: Revisar Resultados de Investigación
+
+#### Acceso a Ideas Generadas
+1. Desde la tarea de investigación, haga clic en **"Ver Ideas Generadas"**
+2. O navegue a **Automatización de Marketing > Generación de Contenido > Ideas de Contenido**
+3. Filtre por su tarea de investigación o rango de fechas
+
+#### Información de Ideas de Contenido
 Cada idea generada incluye:
-- **Título**: Titular del artículo fuente
-- **URL**: Enlace a la fuente original
+- **Título del Artículo**: Título de la fuente original
+- **URL de Fuente**: Enlace directo al contenido referenciado
 - **Fecha de Publicación**: Cuándo se publicó la fuente
-- **Resumen**: Resumen generado por IA de puntos clave
+- **Resumen**: Resumen generado por IA destacando puntos clave
+- **Potencial de Contenido**: Análisis del potencial de publicación de blog
 
-### Mejores Prácticas de Investigación
-- Use consultas de búsqueda específicas y dirigidas para mejores resultados
-- Incluya marcadores de posición de fecha como {today} para contenido oportuno
-- Revise la credibilidad de la fuente antes de usar las ideas
-- Personalice las instrucciones del agente de investigación para el enfoque de su industria
+#### Evaluación y Gestión de Ideas
 
----
+**Flujo de Trabajo de Aprobación**:
+1. **Revisar**: Leer resumen y verificar calidad de la fuente
+2. **Aprobar**: Marcar ideas adecuadas para generación de contenido
+3. **Rechazar**: Descartar ideas irrelevantes o de baja calidad
+4. **Archivar**: Mantener para referencia futura sin usar
 
-## Agente de Generación de Contenido
-
-El Agente de Generación de Contenido toma ideas de investigación y crea borradores completos de publicaciones de blog listos para revisión y publicación.
-
-### Flujo de Trabajo de Generación
-
-#### Paso 1: Acceder a Generación de Contenido
-1. Navegue a **Sitio Web → Blogs → Publicaciones de Blog**
-2. Haga clic en el botón **Generar Contenido** en el encabezado
-3. Esto abre el asistente de generación de contenido
-
-#### Paso 2: Configurar Solicitud de Generación
-- **Idea de Contenido**: Seleccione de las ideas de investigación generadas previamente
-- **Solicitud del Usuario**: Agregue instrucciones o requisitos específicos
-- **Blog Objetivo**: Elija en qué blog publicar
-- **Autor**: Seleccione el autor de la publicación
-- **Idioma**: Establezca el idioma del contenido
-
-#### Paso 3: Procesamiento en Segundo Plano
-- El sistema crea una tarea de generación para procesamiento en segundo plano
-- Monitoree el progreso en **Automatización de Marketing → Generación de Contenido → Tareas de Generación**
-- Las tareas incluyen pipeline completo de creación de contenido
-
-#### Paso 4: Revisar Contenido Generado
-Las publicaciones de blog generadas incluyen:
-- **Título**: Titular optimizado basado en investigación
-- **Contenido**: Contenido completo de publicación de blog formateado en HTML
-- **Meta Descripción**: Descripción optimizada para SEO
-- **Palabras Clave**: Etiquetas relevantes para descubrimiento
-- **Estado de Publicación**: Inicialmente guardado como borrador no publicado
-
-### Mejores Prácticas de Generación
-- Proporcione solicitudes de usuario claras y específicas para mejores resultados
-- Revise y edite el contenido generado antes de publicar
-- Personalice las instrucciones del agente de generación para una voz de marca consistente
-- Use tareas de generación para rastrear el pipeline de creación de contenido
+**Indicadores de Calidad**:
+- ✅ Fecha de publicación reciente (dentro de 6 meses)
+- ✅ Dominio de fuente autoritativo
+- ✅ Resumen de contenido claro y accionable
+- ✅ Relevante para su audiencia objetivo
+- ✅ Ángulo o perspectiva única
 
 ---
 
-## Flujo de Trabajo de Traducción de Blogs
+## Flujo de Trabajo de Generación de Contenido
 
-### Paso 1: Seleccionar Publicaciones de Blog
+### Descripción General
 
-1. Navegue a **Sitio Web → Blogs → Publicaciones de Blog**
-2. Use la vista de lista para ver todas las publicaciones de blog disponibles
-3. Seleccione una o más publicaciones de blog usando las casillas de verificación
-4. Haga clic en el menú desplegable **Acción** en el menú superior
+El flujo de trabajo de Generación de Contenido transforma ideas de contenido aprobadas o temas personalizados en publicaciones de blog completas y optimizadas para SEO listas para publicación.
 
-### Paso 2: Lanzar el Asistente de Traducción
+### Paso 1: Iniciar Generación de Contenido
 
-1. Desde el menú Acción, seleccione **"Traducir con IA"**
-2. El asistente de traducción se abre en un diálogo modal
-3. El asistente muestra el contexto de las publicaciones de blog seleccionadas
+#### Método 1: Desde Ideas de Contenido (Recomendado)
+1. Navegue a **Automatización de Marketing > Generación de Contenido > Ideas de Contenido**
+2. Seleccione una idea aprobada
+3. Haga clic en el botón **"Generar Contenido"**
+4. Siga el asistente de generación
 
-### Paso 3: Configurar la Traducción
+#### Método 2: Generación de Tema Personalizado
+1. Navegue a **Automatización de Marketing > Generación de Contenido > Generar Contenido**
+2. Elija la opción **"Tema Personalizado"**
+3. Ingrese tema e instrucciones detalladas
+4. Configure parámetros de generación
 
-#### Selección de Idioma Objetivo
-- **Campo**: Idioma Objetivo
-- **Opciones**: Solo idiomas publicados en el sitio web
-- **Requisito**: Al menos un idioma debe estar activo
+#### Método 3: Generación Masiva
+1. Seleccione múltiples ideas aprobadas de la vista de lista
+2. Use **Acciones > Generar Contenido** para procesamiento por lotes
+3. Configure parámetros compartidos para todas las ideas seleccionadas
 
-#### Instrucciones del Sistema (Opcional)
-- **Campo**: Instrucciones del Sistema
-- **Propósito**: Guiar el estilo y tono de la traducción IA
-- **Ejemplos**:
-  - "Mantener tono profesional de negocios"
-  - "Usar lenguaje casual y amigable"
-  - "Preservar terminología técnica"
-  - "Adaptar referencias culturales para audiencia local"
+### Paso 2: Configurar Parámetros de Generación
 
-### Paso 4: Ejecutar la Traducción
+#### Configuraciones de Contenido
 
-1. Haga clic en el botón **"Traducir"** para iniciar el proceso
-2. El asistente se cierra y regresa a la lista de publicaciones de blog
-3. Las tareas de traducción se crean en estado "Borrador"
-4. El procesamiento en segundo plano comienza automáticamente
+**Blog Objetivo**:
+- Seleccione el blog de Odoo donde se creará la publicación
+- Asegura categorización y flujo de trabajo de publicación apropiados
 
-### Paso 5: Monitorear el Progreso
+**Objetivo de Número de Palabras**:
+- **800 palabras**: Contenido de forma corta, lecturas rápidas
+- **1200 palabras**: Longitud estándar de publicación de blog
+- **1500+ palabras**: Contenido profundo y completo
+- **Personalizado**: Especificar requisitos exactos
 
-Las tareas de traducción se procesan de forma asíncrona:
+**Configuración del Agente de IA**:
+- Seleccione agente de generación con instrucciones apropiadas
+- Considere agentes específicos de la industria o estilo
+- Use predeterminado para contenido comercial general
 
-- **Borrador**: Tarea creada, esperando procesamiento
-- **En Progreso**: La traducción IA está ejecutándose
-- **Completada**: Traducción completada exitosamente
-- **Error**: La traducción falló (ver detalles del error)
+#### Personalización de Contenido
+
+**Instrucciones Adicionales** (Opcional):
+- Llamadas a la acción específicas u objetivos de conversión
+- Terminología específica de la marca o mensajería
+- Requisitos de profundidad técnica
+- Consideraciones de audiencia objetivo
+
+**Optimización SEO**:
+- **Palabras Clave Primarias**: 1-3 palabras clave de enfoque principales
+- **Palabras Clave Secundarias**: 3-5 términos relacionados
+- **Meta Descripción**: Anulación manual si es necesario
+- **Optimización de Título**: Equilibrio entre SEO y engagement
+
+### Paso 3: Monitorear Progreso de Generación
+
+#### Seguimiento de Tareas
+1. Navegue a **Automatización de Marketing > Gestión de Tareas > Tareas de Generación**
+2. Monitoree estado en tiempo real:
+   - **Borrador**: En cola para procesamiento
+   - **En Progreso**: Agente de IA escribiendo activamente
+   - **Hecho**: Contenido generado exitosamente
+   - **Error**: Generación falló (ver detalles)
+
+#### Marcos de Tiempo de Procesamiento
+- **Publicación Estándar (800 palabras)**: 3-7 minutos
+- **Contenido de Forma Larga (1500+ palabras)**: 8-15 minutos
+- **Temas Personalizados/Complejos**: 10-20 minutos
+
+### Paso 4: Revisar y Publicar Contenido
+
+#### Vista Previa de Contenido
+1. Desde la tarea de generación, haga clic en **"Vista Previa de Contenido"**
+2. Revise contenido generado en vista formateada
+3. Verifique estructura, flujo y calidad
+
+#### Elementos de Contenido Generado
+- **Título**: Encabezado optimizado para SEO y atractivo
+- **Contenido**: Publicación de blog completa con estructura apropiada
+- **Meta Descripción**: Vista previa de fragmento de motor de búsqueda
+- **Palabras Clave**: Términos de enfoque extraídos
+- **Estructura HTML**: Encabezados apropiados (H2, H3) y formateo
+
+#### Lista de Verificación de Aseguramiento de Calidad
+- [ ] El contenido coincide con el tema y ángulo solicitado
+- [ ] Estructura apropiada con introducción, cuerpo, conclusión
+- [ ] Incluye ejemplos relevantes e ideas accionables
+- [ ] Elementos SEO están presentes y optimizados
+- [ ] La voz de marca y el tono son apropiados
+- [ ] Sin errores factuales o inconsistencias
+- [ ] Llamada a la acción es clara y relevante
+
+#### Opciones de Publicación
+
+**Opción 1: Publicación Directa**
+1. Haga clic en **"Publicar en Blog"** desde la tarea
+2. El contenido se crea automáticamente como publicación de blog publicada
+3. Aparece inmediatamente en su sitio web
+
+**Opción 2: Guardar como Borrador**
+1. Haga clic en **"Guardar como Borrador"**
+2. Contenido guardado en blog como borrador no publicado
+3. Permite edición adicional antes de la publicación
+
+**Opción 3: Exportar para Edición**
+1. Copie contenido de la vista previa
+2. Pegue en editor externo para modificaciones
+3. Cree manualmente publicación de blog cuando esté listo
 
 ---
 
 ## Gestión de Tareas
 
-### Acceso a las Tareas de Traducción
+### Descripción General
 
-**Navegación**: Automatización de Marketing → Traducción de Contenido → Tareas de Traducción
+El sistema de Gestión de Tareas proporciona visibilidad completa y control sobre todas las actividades de automatización de contenido, desde investigación hasta publicación.
 
-### Vista de Lista de Tareas
+### Gestión de Tareas de Investigación
 
-La lista de tareas muestra:
-- **Nombre de Tarea**: Nombre descriptivo con publicación de blog e idioma
-- **Publicación de Blog**: Enlace a la publicación de blog original
-- **Idioma Objetivo**: Idioma de destino para la traducción
-- **Estado**: Estado actual de la tarea con codificación de colores
-  - 🔵 Borrador/En Progreso (Azul)
-  - 🟢 Completada (Verde)
-  - 🔴 Error (Rojo)
+#### Acceso a Tareas de Investigación
+- **Ubicación**: Automatización de Marketing > Gestión de Tareas > Tareas de Investigación
+- **Opciones de Vista**: Vista de lista (predeterminada), vista de calendario, vista kanban
 
-### Detalles de la Tarea
+#### Información de Tareas
+- **Nombre de Tarea**: Identificador descriptivo
+- **Consulta de Búsqueda**: Parámetros de investigación originales
+- **Ideas Solicitadas**: Número de ideas solicitadas
+- **Conteo Generado**: Ideas realmente generadas
+- **Fecha de Creación**: Cuándo se inició la tarea
+- **Estado**: Estado de procesamiento actual
+- **Usuario**: Quién inició la tarea
 
-Haga clic en cualquier tarea para ver información detallada:
-- Configuración completa de la tarea
-- Mensajes de error (si aplica)
-- Marcas de tiempo de creación y finalización
-- Instrucciones del sistema utilizadas
+#### Acciones de Tareas
 
-### Acciones de Tareas
+**Ver Ideas**: Acceder a todas las ideas de contenido generadas
+**Reintentar**: Reiniciar tareas fallidas con los mismos parámetros
+**Duplicar**: Crear nueva tarea con parámetros similares
+**Archivar**: Mover tareas completadas al archivo
+**Eliminar**: Remover tarea y todas las ideas asociadas (Solo Admin)
 
-#### Reiniciar a Borrador
-- **Disponible**: Solo para tareas en estado "Error"
-- **Propósito**: Permite reintentar traducciones fallidas
-- **Efecto**: Cambia el estado de vuelta a "Borrador" para reprocesamiento
+### Gestión de Tareas de Generación
 
-**Nota**: Use esta acción cuando los problemas de la API de OpenAI se resuelvan o la configuración se corrija.
+#### Acceso a Tareas de Generación
+- **Ubicación**: Automatización de Marketing > Gestión de Tareas > Tareas de Generación
+- **Filtrado Avanzado**: Por estado, fecha, usuario, blog, etc.
 
-### Historial de Tareas
+#### Detalles de Tareas
+- **Fuente de Contenido**: Idea o tema personalizado usado
+- **Blog Objetivo**: Destino para contenido generado
+- **Número de Palabras**: Conteos objetivo y real de palabras
+- **Tiempo de Procesamiento**: Duración total de generación
+- **Publicación de Blog**: Enlace a publicación de blog creada (si está publicada)
 
-Desde cualquier formulario de publicación de blog:
-1. Abra el registro de la publicación de blog
-2. Navegue a la pestaña **"Historial de Traducción"**
-3. Vea todos los intentos de traducción para esa publicación
-4. Rastree el estado de traducción a lo largo del tiempo
+#### Acciones de Tareas
+
+**Vista Previa de Contenido**: Ver contenido generado antes de publicar
+**Publicar**: Crear publicación de blog desde contenido generado
+**Regenerar**: Crear nueva versión con parámetros diferentes
+**Editar Instrucciones**: Modificar y reiniciar con orientación actualizada
+**Exportar**: Descargar contenido para uso externo
+
+### Gestión de Estados
+
+#### Estados de Tareas
+
+**Borrador**:
+- Tarea creada pero aún no procesando
+- Puede editarse o cancelarse
+- En cola para procesamiento en segundo plano
+
+**En Progreso**:
+- Agente de IA trabajando activamente
+- No puede modificarse
+- Tiempo estimado de finalización mostrado
+
+**Hecho**:
+- Completado exitosamente
+- Contenido disponible para revisión
+- Listo para publicación o acción adicional
+
+**Error**:
+- Procesamiento falló
+- Detalles de error disponibles
+- Puede reintentarse o reconfigurarse
+
+#### Operaciones Masivas
+
+**Seleccionar Múltiples Tareas**:
+- Use casillas de verificación en vista de lista
+- Aplique acciones a múltiples tareas simultáneamente
+
+**Acciones Masivas Disponibles**:
+- **Archivar Seleccionadas**: Mover al estado archivo
+- **Eliminar Seleccionadas**: Remover múltiples tareas (Solo Admin)
+- **Reintentar Fallidas**: Reiniciar todas las tareas fallidas
+- **Exportar Reporte**: Generar reporte resumen de tareas
+
+### Monitoreo de Rendimiento
+
+#### Métricas de Rendimiento de Tareas
+- **Tasa de Éxito**: Porcentaje de finalizaciones exitosas
+- **Tiempo Promedio de Procesamiento**: Tiempo desde inicio hasta finalización
+- **Frecuencia de Errores**: Razones de falla más comunes
+- **Patrones de Uso**: Horas pico de uso y volúmenes
+
+#### Recomendaciones de Optimización
+- **Horas Pico**: Programar operaciones masivas durante horas de menor actividad
+- **Optimización de Consultas**: Refinar consultas de búsqueda para mejores resultados
+- **Selección de Agentes**: Usar agentes apropiados para tareas específicas
+- **Procesamiento por Lotes**: Agrupar tareas similares para eficiencia
 
 ---
 
-## Monitoreo de Uso
+## Monitoreo y Análisis
 
-La función de Monitoreo de Uso proporciona información sobre el consumo de la API de OpenAI, ayudándole a rastrear costos y optimizar el uso en todos los agentes de IA.
+### Descripción General
 
-### Acceso al Panel de Uso
+El sistema de monitoreo proporciona información detallada sobre el uso de OpenAI, costos y rendimiento del sistema para ayudar a optimizar las actividades de automatización de contenido.
 
-**Navegación**: Automatización de Marketing → Uso de OpenAI
+### Monitoreo de Uso
 
-### Características del Panel
+#### Acceso a Datos de Uso
+- **Ubicación**: Automatización de Marketing > Análisis > Historial de Solicitudes
+- **Vistas**: Resumen diario, registros detallados, análisis de costos
 
-#### 1. Estadísticas de Uso
-- **Consumo Diario de Tokens**: Tokens de solicitud, tokens de finalización y totales
-- **Seguimiento de Costos**: Monitorear patrones de gasto de API
-- **Tendencias de Uso**: Vista histórica de 30 días con gráficos
+#### Información de Registro de Solicitudes
+- **Marca de Tiempo**: Tiempo exacto de solicitud de API
+- **Modelo Usado**: Modelo de OpenAI para la solicitud
+- **Uso de Tokens**: Tokens de entrada, salida y totales
+- **Costo**: Costo calculado basado en precios del modelo
+- **Estado de Éxito**: Completado exitosamente o error
+- **Tarea Relacionada**: Enlace a tarea de contenido asociada
 
-#### 2. Sincronización Manual de Datos
-- **Botón Obtener Datos Más Recientes**: Actualizar manualmente las estadísticas de uso
-- **Sincronización Automática**: Trabajo cron diario actualiza datos de uso automáticamente
-- **Rango de Datos**: Hasta 90 días de datos históricos de uso
+#### Análisis de Patrones de Uso
+- **Horas Pico de Uso**: Identificar períodos ocupados
+- **Preferencias de Modelo**: Modelos más frecuentemente usados
+- **Tendencias de Costo**: Patrones de gasto diario, semanal, mensual
+- **Métricas de Eficiencia**: Tokens por operación exitosa
 
-#### 3. Análisis de Uso
-- **Desglose por Agente**: Ver qué agentes consumen más tokens
-- **Optimización de Costos**: Identificar oportunidades para reducir costos de API
-- **Patrones de Uso**: Rastrear horarios pico de uso y tendencias
+### Análisis de Costos
 
-### Entendiendo las Métricas de Uso
+#### Estadísticas de Modelo
+- **Ubicación**: Automatización de Marketing > Análisis > Estadísticas de Modelo
+- **Datos**: Desglose de uso y costo por modelo
 
-#### Tipos de Tokens
-- **Tokens de Solicitud**: Texto de entrada enviado a OpenAI (su contenido e instrucciones)
-- **Tokens de Finalización**: Respuestas generadas por IA (traducciones, contenido, ideas)
-- **Tokens Totales**: Suma de tokens de solicitud y finalización para facturación
+#### Características de Seguimiento de Costos
+- **Costos en Tiempo Real**: Gasto de sesión actual
+- **Totales Diarios**: Costos agregados diarios
+- **Comparación de Modelos**: Eficiencia de costo por modelo
+- **Alertas de Presupuesto**: Umbrales de gasto configurables
 
-#### Consejos de Gestión de Costos
-- Monitorear uso diario para mantenerse dentro de los límites de presupuesto
-- Usar gpt-3.5-turbo para operaciones rentables cuando la calidad lo permita
-- Optimizar instrucciones de agentes para reducir el uso de tokens de solicitud
-- Revisar patrones de uso para identificar oportunidades de optimización
+#### Consejos de Optimización de Costos
+1. **Selección de Modelo**: Use gpt-3.5-turbo para tareas simples
+2. **Procesamiento por Lotes**: Combine múltiples solicitudes cuando sea posible
+3. **Optimización de Consultas**: Consultas más específicas = respuestas más eficientes
+4. **Caché de Resultados**: Evite investigación duplicada en los mismos temas
 
-### Mejores Prácticas de Monitoreo de Uso
-- Revisar el panel de uso semanalmente para rastrear gastos
-- Configurar alertas internas basadas en consumo diario de tokens
-- Revisar eficiencia de agentes y optimizar instrucciones regularmente
-- Usar datos de uso para tomar decisiones informadas sobre selección de modelos
+### Análisis Avanzados
+
+#### Panel de Rendimiento
+- **Ubicación**: Automatización de Marketing > Análisis > Análisis Avanzados
+- **Métricas**: Tasas de éxito, tiempos de procesamiento, análisis de errores
+
+#### Indicadores Clave de Rendimiento (KPIs)
+- **Tasa de Generación de Contenido**: Publicaciones creadas por semana/mes
+- **Eficiencia de Investigación**: Ideas generadas vs. ideas usadas
+- **Éxito de Publicación**: Contenido generado realmente publicado
+- **Costo por Publicación**: Costo promedio para generar publicación de blog completa
+
+#### Monitoreo de Salud del Sistema
+- **Tiempos de Respuesta de API**: Rendimiento del servicio OpenAI
+- **Tasas de Error**: Frecuencia y tipos de fallas
+- **Estado de Cola**: Salud de procesamiento de tareas en segundo plano
+- **Carga del Sistema**: Utilización de recursos del servidor
+
+---
+
+## Administración
+
+### Descripción General
+
+Funciones administrativas para configuración del sistema, gestión de usuarios y operaciones de mantenimiento.
+
+### Configuración del Sistema
+
+#### Configuraciones de Integración OpenAI
+- **Gestión de Credenciales API**: Almacenamiento seguro y rotación
+- **Limitación de Velocidad**: Configurar limitación de solicitudes
+- **Configuraciones de Tiempo de Espera**: Valores de tiempo de espera de solicitud API
+- **Políticas de Reintento**: Lógica de reintento de solicitudes fallidas
+
+#### Configuración de Trabajos Cron
+- **Procesamiento de Investigación**: Programar para procesamiento de tareas de investigación
+- **Procesamiento de Generación**: Programar para generación de contenido
+- **Tareas de Limpieza**: Archivo automático de tareas antiguas
+- **Monitoreo**: Frecuencia de recolección de datos de uso
+
+### Gestión de Usuarios
+
+#### Gestión de Permisos
+- **Usuario de Marketing**: Creación de contenido y gestión de tareas
+- **Gerente de Marketing**: Acceso completo al sistema y configuración
+- **Administrador del Sistema**: Todos los permisos más mantenimiento del sistema
+
+#### Control de Acceso
+- **Propiedad de Tareas**: Los usuarios solo pueden gestionar sus propias tareas
+- **Recursos Compartidos**: Configuraciones de agentes de IA, acceso a blogs
+- **Rastro de Auditoría**: Registro completo de actividades para cumplimiento
+
+### Operaciones de Mantenimiento
+
+#### Gestión de Datos
+- **Archivo de Tareas**: Limpieza automática de tareas completadas antiguas
+- **Rotación de Registros**: Políticas de retención de registros de solicitudes
+- **Gestión de Caché**: Limpiar datos temporales y optimizar rendimiento
+- **Verificación de Respaldo**: Asegurar que la configuración crítica esté respaldada
+
+#### Verificaciones de Salud del Sistema
+- **Conectividad API**: Probar disponibilidad del servicio OpenAI
+- **Validación de Configuración**: Verificar que todas las configuraciones sean correctas
+- **Pruebas de Rendimiento**: Verificar tiempos de respuesta del sistema
+- **Revisión de Registros de Error**: Identificar y resolver problemas recurrentes
+
+#### Herramientas de Solución de Problemas
+- **Repetición de Solicitudes**: Reintentar operaciones fallidas con depuración
+- **Exportación de Configuración**: Respaldar configuraciones actuales del sistema
+- **Herramientas de Análisis de Registros**: Herramientas detalladas de investigación de errores
+- **Perfilado de Rendimiento**: Identificar cuellos de botella del sistema
 
 ---
 
 ## Solución de Problemas
 
-### Problemas Comunes
+### Problemas Comunes y Soluciones
 
-#### 1. Tareas de Traducción Atascadas en "Borrador"
-**Síntomas**: Las tareas permanecen en estado borrador por períodos extendidos
+#### Problemas de Configuración
 
-**Posibles Causas**:
-- Credenciales de OpenAI API no configuradas
-- Clave API inválida o expirada
-- Problemas de conectividad de red
-- Trabajo cron no ejecutándose
+**Problema**: "Clave API de OpenAI no configurada"
+- **Causa**: Clave API faltante o inválida
+- **Solución**: Configurar clave API válida en Configuraciones > Configuraciones Generales > Herramienta de Automatización de Marketing
+- **Verificación**: Probar conexión usando el botón "Probar Conexión API"
 
-**Soluciones**:
-- Verificar configuración de API en Ajustes
-- Verificar estado de cuenta OpenAI y créditos
-- Reiniciar servidor Odoo para restablecer trabajos cron
-- Verificar registros del servidor para errores específicos
+**Problema**: "ID de organización inválido"
+- **Causa**: Formato de ID de organización incorrecto o permisos
+- **Solución**: Verificar ID de organización del panel de OpenAI, asegurar formato apropiado (org-...)
+- **Nota**: El ID de organización es opcional pero recomendado para cuentas de equipo
 
-#### 2. La Traducción Falla con Errores de API
-**Síntomas**: Las tareas pasan a estado "Error" con mensajes relacionados con API
+**Problema**: "Modelo no disponible"
+- **Causa**: Modelo seleccionado no accesible con la clave API actual
+- **Solución**: Verificar disponibilidad del modelo en el panel de OpenAI, seleccionar modelo alternativo
+- **Respaldo**: Usar gpt-3.5-turbo como opción de respaldo confiable
 
-**Posibles Causas**:
-- Límites de velocidad de API excedidos
-- Créditos de OpenAI insuficientes
-- Selección de modelo inválida
-- Contenido demasiado grande para procesamiento
+#### Problemas de Procesamiento de Tareas
 
-**Soluciones**:
-- Esperar el restablecimiento del límite de velocidad (típicamente 1 minuto)
-- Agregar créditos a la cuenta de OpenAI
-- Cambiar a modelo disponible (gpt-3.5-turbo)
-- Dividir contenido grande en publicaciones más pequeñas
+**Problema**: Tareas de investigación atascadas en estado "Borrador"
+- **Causa**: Trabajo cron no ejecutándose o cola sobrecargada
+- **Solución**: Verificar trabajos cron del sistema, verificar que el procesamiento en segundo plano esté activo
+- **Corrección Manual**: Forzar procesamiento de tareas individuales desde gestión de tareas
+
+**Problema**: La generación de contenido produce resultados de baja calidad
+- **Causa**: Instrucciones poco claras, modelo inapropiado o contexto insuficiente
+- **Soluciones**:
+  - Proporcionar instrucciones más específicas y detalladas
+  - Probar configuración de agente de IA diferente
+  - Usar modelo de mayor calidad (gpt-4o en lugar de gpt-3.5-turbo)
+  - Incluir más contexto sobre audiencia objetivo y objetivos
+
+**Problema**: Tareas fallando con errores de tiempo de espera
+- **Causa**: Consultas complejas tardando demasiado en procesarse
+- **Soluciones**:
+  - Simplificar consultas de búsqueda o requisitos de contenido
+  - Aumentar configuraciones de tiempo de espera (Solo Admin)
+  - Dividir solicitudes complejas en partes más pequeñas
+  - Reintentar durante horas de menor actividad
+
+#### Problemas de Calidad de Contenido
+
+**Problema**: El contenido generado está fuera de tema o es irrelevante
+- **Soluciones**:
+  - Refinar consultas de búsqueda para ser más específicas
+  - Actualizar instrucciones de agente de IA para su industria/dominio
+  - Proporcionar contexto adicional en el campo de solicitud del usuario
+  - Revisar y mejorar proceso de aprobación de ideas de contenido
+
+**Problema**: El contenido carece de voz o estilo de marca
+- **Soluciones**:
+  - Crear configuración de agente de IA personalizada con directrices de marca
+  - Incluir requisitos de estilo en instrucciones adicionales
+  - Proporcionar ejemplos de contenido preferido en instrucciones del agente
+  - Revisar y editar contenido generado antes de publicar
+
+#### Problemas de Rendimiento
+
+**Problema**: Generación de contenido lenta
+- **Causas**: Alta carga de API, solicitudes complejas, horas pico de uso
+- **Soluciones**:
+  - Programar operaciones masivas durante horas de menor actividad
+  - Usar modelos más eficientes para tareas simples
+  - Optimizar procesamiento por lotes de solicitudes
+  - Monitorear estado del servicio OpenAI
+
+**Problema**: Costos altos o uso inesperado
+- **Soluciones**:
+  - Revisar análisis de uso para identificar operaciones costosas
+  - Optimizar instrucciones de agente de IA para ser más eficientes
+  - Usar modelos apropiados para complejidad de tareas
+  - Configurar alertas de costo y presupuestos
+  - Considerar procesamiento por lotes para tareas similares
+
+### Obtener Ayuda
+
+#### Recursos de Soporte Interno
+1. **Registros del Sistema**: Automatización de Marketing > Análisis > Historial de Solicitudes
+2. **Detalles de Error**: Disponibles en registros de tareas fallidas
+3. **Verificación de Configuración**: Verificar todas las configuraciones en panel de admin
+4. **Métricas de Rendimiento**: Monitorear panel de salud del sistema
+
+#### Soporte Externo
+- **Email**: support@soluttoconsulting.com
+- **Incluir**: Mensajes de error, IDs de tareas, detalles de configuración
+- **Tiempo de Respuesta**: 24-48 horas para problemas estándar
+- **Escalación**: Fallas críticas del sistema reciben soporte prioritario
+
+---
+
+## Mejores Prácticas
+
+### Optimización de Investigación de Contenido
+
+#### Formulación de Consultas
+1. **Sea Específico**: Incluya calificadores de industria, geográficos o demográficos
+2. **Use Términos Profesionales**: Jerga de la industria y términos técnicos mejoran resultados
+3. **Incluya Contexto**: Marcos de tiempo, audiencia objetivo, objetivos comerciales
+4. **Evite Ambigüedad**: Lenguaje claro e inequívoco produce mejores resultados
+
+#### Gestión de Ideas
+- **Revisión Regular**: Evaluar ideas generadas dentro de 48 horas
+- **Estándares de Calidad**: Establecer criterios para aprobar ideas
+- **Monitoreo de Tendencias**: Rastrear temas emergentes en su industria
+- **Análisis Competitivo**: Usar investigación para monitorear contenido de competidores
+
+### Excelencia en Generación de Contenido
+
+#### Optimización de Instrucciones
+- **Objetivos Claros**: Definir metas de contenido y llamadas a la acción
+- **Definición de Audiencia**: Especificar características del lector objetivo
+- **Directrices de Estilo**: Incluir requisitos de voz y tono de marca
+- **Preferencias de Estructura**: Delinear organización de contenido preferida
+
+#### Aseguramiento de Calidad
+- **Verificación de Hechos**: Verificar todas las afirmaciones y estadísticas
+- **Alineación de Marca**: Asegurar que el contenido coincida con mensajería de marca
+- **Optimización SEO**: Revisar palabras clave y meta descripciones
+- **Legibilidad**: Verificar flujo de contenido y accesibilidad
+
+### Eficiencia de Flujo de Trabajo
+
+#### Procesamiento por Lotes
+- **Temas Similares**: Agrupar consultas de investigación relacionadas
+- **Bloques de Tiempo**: Dedicar tiempos específicos para actividades de contenido
+- **Reutilización de Plantillas**: Estandarizar configuraciones de agentes exitosas
+- **Monitoreo de Progreso**: Verificaciones regulares del estado de tareas
+
+#### Gestión de Recursos
+- **Control de Costos**: Monitorear uso y optimizar selección de modelos
+- **Planificación de Tiempo**: Considerar retrasos de procesamiento en calendarios de contenido
+- **Calidad vs. Velocidad**: Equilibrar automatización con necesidades de revisión manual
+- **Coordinación de Equipo**: Asignación clara de tareas y responsabilidades
+
+### Mantenimiento del Sistema
+
+#### Actividades Regulares
+- **Semanal**: Revisar rendimiento de tareas y limpiar tareas completadas
+- **Mensual**: Analizar patrones de uso y optimizar configuraciones
+- **Trimestral**: Actualizar instrucciones de agente de IA basadas en resultados
+- **Anual**: Revisar seguridad de clave API y rotar credenciales
+
+#### Optimización de Rendimiento
+- **Monitorear Métricas**: Rastrear tasas de éxito y tiempos de procesamiento
+- **Actualizar Instrucciones**: Refinar configuraciones de agente de IA basadas en resultados
+- **Limpiar Datos**: Archivar tareas antiguas y mantener rendimiento del sistema
+- **Entrenamiento**: Mantener al equipo actualizado sobre nuevas características y mejores prácticas
+
+### Seguridad y Cumplimiento
+
+#### Protección de Datos
+- **Seguridad de Clave API**: Rotar claves regularmente, limitar acceso
+- **Revisión de Contenido**: Asegurar que el contenido generado cumpla requisitos de cumplimiento
+- **Rastros de Auditoría**: Mantener registros de todas las actividades del sistema
+- **Control de Acceso**: Revisión regular de permisos de usuario y niveles de acceso
+
+#### Estándares de Calidad
+- **Aprobación de Contenido**: Implementar proceso de revisión antes de publicación
+- **Directrices de Marca**: Asegurar que todo el contenido cumpla estándares de marca
+- **Cumplimiento Legal**: Revisar contenido para requisitos regulatorios
+- **Prevención de Plagio**: Verificar originalidad del contenido generado
+
+---
+
+## Referencias Externas
+
+### Ejemplos del Núcleo de Odoo
+- **Estructura de UI de Configuraciones**: `odoo-src/odoo/addons/base/views/res_config_settings_views.xml` - Patrones de ancla de configuraciones
+- **Organización de Menús**: `odoo-src/addons/website/views/website_menus.xml` - Ejemplos de jerarquía de menús
+
+### Dependencias Externas
+- **OpenAI Agents SDK**: [https://github.com/openai/openai-agents](https://github.com/openai/openai-agents) (v0.2.9+)
+- **Documentación de API OpenAI**: [https://platform.openai.com/docs](https://platform.openai.com/docs)
+- **Referencia de API de Uso**: [https://platform.openai.com/docs/api-reference/usage](https://platform.openai.com/docs/api-reference/usage)
+
+### Límites de Velocidad y Tiempos de Espera
+- **Límites de Velocidad de API**: Límites basados en niveles por suscripción de OpenAI
+- **Tiempos de Espera de Solicitudes**: 30-60 segundos para generación de contenido
+- **Políticas de Reintento**: Retroceso exponencial para solicitudes fallidas
+- **Manejo de Errores**: Captura completa de errores y retroalimentación al usuario
+
+---
+
+*Última Actualización: 20 de Septiembre de 2025 | Versión: 18.0.1.0.1*
 
 #### 3. Calidad de Traducción Pobre
 **Síntomas**: Las traducciones son incorrectas o inapropiadas

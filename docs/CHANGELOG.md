@@ -5,6 +5,62 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [18.0.1.0.1] - 2025-09-20 (Documentation Audit & Module Cleanup)
+
+### Fixed - Module Structure Cleanup
+- **Translation Feature Removal**: Completely removed translation functionality from module
+  - Removed `sc.translation.task` model and all related files
+  - Cleaned up `sc_translation_task.py`, translation wizard files, and XML views
+  - Updated `__manifest__.py` to remove translation-related dependencies and data files
+  - Eliminated empty XML files and unused translation views
+- **Model Consolidation**: Streamlined module structure to focus on content automation
+  - Removed `sc.usage.statistics` model (functionality integrated into monitoring dashboard)
+  - Cleaned up unused model files and references
+  - Updated security ACL files to remove obsolete model permissions
+  - Simplified module dependencies and data file structure
+
+### Enhanced - Comprehensive Documentation Audit
+- **Documentation Coverage Matrix**: Created complete feature-to-documentation mapping
+  - New file: `docs/coverage-matrix.md` with comprehensive feature coverage analysis
+  - Verified all v18.0.1.0.1 features are properly documented
+  - Identified and removed references to deprecated translation workflows
+  - Validated technical and functional documentation alignment with actual functionality
+- **Functional Documentation Updates**: Enhanced end-user documentation
+  - Updated Spanish functional guide (`docs/functional/guide.es.md`) to remove translation references
+  - Revised workflow documentation to reflect current content automation features
+  - Enhanced troubleshooting sections with current functionality
+  - Improved configuration guides with updated settings UI screenshots
+- **Technical Documentation Regeneration**: Complete technical guide overhaul
+  - Regenerated English technical guide (`docs/technical/guide.en.md`) with current architecture
+  - Updated Spanish technical guide (`docs/technical/guide.es.md`) with v18.0.1.0.1 features
+  - Enhanced API integration patterns and development guidelines
+  - Added comprehensive security implementation and customization guides
+  - Updated external references to use stable anchors from Odoo core examples
+
+### Enhanced - Version-Aware Documentation
+- **Version Scope Management**: Implemented version-specific documentation approach
+  - All documentation now clearly marked with version 18.0.1.0.1
+  - Feature descriptions include version context and change notes
+  - Removed outdated feature references and version inconsistencies
+  - Added version changelog integration with feature documentation
+- **External References Documentation**: Enhanced developer guidance
+  - Added core Odoo examples section with specific file paths and anchor IDs
+  - Documented stable settings view inheritance patterns
+  - Referenced official API documentation with version compatibility notes
+  - Enhanced troubleshooting with version-specific solutions
+
+### Technical - Module Quality Improvements
+- **Manifest File Optimization**: Cleaned up module dependencies and data files
+  - Removed references to deleted translation and usage statistics files
+  - Updated dependency list to reflect current functionality
+  - Cleaned up data file references in `__manifest__.py`
+  - Optimized module loading with accurate file structure
+- **Code Structure Validation**: Verified module integrity after cleanup
+  - Confirmed all referenced files exist and are properly formatted
+  - Validated model relationships and dependencies
+  - Checked view references and menu structures
+  - Ensured security rules align with current model structure
+
 ## [18.0.1.0.1] - 2025-09-16 (Critical Monitoring Fixes)
 
 ### Fixed - Image Generation Monitoring

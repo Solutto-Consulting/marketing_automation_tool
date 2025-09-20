@@ -1,123 +1,514 @@
-# Guía Técnica: Herramienta de Gestión de Contenido para Odoo v18.0.1.0.0
+# Guía Técnica para Desarrolladores: Herramienta de Gestión de Contenido v18.0.1.0.1
 
 ## Tabla de Contenidos
-1. [Descripción General de la Arquitectura](#descripción-general-de-la-arquitectura)
-2. [Estructura del Módulo](#estructura-del-módulo)
-3. [Modelos de Datos](#modelos-de-datos)
-4. [Puntos de Integración](#puntos-de-integración)
-5. [Implementación de API](#implementación-de-api)
-6. [Marco de Seguridad](#marco-de-seguridad)
-7. [Gestión de Configuración](#gestión-de-configuración)
-8. [Procesamiento en Segundo Plano](#procesamiento-en-segundo-plano)
-9. [Manejo de Errores](#manejo-de-errores)
-10. [Implementación Específica de la Versión](#implementación-específica-de-la-versión)
-11. [Pautas de Desarrollo](#pautas-de-desarrollo)
-12. [Marco de Pruebas](#marco-de-pruebas)
+1. [Visión General de la Arquitectura](#visión-general-de-la-arquitectura)
+2. [Configuración del Entorno de Desarrollo](#configuración-del-entorno-de-desarrollo)
+3. [Referencia de Modelos Principales](#referencia-de-modelos-principales)
+4. [Patrones de Integración de API](#patrones-de-integración-de-api)
+5. [Desarrollo de Vistas e Interfaces](#desarrollo-de-vistas-e-interfaces)
+6. [Procesamiento en Segundo Plano](#procesamiento-en-segundo-plano)
+7. [Implementación de Seguridad](#implementación-de-seguridad)
+8. [Personalización y Extensión](#personalización-y-extensión)
+9. [Pruebas y Aseguramiento de Calidad](#pruebas-y-aseguramiento-de-calidad)
+10. [Despliegue y Mantenimiento](#despliegue-y-mantenimiento)
 
 ---
 
-## Descripción General de la Arquitectura
+## Visión General de la Arquitectura
 
-La Herramienta de Gestión de Contenido para Odoo v18.0.1.0.0 implementa una arquitectura modular para la traducción de contenido impulsada por IA, construida sobre los estándares de Odoo 18.0 e integrada con los modelos de lenguaje de OpenAI.
+### Arquitectura del Sistema
 
-### Componentes del Sistema
+La Herramienta de Gestión de Contenido v18.0.1.0.1 sigue una arquitectura modular basada en agentes diseñada para escalabilidad y mantenibilidad.
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│ Interfaz Usuario│    │ Lógica Negocio  │    │  APIs Externas  │
-│                 │    │                 │    │                 │
-│ • Lista Posts   │    │ • Tareas de     │    │ • API OpenAI    │
-│   Blog          │◄──►│   Traducción    │◄──►│ • Lista Modelos │
-│ • Asistente     │    │ • Gestor Tareas │    │ • Ejecución     │
-│   Traducción    │    │ • Trabajos Cron │    │   Traducción    │
-│ • Vistas Tareas │    │                 │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │  Capa de Datos  │
-                    │                 │
-                    │ • sc.translation│
-                    │   .task         │
-                    │ • blog.post     │
-                    │   (extendido)   │
-                    │ • res.config    │
-                    │   .settings     │
-                    └─────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                   Capa de Interfaz de Usuario               │
+├─────────────────────────────────────────────────────────────┤
+│  IU Configuración │  Asistentes │  Vistas (Lista/Form/Kanban)│
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                   Capa de Lógica de Negocio                 │
+├─────────────────────────────────────────────────────────────┤
+│  Ideas Contenido │ Tareas Generación │ Config Agentes │ Utils│
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                    Capa de Integración                      │
+├─────────────────────────────────────────────────────────────┤
+│     SDK Agentes OpenAI    │    Lector Contenido Web        │
+│     Registro Solicitudes  │    Monitoreo Uso               │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                     Servicios Externos                      │
+├─────────────────────────────────────────────────────────────┤
+│      API OpenAI          │      APIs Búsqueda Web         │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Principios de Diseño Clave (v18.0.1.0.0)
-- **Cumplimiento Odoo 18.0**: Sintaxis de vista moderna y atributos condicionales
-- **Procesamiento Asíncrono**: Ejecución de traducción no bloqueante
-- **Recuperación de Errores**: Capacidades de reinicio manual de tareas
-- **Seguridad Primero**: Almacenamiento cifrado de credenciales y controles de acceso
-- **Extensibilidad**: Base para futuras características de automatización
+### Patrones de Diseño Clave
+
+#### 1. Procesamiento Basado en Agentes
+- **Agente de Investigación de Contenido**: Especializado en búsqueda web y descubrimiento de contenido
+- **Agente de Generación de Contenido**: Optimizado para creación y formato de artículos de blog
+- **Instrucciones Configurables**: Comportamiento personalizable por agente vía prompts del sistema
+
+#### 2. Métodos de Modelo Primero
+Toda la lógica de negocio se implementa en métodos de modelo en lugar de acciones del servidor
+
+#### 3. Procesamiento Asíncrono en Segundo Plano
+- **Trabajos Cron**: Procesamiento separado para tareas de investigación y generación
+- **Gestión de Estados**: Transiciones claras de estado (draft → in_progress → done/error)
+- **Aislamiento de Errores**: Fallos individuales de tareas no afectan el procesamiento por lotes
+
+#### 4. Registro Integral
+- **Registro de Solicitudes**: Todas las llamadas a la API de OpenAI registradas con seguimiento de costos
+- **Seguimiento de Errores**: Captura detallada de errores para resolución de problemas
+- **Monitoreo de Uso**: Análisis en tiempo real de costos y uso
+
+### Dependencias del Módulo
+
+#### Dependencias Principales de Odoo
+- `base`: Framework principal de Odoo
+- `mail`: Soporte para chatter y hilos
+- `website`: Integración de sitio web y blog
+- `website_blog`: Creación y gestión de artículos de blog
+
+#### Dependencias Externas
+- `openai-agents` (>=0.2.9): SDK Agentes OpenAI para operaciones IA
+- Librerías estándar de Python: `json`, `logging`, `datetime`, `requests`
+---
+
+## Configuración del Entorno de Desarrollo
+
+### Prerrequisitos
+
+#### Requisitos del Sistema
+- Python 3.8+ con pip
+- Odoo 18.0 Community o Enterprise
+- Git para control de versiones
+- Editor de texto con soporte Python
+
+#### Acceso a API
+- Cuenta API OpenAI con acceso de organización
+- Clave API con límites de uso suficientes
+- (Opcional) Clave API de administrador para monitoreo de uso
+
+### Pasos de Instalación
+
+#### 1. Clonar y Configurar Módulo
+```bash
+# Navegar al directorio de addons personalizados
+cd /ruta/a/odoo/custom-addons
+
+# Clonar o copiar el módulo
+cp -r /fuente/sc_marketing_automation_tool .
+
+# Instalar dependencias Python
+pip install -r sc_marketing_automation_tool/requirements.txt
+```
+
+#### 2. Instalar Dependencias
+```bash
+# Instalar SDK Agentes OpenAI
+pip install openai-agents>=0.2.9
+
+# Instalar requisitos adicionales si es necesario
+pip install requests beautifulsoup4 lxml
+```
+
+#### 3. Configurar Odoo
+```bash
+# Actualizar Odoo con nuevo módulo
+./odoo-bin -d tu_base_datos -i sc_marketing_automation_tool --stop-after-init
+
+# O actualizar instalación existente
+./odoo-bin -d tu_base_datos -u sc_marketing_automation_tool --stop-after-init
+```
+
+#### 4. Configurar Credenciales API
+1. Navegar a Configuración > Configuración General > Herramienta de Automatización de Marketing
+2. Ingresar clave API OpenAI e ID de organización
+3. Probar conexión usando validación proporcionada
+4. Configurar instrucciones de agentes IA
 
 ---
 
-## Estructura del Módulo
+## Referencia de Modelos Principales
 
-### Organización de Archivos
-```
-sc_marketing_automation_tool/
-├── __init__.py                    # Inicialización del módulo
-├── __manifest__.py                # Manifiesto del módulo (v18.0.1.0.0)
-├── models/
-│   ├── __init__.py
-│   ├── res_config_settings.py     # Configuración OpenAI
-│   ├── sc_translation_task.py     # Modelo de tarea de traducción
-│   └── blog_post.py               # Extensiones de post de blog
-├── wizard/
-│   ├── __init__.py
-│   └── sc_translate_blog_post_wizard.py  # Asistente de traducción
-├── views/
-│   ├── res_config_settings_views.xml     # UI de configuración
-│   ├── sc_translation_task_views.xml     # Vistas de gestión de tareas
-│   ├── blog_post_views.xml               # Mejoras de post de blog
-│   └── sc_translate_blog_post_wizard_views.xml  # UI del asistente
-├── security/
-│   ├── ir.model.access.csv        # Controles de acceso a modelos
-│   └── security.xml               # Grupos y reglas de registro
-├── data/
-│   ├── ir_actions_server.xml      # Acciones de servidor
-│   ├── ir_cron.xml                # Trabajos programados
-│   └── menu.xml                   # Estructura de menú
-├── i18n/
-│   └── es_ES.po                   # Traducciones al español
-├── docs/                          # Documentación
-└── requirements.txt               # Dependencias externas
-```
+### Modelo de Idea de Contenido (`sc.content.idea`)
 
-### Matriz de Dependencias
-| Dependencia | Tipo | Propósito | Restricción de Versión |
-|-------------|------|-----------|------------------------|
-| base | Núcleo Odoo | Modelos base | 18.0+ |
-| website | Núcleo Odoo | Integración sitio web | 18.0+ |
-| website_blog | Núcleo Odoo | Modelo post de blog | 18.0+ |
-| mail | Núcleo Odoo | Integración chatter | 18.0+ |
-| openai-agents | Externa | SDK OpenAI | 0.2.9+ |
+#### Propósito
+Almacena ideas de contenido descubiertas desde tareas de investigación con metadatos y estado de aprobación.
 
----
-
-## Modelos de Datos
-
-### sc.translation.task
-
-**Propósito**: Rastrea solicitudes individuales de traducción y su estado de ejecución.
-
+#### Campos Principales
 ```python
-class SCTranslationTask(models.Model):
-    _name = 'sc.translation.task'
-    _description = 'Tarea de Traducción IA'
-    _inherit = ['mail.thread']  # Integración chatter
+class ScContentIdea(models.Model):
+    _name = 'sc.content.idea'
+    _description = 'Idea de Contenido'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'create_date desc'
 
     # Campos Principales
+    title = fields.Char(string='Título del Artículo', required=True, tracking=True)
+    url = fields.Char(string='URL Fuente', required=True)
+    published_date = fields.Date(string='Fecha de Publicación')
+    summary = fields.Text(string='Resumen', required=True)
+    
+    # Campos de Flujo de Trabajo  
+    state = fields.Selection([
+        ('pending', 'Pendiente de Revisión'),
+        ('approved', 'Aprobado'),
+        ('rejected', 'Rechazado'),
+        ('used', 'Usado para Contenido'),
+        ('archived', 'Archivado')
+    ], default='pending', tracking=True)
+```
+
+### Modelo de Tarea de Investigación de Contenido (`sc.content.idea.task`)
+
+#### Propósito
+Gestiona tareas de investigación en segundo plano que generan múltiples ideas de contenido.
+
+#### Gestión de Estados
+```python
+state = fields.Selection([
+    ('draft', 'Borrador'),           # Creado, en cola para procesamiento
+    ('in_progress', 'Procesando'),   # Actualmente siendo procesado
+    ('done', 'Completado'),          # Completado exitosamente
+    ('error', 'Error')               # Falló con error
+], default='draft', tracking=True)
+```
+
+### Modelo de Tarea de Generación de Contenido (`sc.content.generation.task`)
+
+#### Propósito
+Maneja la generación de artículos de blog desde ideas de contenido o temas personalizados.
+
+#### Campos Clave
+```python
+class ScContentGenerationTask(models.Model):
+    _name = 'sc.content.generation.task'
+    _description = 'Tarea de Generación de Contenido'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
     name = fields.Char(string='Nombre de Tarea', required=True)
-    blog_post_id = fields.Many2one('blog.post', required=True, ondelete='cascade')
-    target_lang_id = fields.Many2one('res.lang', required=True)
-    system_instructions = fields.Text(string='Instrucciones del Sistema')
+    content_idea_id = fields.Many2one('sc.content.idea', string='Idea de Contenido')
+    custom_topic = fields.Char(string='Tema Personalizado')
+    target_blog_id = fields.Many2one('blog.blog', string='Blog Objetivo', required=True)
+    generated_blog_post_id = fields.Many2one('blog.post', string='Artículo Generado')
+    state = fields.Selection([
+        ('draft', 'Borrador'),
+        ('in_progress', 'Procesando'),
+        ('done', 'Completado'),
+        ('error', 'Error')
+    ], default='draft', tracking=True)
+```
+
+### Modelo de Configuración de Agente IA (`sc.ai.agent.config`)
+
+#### Propósito
+Almacena configuraciones de agentes IA con instrucciones personalizables y configuraciones de modelo.
+
+#### Estructura de Configuración
+```python
+class ScAiAgentConfig(models.Model):
+    _name = 'sc.ai.agent.config'
+    _description = 'Configuración de Agente IA'
+
+    name = fields.Char(string='Nombre de Configuración', required=True)
+    agent_type = fields.Selection([
+        ('research', 'Investigación de Contenido'),
+        ('generation', 'Generación de Contenido')
+    ], required=True)
+    
+    model_id = fields.Many2one('sc.openai.models', string='Modelo OpenAI')
+    instructions = fields.Text(string='Instrucciones del Agente', required=True)
+    
+    # Parámetros de configuración
+    temperature = fields.Float(string='Temperatura', default=0.7)
+    max_tokens = fields.Integer(string='Tokens Máximos', default=2000)
+```
+
+---
+
+## Patrones de Integración de API
+
+### Integración SDK Agentes OpenAI
+
+#### Inicialización de Agente
+```python
+from openai_agents import Agent, WebSearchTool
+
+def _initialize_research_agent(self, config):
+    """Inicializar agente de investigación con capacidades de búsqueda web"""
+    agent = Agent(
+        model=config.model_id.name,
+        instructions=config.instructions,
+        tools=[WebSearchTool()],
+        temperature=config.temperature
+    )
+    return agent
+```
+
+#### Patrón de Manejo de Errores
+```python
+def _safe_api_call(self, func, *args, **kwargs):
+    """Envolvente para llamadas seguras a API OpenAI con lógica de reintento"""
+    max_retries = 3
+    retry_delay = 1
+    
+    for attempt in range(max_retries):
+        try:
+            result = func(*args, **kwargs)
+            
+            # Registrar solicitud exitosa
+            self._log_api_request(success=True, **result.usage)
+            
+            return result
+            
+        except openai.RateLimitError as e:
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay * (2 ** attempt))  # Retroceso exponencial
+                continue
+            raise
+            
+        except openai.AuthenticationError as e:
+            _logger.error(f"Autenticación OpenAI falló: {e}")
+            raise UserError("Autenticación API OpenAI falló. Por favor verifique su clave API.")
+            
+        except Exception as e:
+            # Registrar solicitud fallida
+            self._log_api_request(success=False, error=str(e))
+            raise
+```
+
+---
+
+## Desarrollo de Vistas e Interfaces
+
+### Estándares de Vistas Odoo 18.0
+
+#### Patrón de Vista Lista
+```xml
+<!-- Siempre usar <list> en lugar de <tree> en Odoo 18.0 -->
+<record id="view_sc_content_idea_list" model="ir.ui.view">
+    <field name="name">sc.content.idea.list</field>
+    <field name="model">sc.content.idea</field>
+    <field name="arch" type="xml">
+        <list default_order="create_date desc">
+            <field name="title"/>
+            <field name="published_date"/>
+            <field name="state" decoration-info="state=='pending'" 
+                               decoration-success="state=='approved'"
+                               decoration-danger="state=='rejected'"/>
+            <field name="create_date"/>
+        </list>
+    </field>
+</record>
+```
+
+#### Vista Kanban con Grupos
+```xml
+<record id="view_sc_content_generation_task_kanban" model="ir.ui.view">
+    <field name="name">sc.content.generation.task.kanban</field>
+    <field name="model">sc.content.generation.task</field>
+    <field name="arch" type="xml">
+        <kanban default_group_by="state" class="o_kanban_small_column">
+            <field name="name"/>
+            <field name="content_idea_id"/>
+            <field name="target_blog_id"/>
+            <field name="state"/>
+            <templates>
+                <t t-name="kanban-card">
+                    <div class="oe_kanban_content">
+                        <div class="oe_kanban_details">
+                            <strong><field name="name"/></strong>
+                            <div t-if="record.content_idea_id.raw_value">
+                                Idea: <field name="content_idea_id"/>
+                            </div>
+                            <div>
+                                Blog: <field name="target_blog_id"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </templates>
+        </kanban>
+    </field>
+</record>
+```
+
+---
+
+## Procesamiento en Segundo Plano
+
+### Configuración de Trabajos Cron
+
+#### Cron de Procesamiento de Investigación
+```xml
+<record id="cron_process_research_tasks" model="ir.cron">
+    <field name="name">Procesar Tareas de Investigación de Contenido</field>
+    <field name="model_id" ref="model_sc_content_idea_task"/>
+    <field name="state">code</field>
+    <field name="code">model.action_process_research_tasks()</field>
+    <field name="interval_number">5</field>
+    <field name="interval_type">minutes</field>
+    <field name="numbercall">-1</field>
+    <field name="active" eval="True"/>
+</record>
+```
+
+#### Procesamiento por Lotes
+```python
+@api.model
+def action_process_research_tasks(self):
+    """Procesar tareas de investigación en lotes"""
+    # Obtener tareas pendientes (límite para rendimiento)
+    pending_tasks = self.search([
+        ('state', '=', 'draft')
+    ], limit=10, order='create_date asc')
+    
+    for task in pending_tasks:
+        try:
+            task._process_research_task()
+            self.env.cr.commit()  # Confirmar cada tarea individualmente
+        except Exception as e:
+            self.env.cr.rollback()  # Retroceder solo esta tarea
+            _logger.error(f"Falló procesar tarea de investigación {task.id}: {e}")
+```
+
+---
+
+## Implementación de Seguridad
+
+### Listas de Control de Acceso (ACL)
+
+#### Permisos de Modelo
+```csv
+# ir.model.access.csv
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sc_content_idea_manager,sc.content.idea manager,model_sc_content_idea,group_marketing_manager,1,1,1,1
+access_sc_content_idea_user,sc.content.idea user,model_sc_content_idea,group_marketing_user,1,1,1,0
+```
+
+#### Grupos de Seguridad
+```xml
+<record id="group_marketing_user" model="res.groups">
+    <field name="name">Usuario de Marketing</field>
+    <field name="category_id" ref="base.module_category_marketing"/>
+    <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+</record>
+```
+
+---
+
+## Personalización y Extensión
+
+### Extensión de Configuración de Agentes
+
+#### Campos Personalizados
+```python
+class ScAiAgentConfig(models.Model):
+    _inherit = 'sc.ai.agent.config'
+    
+    # Agregar campos específicos de industria
+    industry_focus = fields.Selection([
+        ('technology', 'Tecnología'),
+        ('healthcare', 'Salud'), 
+        ('finance', 'Finanzas'),
+        ('education', 'Educación'),
+        ('retail', 'Comercio Minorista')
+    ], string='Enfoque Industrial')
+```
+
+---
+
+## Pruebas y Aseguramiento de Calidad
+
+### Marco de Pruebas Unitarias
+
+#### Estructura de Pruebas
+```python
+from odoo.tests.common import TransactionCase
+
+class TestContentIdea(TransactionCase):
+    
+    def test_content_idea_creation(self):
+        """Probar creación de idea de contenido"""
+        idea = self.env['sc.content.idea'].create({
+            'title': 'Artículo de Prueba',
+            'url': 'https://ejemplo.com/prueba',
+            'summary': 'Resumen de prueba'
+        })
+        
+        self.assertEqual(idea.state, 'pending')
+        self.assertEqual(idea.title, 'Artículo de Prueba')
+```
+
+---
+
+## Despliegue y Mantenimiento
+
+### Lista de Verificación de Despliegue
+- [ ] Respaldar base de datos existente
+- [ ] Instalar/actualizar módulo en entorno de staging
+- [ ] Ejecutar suite completa de pruebas
+- [ ] Configurar credenciales API de producción
+- [ ] Verificar que trabajos cron estén activos
+- [ ] Probar flujos de trabajo principales de extremo a extremo
+- [ ] Monitorear logs para errores
+
+### Herramientas de Monitoreo
+
+#### Verificación de Salud del Sistema
+```python
+@api.model
+def system_health_check(self):
+    """Verificación integral de salud del sistema"""
+    health_status = {
+        'openai_connection': self._test_openai_connection(),
+        'pending_tasks': self._count_pending_tasks(),
+        'error_rate': self._calculate_error_rate(),
+        'last_successful_run': self._get_last_successful_run()
+    }
+    
+    # Registrar estado de salud
+    _logger.info(f"Verificación de salud del sistema: {health_status}")
+    
+    return health_status
+```
+
+---
+
+## Referencias Externas
+
+### Ejemplos del Núcleo de Odoo
+- **Patrones de IU de Configuraciones**: `odoo-src/odoo/addons/base/views/res_config_settings_views.xml`
+- **Integración Mail Thread**: `odoo-src/addons/mail/models/mail_thread.py`
+- **Ejemplos de Trabajos Cron**: `odoo-src/addons/base/data/ir_cron_data.xml`
+- **Patrones de Reglas de Seguridad**: `odoo-src/addons/base/security/ir_rule.xml`
+
+### Documentación de API Externa
+- **SDK Agentes OpenAI**: [https://github.com/openai/openai-agents](https://github.com/openai/openai-agents) (v0.2.9+)
+- **Referencia API OpenAI**: [https://platform.openai.com/docs/api-reference](https://platform.openai.com/docs/api-reference)
+- **Endpoints API de Uso**: [https://platform.openai.com/docs/api-reference/usage](https://platform.openai.com/docs/api-reference/usage)
+
+### Librerías Python
+- **Requests**: Cliente HTTP para web scraping y llamadas API
+- **BeautifulSoup4**: Análisis HTML para extracción de contenido
+- **JSON**: Serialización de datos para respuestas API
+
+### Límites de Tasa y Mejores Prácticas
+- **Límites de Tasa API**: Límites basados en nivel según nivel de suscripción OpenAI
+- **Políticas de Reintento**: Retroceso exponencial con máximo 3 intentos
+- **Configuraciones de Timeout**: 30-60 segundos para solicitudes de generación de contenido
+- **Manejo de Errores**: Categorización integral de errores y retroalimentación al usuario
+
+---
+
+*Versión de documentación técnica: 18.0.1.0.1 | Última actualización: 20 de septiembre, 2025*
     
     # Gestión de Estado
     state = fields.Selection([

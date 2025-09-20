@@ -1,53 +1,1540 @@
-# Technical Guide: Content Management Tool for Odoo v18.0.1.0.1
+# Technical Developer Guide: Content Management Tool v18.0.1.0.1
 
 ## Table of Contents
 1. [Architecture Overview](#architecture-overview)
-2. [Agent-Based Architecture](#agent-based-architecture)
-3. [Module Structure](#module-structure)
-4. [Data Models](#data-models)
-5. [Integration Points](#integration-points)
-6. [OpenAI Agents SDK Implementation](#openai-agents-sdk-implementation)
-7. [API Implementation](#api-implementation)
-8. [Security Framework](#security-framework)
-9. [Configuration Management](#configuration-management)
-10. [Multi-Agent Background Processing](#multi-agent-background-processing)
-11. [Error Handling](#error-handling)
-12. [Version-Specific Implementation](#version-specific-implementation)
-13. [Development Guidelines](#development-guidelines)
-14. [Testing Framework](#testing-framework)
+2. [Development Environment Setup](#development-environment-setup)
+3. [Core Models Reference](#core-models-reference)
+4. [API Integration Patterns](#api-integration-patterns)
+5. [View and Interface Development](#view-and-interface-development)
+6. [Background Processing](#background-processing)
+7. [Security Implementation](#security-implementation)
+8. [Customization and Extension](#customization-and-extension)
+9. [Testing and Quality Assurance](#testing-and-quality-assurance)
+10. [Deployment and Maintenance](#deployment-and-maintenance)
 
 ---
 
 ## Architecture Overview
 
-The Content Management Tool for Odoo v18.0.1.0.1 implements a sophisticated **multi-agent architecture** for AI-powered content strategy, representing a significant evolution from the translation-focused v18.0.1.0.0 to a comprehensive content management platform.
+### System Architecture
 
-### System Components (v18.0.1.0.1)
+The Content Management Tool v18.0.1.0.1 follows a modular, agent-based architecture designed for scalability and maintainability.
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   User Interface │    │  Agent Layer    │    │  External APIs  │
-│                 │    │                 │    │                 │
-│ • Agent Config  │    │ • Research      │    │ • OpenAI API    │
-│ • Content Ideas │◄──►│   Agent         │◄──►│ • WebSearchTool │
-│ • Generation    │    │ • Generation    │    │ • Usage API     │
-│   Wizards       │    │   Agent         │    │ • Models API    │
-│ • Image Config  │    │ • Image Gen     │    │ • Direct Images │
-│ • Usage Monitor │    │   Agent         │    │   API (gpt-i-1) │
-│ • Task Mgmt     │    │ • Translation   │    └─────────────────┘
-└─────────────────┘    │   Agent         │             │
-         │              └─────────────────┘             │
-         └───────────────────────┼──────────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │   Data Layer    │
-                    │                 │
-                    │ • sc.content    │
-                    │   .idea         │
-                    │ • sc.content    │
-                    │   .idea.task    │
-                    │ • sc.content    │
-                    │   .generation   │
+┌─────────────────────────────────────────────────────────────┐
+│                    User Interface Layer                     │
+├─────────────────────────────────────────────────────────────┤
+│  Settings UI  │  Wizards  │  Views (List/Form/Kanban)      │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                   Business Logic Layer                      │
+├─────────────────────────────────────────────────────────────┤
+│  Content Ideas │ Generation Tasks │ Agent Configs │ Utils   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                  Integration Layer                          │
+├─────────────────────────────────────────────────────────────┤
+│     OpenAI Agents SDK    │    Web Content Reader           │
+│     Request Logging      │    Usage Monitoring             │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                   External Services                         │
+├─────────────────────────────────────────────────────────────┤
+│      OpenAI API          │      Web Search APIs            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Key Design Patterns
+
+#### 1. Agent-Based Processing
+- **Content Research Agent**: Specialized for web search and content discovery
+- **Content Generation Agent**: Optimized for blog post creation and formatting
+- **Configurable Instructions**: Customizable behavior per agent via system prompts
+
+#### 2. Model Methods First
+All business logic is implemented in model methods rather than server actions:
+```python
+# In models, not server actions
+@api.model
+def action_process_research_tasks(self):
+    """Process pending research tasks in background"""
+    tasks = self.search([('state', '=', 'draft')], limit=10)
+    for task in tasks:
+        task._process_research_task()
+```
+
+#### 3. Async Background Processing
+- **Cron Jobs**: Separate processing for research and generation tasks
+- **State Management**: Clear state transitions (draft → in_progress → done/error)
+- **Error Isolation**: Individual task failures don't affect batch processing
+
+#### 4. Comprehensive Logging
+- **Request Logging**: All OpenAI API calls logged with cost tracking
+- **Error Tracking**: Detailed error capture for troubleshooting
+- **Usage Monitoring**: Real-time cost and usage analytics
+
+### Module Dependencies
+
+#### Core Odoo Dependencies
+- `base`: Core Odoo framework
+- `mail`: Chatter and threading support
+- `website`: Website and blog integration
+- `website_blog`: Blog post creation and management
+
+#### External Dependencies
+- `openai-agents` (>=0.2.9): OpenAI Agents SDK for AI operations
+- Python standard libraries: `json`, `logging`, `datetime`, `requests`
+
+---
+
+## Development Environment Setup
+
+### Prerequisites
+
+#### System Requirements
+- Python 3.8+ with pip
+- Odoo 18.0 Community or Enterprise
+- Git for version control
+- Text editor with Python support
+
+#### API Access
+- OpenAI API account with organization access
+- API key with sufficient usage limits
+- (Optional) Admin API key for usage monitoring
+
+### Installation Steps
+
+#### 1. Clone and Setup Module
+```bash
+# Navigate to custom addons directory
+cd /path/to/odoo/custom-addons
+
+# Clone or copy the module
+cp -r /source/sc_marketing_automation_tool .
+
+# Install Python dependencies
+pip install -r sc_marketing_automation_tool/requirements.txt
+```
+
+#### 2. Install Dependencies
+```bash
+# Install OpenAI Agents SDK
+pip install openai-agents>=0.2.9
+
+# Install additional requirements if needed
+pip install requests beautifulsoup4 lxml
+```
+
+#### 3. Configure Odoo
+```bash
+# Update Odoo with new module
+./odoo-bin -d your_database -i sc_marketing_automation_tool --stop-after-init
+
+# Or upgrade existing installation
+./odoo-bin -d your_database -u sc_marketing_automation_tool --stop-after-init
+```
+
+#### 4. Configure API Credentials
+1. Navigate to Settings > General Settings > Marketing Automation Tool
+2. Enter OpenAI API key and organization ID
+3. Test connection using provided validation
+4. Configure AI agent instructions
+
+### Development Tools
+
+#### Recommended IDE Setup
+- **VS Code** with Python extension
+- **PyCharm** with Odoo plugin
+- **Vim/Emacs** with Python syntax highlighting
+
+#### Debugging Configuration
+```python
+# Add to odoo config for development
+[options]
+log_level = debug
+log_handler = :DEBUG
+dev_mode = reload,qweb,werkzeug,xml
+```
+
+#### Testing Environment
+```bash
+# Run tests for the module
+./odoo-bin -d test_database --test-enable --test-tags sc_marketing_automation_tool --stop-after-init
+```
+
+---
+
+## Core Models Reference
+
+### Content Idea Model (`sc.content.idea`)
+
+#### Purpose
+Stores discovered content ideas from research tasks with metadata and approval status.
+
+#### Fields Reference
+```python
+class ScContentIdea(models.Model):
+    _name = 'sc.content.idea'
+    _description = 'Content Idea'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = 'create_date desc'
+
+    # Core Fields
+    title = fields.Char(string='Article Title', required=True, tracking=True)
+    url = fields.Char(string='Source URL', required=True)
+    published_date = fields.Date(string='Publication Date')
+    summary = fields.Text(string='Summary', required=True)
+    
+    # Workflow Fields  
+    state = fields.Selection([
+        ('pending', 'Pending Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('used', 'Used for Content'),
+        ('archived', 'Archived')
+    ], default='pending', tracking=True)
+    
+    # Relationships
+    research_task_id = fields.Many2one('sc.content.idea.task', 
+                                      string='Research Task', 
+                                      ondelete='cascade')
+    generation_task_ids = fields.One2many('sc.content.generation.task', 
+                                         'content_idea_id',
+                                         string='Generation Tasks')
+```
+
+#### Key Methods
+```python
+def action_approve(self):
+    """Approve content idea for generation"""
+    self.state = 'approved'
+    self.message_post(body="Content idea approved for generation")
+
+def action_reject(self):
+    """Reject content idea"""
+    self.state = 'rejected'
+    self.message_post(body="Content idea rejected")
+
+def action_generate_content(self):
+    """Launch content generation wizard for this idea"""
+    return {
+        'type': 'ir.actions.act_window',
+        'name': 'Generate Content',
+        'res_model': 'sc.generate.content.wizard',
+        'view_mode': 'form',
+        'target': 'new',
+        'context': {'default_content_idea_id': self.id}
+    }
+```
+
+### Content Research Task Model (`sc.content.idea.task`)
+
+#### Purpose
+Manages background research tasks that generate multiple content ideas.
+
+#### State Management
+```python
+state = fields.Selection([
+    ('draft', 'Draft'),           # Created, queued for processing
+    ('in_progress', 'Processing'), # Currently being processed
+    ('done', 'Completed'),        # Successfully completed
+    ('error', 'Error')            # Failed with error
+], default='draft', tracking=True)
+```
+
+#### Processing Logic
+```python
+def _process_research_task(self):
+    """Process research task using OpenAI Agents SDK"""
+    try:
+        self.state = 'in_progress'
+        
+        # Initialize research agent
+        agent_config = self.env['sc.ai.agent.config'].get_research_agent()
+        
+        # Execute web search and analysis
+        ideas_data = self._execute_research_with_agent(agent_config)
+        
+        # Create content ideas from results
+        self._create_ideas_from_results(ideas_data)
+        
+        self.state = 'done'
+        self.processed_date = fields.Datetime.now()
+        
+    except Exception as e:
+        self.state = 'error'
+        self.error_message = str(e)
+        _logger.error(f"Research task {self.id} failed: {e}")
+```
+
+### Content Generation Task Model (`sc.content.generation.task`)
+
+#### Purpose
+Handles blog post generation from content ideas or custom topics.
+
+#### Generation Flow
+```python
+def _process_generation_task(self):
+    """Generate blog post content using AI agent"""
+    try:
+        self.state = 'in_progress'
+        
+        # Get generation agent configuration
+        agent_config = self.env['sc.ai.agent.config'].get_generation_agent()
+        
+        # Prepare generation context
+        context = self._prepare_generation_context()
+        
+        # Generate content using OpenAI
+        blog_data = self._generate_content_with_agent(agent_config, context)
+        
+        # Create blog post
+        blog_post = self._create_blog_post(blog_data)
+        
+        self.generated_blog_post_id = blog_post.id
+        self.state = 'done'
+        
+    except Exception as e:
+        self.state = 'error'
+        self.error_message = str(e)
+```
+
+### AI Agent Configuration Model (`sc.ai.agent.config`)
+
+#### Purpose
+Stores AI agent configurations with customizable instructions and model settings.
+
+#### Configuration Structure
+```python
+class ScAiAgentConfig(models.Model):
+    _name = 'sc.ai.agent.config'
+    _description = 'AI Agent Configuration'
+
+    name = fields.Char(string='Configuration Name', required=True)
+    agent_type = fields.Selection([
+        ('research', 'Content Research'),
+        ('generation', 'Content Generation')
+    ], required=True)
+    
+    model_id = fields.Many2one('sc.openai.models', string='OpenAI Model')
+    instructions = fields.Text(string='Agent Instructions', required=True)
+    
+    # Configuration parameters
+    temperature = fields.Float(string='Temperature', default=0.7)
+    max_tokens = fields.Integer(string='Max Tokens', default=2000)
+    
+    @api.model
+    def get_research_agent(self):
+        """Get active research agent configuration"""
+        return self.search([('agent_type', '=', 'research')], limit=1)
+    
+    @api.model  
+    def get_generation_agent(self):
+        """Get active generation agent configuration"""
+        return self.search([('agent_type', '=', 'generation')], limit=1)
+```
+
+### Usage Monitoring Models
+
+#### Request Log Model (`sc.openai.request.log`)
+```python
+class ScOpenaiRequestLog(models.Model):
+    _name = 'sc.openai.request.log'
+    _description = 'OpenAI Request Log'
+    _order = 'create_date desc'
+
+    model_name = fields.Char(string='Model Name', required=True)
+    prompt_tokens = fields.Integer(string='Prompt Tokens', default=0)
+    completion_tokens = fields.Integer(string='Completion Tokens', default=0)
+    total_tokens = fields.Integer(string='Total Tokens', compute='_compute_total_tokens')
+    cost = fields.Float(string='Cost', digits=(12, 6))
+    success = fields.Boolean(string='Success', default=True)
+    
+    # Relationships
+    related_task_id = fields.Reference([
+        ('sc.content.idea.task', 'Research Task'),
+        ('sc.content.generation.task', 'Generation Task')
+    ], string='Related Task')
+```
+
+---
+
+## API Integration Patterns
+
+### OpenAI Agents SDK Integration
+
+#### Agent Initialization
+```python
+from openai_agents import Agent, WebSearchTool
+
+def _initialize_research_agent(self, config):
+    """Initialize research agent with web search capabilities"""
+    agent = Agent(
+        model=config.model_id.name,
+        instructions=config.instructions,
+        tools=[WebSearchTool()],
+        temperature=config.temperature
+    )
+    return agent
+```
+
+#### Error Handling Pattern
+```python
+def _safe_api_call(self, func, *args, **kwargs):
+    """Wrapper for safe OpenAI API calls with retry logic"""
+    max_retries = 3
+    retry_delay = 1
+    
+    for attempt in range(max_retries):
+        try:
+            result = func(*args, **kwargs)
+            
+            # Log successful request
+            self._log_api_request(success=True, **result.usage)
+            
+            return result
+            
+        except openai.RateLimitError as e:
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay * (2 ** attempt))  # Exponential backoff
+                continue
+            raise
+            
+        except openai.AuthenticationError as e:
+            _logger.error(f"OpenAI authentication failed: {e}")
+            raise UserError("OpenAI API authentication failed. Please check your API key.")
+            
+        except Exception as e:
+            # Log failed request
+            self._log_api_request(success=False, error=str(e))
+            raise
+```
+
+#### Usage Tracking
+```python
+def _log_api_request(self, model_name, prompt_tokens, completion_tokens, 
+                    cost=None, success=True, error=None):
+    """Log API request for monitoring and cost tracking"""
+    
+    self.env['sc.openai.request.log'].create({
+        'model_name': model_name,
+        'prompt_tokens': prompt_tokens,
+        'completion_tokens': completion_tokens,
+        'cost': cost or self._calculate_cost(model_name, prompt_tokens, completion_tokens),
+        'success': success,
+        'error_message': error,
+        'related_task_id': f"{self._name},{self.id}" if hasattr(self, 'id') else False,
+        'create_date': fields.Datetime.now()
+    })
+```
+
+### Web Content Scraping
+
+#### Content Reader Implementation
+```python
+class WebContentReader(models.Model):
+    _name = 'web.content.reader'
+    _description = 'Web Content Reader Utility'
+
+    def extract_content(self, url, max_length=5000):
+        """Extract clean text content from URL"""
+        try:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Content Management Tool)'
+            }
+            
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+            
+            # Parse HTML content
+            soup = BeautifulSoup(response.content, 'html.parser')
+            
+            # Remove script and style elements
+            for script in soup(["script", "style"]):
+                script.decompose()
+                
+            # Extract text content
+            text = soup.get_text()
+            
+            # Clean and truncate
+            clean_text = ' '.join(text.split())
+            return clean_text[:max_length]
+            
+        except Exception as e:
+            _logger.warning(f"Failed to extract content from {url}: {e}")
+            return ""
+```
+
+### Configuration Management
+
+#### Settings Integration
+```python
+class ResConfigSettings(models.TransientModel):
+    _inherit = 'res.config.settings'
+
+    # OpenAI Configuration
+    openai_api_key = fields.Char(
+        string='OpenAI API Key',
+        config_parameter='sc_marketing_automation_tool.openai_api_key'
+    )
+    openai_organization_id = fields.Char(
+        string='OpenAI Organization ID', 
+        config_parameter='sc_marketing_automation_tool.openai_organization_id'
+    )
+    
+    @api.model
+    def get_openai_client(self):
+        """Get configured OpenAI client instance"""
+        api_key = self.env['ir.config_parameter'].sudo().get_param(
+            'sc_marketing_automation_tool.openai_api_key'
+        )
+        organization_id = self.env['ir.config_parameter'].sudo().get_param(
+            'sc_marketing_automation_tool.openai_organization_id'
+        )
+        
+        if not api_key:
+            raise UserError("OpenAI API key not configured")
+            
+        return openai.OpenAI(
+            api_key=api_key,
+            organization=organization_id
+        )
+```
+
+---
+
+## View and Interface Development
+
+### Odoo 18.0 View Standards
+
+#### List View Pattern
+```xml
+<!-- Always use <list> instead of <tree> in Odoo 18.0 -->
+<record id="view_sc_content_idea_list" model="ir.ui.view">
+    <field name="name">sc.content.idea.list</field>
+    <field name="model">sc.content.idea</field>
+    <field name="arch" type="xml">
+        <list default_order="create_date desc">
+            <field name="title"/>
+            <field name="published_date"/>
+            <field name="state" decoration-info="state=='pending'" 
+                               decoration-success="state=='approved'"
+                               decoration-danger="state=='rejected'"/>
+            <field name="create_date"/>
+        </list>
+    </field>
+</record>
+```
+
+#### Form View with Chatter
+```xml
+<record id="view_sc_content_idea_form" model="ir.ui.view">
+    <field name="name">sc.content.idea.form</field>
+    <field name="model">sc.content.idea</field>
+    <field name="arch" type="xml">
+        <form>
+            <header>
+                <button name="action_approve" type="object" string="Approve" 
+                        class="btn-primary" invisible="state != 'pending'"/>
+                <button name="action_reject" type="object" string="Reject"
+                        invisible="state != 'pending'"/>
+                <field name="state" widget="statusbar" 
+                       statusbar_visible="pending,approved,used"/>
+            </header>
+            <sheet>
+                <group>
+                    <group>
+                        <field name="title"/>
+                        <field name="url" widget="url"/>
+                        <field name="published_date"/>
+                    </group>
+                    <group>
+                        <field name="research_task_id"/>
+                        <field name="create_date"/>
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Summary">
+                        <field name="summary" widget="text"/>
+                    </page>
+                    <page string="Generation Tasks">
+                        <field name="generation_task_ids">
+                            <list>
+                                <field name="name"/>
+                                <field name="state"/>
+                                <field name="create_date"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </sheet>
+            <!-- Chatter integration for mail.thread -->
+            <chatter/>
+        </form>
+    </field>
+</record>
+```
+
+#### Kanban View with Groups
+```xml
+<record id="view_sc_content_generation_task_kanban" model="ir.ui.view">
+    <field name="name">sc.content.generation.task.kanban</field>
+    <field name="model">sc.content.generation.task</field>
+    <field name="arch" type="xml">
+        <kanban default_group_by="state" class="o_kanban_small_column">
+            <field name="name"/>
+            <field name="content_idea_id"/>
+            <field name="target_blog_id"/>
+            <field name="state"/>
+            <templates>
+                <t t-name="kanban-card">
+                    <div class="oe_kanban_content">
+                        <div class="oe_kanban_details">
+                            <strong><field name="name"/></strong>
+                            <div t-if="record.content_idea_id.raw_value">
+                                Idea: <field name="content_idea_id"/>
+                            </div>
+                            <div>
+                                Blog: <field name="target_blog_id"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </templates>
+        </kanban>
+    </field>
+</record>
+```
+
+### Settings UI Implementation
+
+#### Stable Anchor Pattern
+```xml
+<record id="res_config_settings_view_form_inherit_sc" model="ir.ui.view">
+    <field name="name">res.config.settings.form.inherit.sc</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+        <!-- Use stable anchor from core examples -->
+        <xpath expr="//setting[@id='account_setting_payment_terms']" position="after">
+            <setting id="sc_marketing_automation_setting" string="Marketing Automation Tool">
+                <div class="content-group">
+                    <div class="mt16">
+                        <field name="openai_api_key" password="True"/>
+                        <label for="openai_api_key" class="o_light_label"/>
+                        <div class="text-muted">
+                            Your OpenAI API key for AI-powered content automation.
+                        </div>
+                    </div>
+                    <div class="mt16">
+                        <field name="openai_organization_id"/>
+                        <label for="openai_organization_id" class="o_light_label"/>
+                        <div class="text-muted">
+                            Optional: Your OpenAI organization ID for usage tracking.
+                        </div>
+                    </div>
+                </div>
+            </setting>
+        </xpath>
+    </field>
+</record>
+```
+
+### Wizard Development
+
+#### Generation Wizard Pattern
+```python
+class ScGenerateContentWizard(models.TransientModel):
+    _name = 'sc.generate.content.wizard'
+    _description = 'Content Generation Wizard'
+
+    content_idea_id = fields.Many2one('sc.content.idea', string='Content Idea')
+    custom_topic = fields.Char(string='Custom Topic')
+    target_blog_id = fields.Many2one('blog.blog', string='Target Blog', required=True)
+    user_prompt = fields.Text(string='Additional Instructions')
+    word_count_target = fields.Integer(string='Target Word Count', default=800)
+    
+    def action_generate_content(self):
+        """Create generation task and return to task list"""
+        task_vals = {
+            'name': self.custom_topic or self.content_idea_id.title,
+            'content_idea_id': self.content_idea_id.id,
+            'custom_topic': self.custom_topic,
+            'target_blog_id': self.target_blog_id.id,
+            'user_prompt': self.user_prompt,
+            'word_count_target': self.word_count_target,
+            'state': 'draft'
+        }
+        
+        task = self.env['sc.content.generation.task'].create(task_vals)
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Generation Tasks',
+            'res_model': 'sc.content.generation.task',
+            'view_mode': 'list,form',
+            'domain': [('id', '=', task.id)]
+        }
+```
+
+---
+
+## Background Processing
+
+### Cron Job Configuration
+
+#### Research Processing Cron
+```xml
+<record id="cron_process_research_tasks" model="ir.cron">
+    <field name="name">Process Content Research Tasks</field>
+    <field name="model_id" ref="model_sc_content_idea_task"/>
+    <field name="state">code</field>
+    <field name="code">model.action_process_research_tasks()</field>
+    <field name="interval_number">5</field>
+    <field name="interval_type">minutes</field>
+    <field name="numbercall">-1</field>
+    <field name="active" eval="True"/>
+</record>
+```
+
+#### Generation Processing Cron
+```xml
+<record id="cron_process_generation_tasks" model="ir.cron">
+    <field name="name">Process Content Generation Tasks</field>
+    <field name="model_id" ref="model_sc_content_generation_task"/>
+    <field name="state">code</field>
+    <field name="code">model.action_process_generation_tasks()</field>
+    <field name="interval_number">5</field>
+    <field name="interval_type">minutes</field>
+    <field name="numbercall">-1</field>
+    <field name="active" eval="True"/>
+</record>
+```
+
+### Processing Implementation
+
+#### Batch Processing Pattern
+```python
+@api.model
+def action_process_research_tasks(self):
+    """Process research tasks in batches"""
+    # Get pending tasks (limit for performance)
+    pending_tasks = self.search([
+        ('state', '=', 'draft')
+    ], limit=10, order='create_date asc')
+    
+    for task in pending_tasks:
+        try:
+            task._process_research_task()
+            self.env.cr.commit()  # Commit each task individually
+        except Exception as e:
+            self.env.cr.rollback()  # Rollback only this task
+            _logger.error(f"Failed to process research task {task.id}: {e}")
+            task.write({
+                'state': 'error',
+                'error_message': str(e)
+            })
+            self.env.cr.commit()
+```
+
+#### State Management
+```python
+def _process_research_task(self):
+    """Process single research task with state management"""
+    if self.state != 'draft':
+        return  # Already processed or processing
+        
+    try:
+        # Update state before processing
+        self.write({'state': 'in_progress'})
+        self.env.cr.commit()
+        
+        # Perform actual processing
+        self._execute_research()
+        
+        # Mark as completed
+        self.write({
+            'state': 'done',
+            'processed_date': fields.Datetime.now()
+        })
+        
+    except Exception as e:
+        # Mark as failed
+        self.write({
+            'state': 'error',
+            'error_message': str(e)
+        })
+        raise
+```
+
+### Error Handling and Recovery
+
+#### Retry Mechanism
+```python
+def action_retry(self):
+    """Retry failed task"""
+    if self.state != 'error':
+        raise UserError("Only failed tasks can be retried")
+        
+    self.write({
+        'state': 'draft',
+        'error_message': False,
+        'processed_date': False
+    })
+    
+    # Log retry action
+    self.message_post(body="Task reset for retry")
+```
+
+#### Monitoring and Alerts
+```python
+@api.model
+def check_stuck_tasks(self):
+    """Check for tasks stuck in processing state"""
+    cutoff_time = fields.Datetime.now() - timedelta(hours=1)
+    
+    stuck_tasks = self.search([
+        ('state', '=', 'in_progress'),
+        ('write_date', '<', cutoff_time)
+    ])
+    
+    for task in stuck_tasks:
+        task.write({
+            'state': 'error',
+            'error_message': 'Task stuck in processing state - timed out'
+        })
+        
+    if stuck_tasks:
+        _logger.warning(f"Found {len(stuck_tasks)} stuck tasks")
+```
+
+---
+
+## Security Implementation
+
+### Access Control Lists (ACL)
+
+#### Model Permissions
+```csv
+# ir.model.access.csv
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sc_content_idea_manager,sc.content.idea manager,model_sc_content_idea,group_marketing_manager,1,1,1,1
+access_sc_content_idea_user,sc.content.idea user,model_sc_content_idea,group_marketing_user,1,1,1,0
+access_sc_content_idea_task_manager,sc.content.idea.task manager,model_sc_content_idea_task,group_marketing_manager,1,1,1,1
+access_sc_content_idea_task_user,sc.content.idea.task user,model_sc_content_idea_task,group_marketing_user,1,1,1,0
+access_sc_content_generation_task_manager,sc.content.generation.task manager,model_sc_content_generation_task,group_marketing_manager,1,1,1,1
+access_sc_content_generation_task_user,sc.content.generation.task user,model_sc_content_generation_task,group_marketing_user,1,1,1,0
+```
+
+#### Security Groups
+```xml
+<!-- Security Groups -->
+<record id="group_marketing_user" model="res.groups">
+    <field name="name">Marketing User</field>
+    <field name="category_id" ref="base.module_category_marketing"/>
+    <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+</record>
+
+<record id="group_marketing_manager" model="res.groups">
+    <field name="name">Marketing Manager</field>
+    <field name="category_id" ref="base.module_category_marketing"/>
+    <field name="implied_ids" eval="[(4, ref('group_marketing_user'))]"/>
+</record>
+```
+
+### Record Rules
+
+#### User Data Isolation
+```xml
+<record id="rule_content_idea_user" model="ir.rule">
+    <field name="name">Content Ideas: Users can see their own ideas</field>
+    <field name="model_id" ref="model_sc_content_idea"/>
+    <field name="domain_force">[('create_uid', '=', user.id)]</field>
+    <field name="groups" eval="[(4, ref('group_marketing_user'))]"/>
+</record>
+
+<record id="rule_content_idea_manager" model="ir.rule">
+    <field name="name">Content Ideas: Managers can see all ideas</field>
+    <field name="model_id" ref="model_sc_content_idea"/>
+    <field name="domain_force">[(1, '=', 1)]</field>
+    <field name="groups" eval="[(4, ref('group_marketing_manager'))]"/>
+</record>
+```
+
+#### Multi-Company Support
+```xml
+<record id="rule_content_idea_company" model="ir.rule">
+    <field name="name">Content Ideas: Multi-company</field>
+    <field name="model_id" ref="model_sc_content_idea"/>
+    <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    <field name="global" eval="True"/>
+</record>
+```
+
+### API Security
+
+#### Credential Management
+```python
+def _get_openai_credentials(self):
+    """Secure credential retrieval"""
+    ICPSudo = self.env['ir.config_parameter'].sudo()
+    
+    api_key = ICPSudo.get_param('sc_marketing_automation_tool.openai_api_key')
+    if not api_key:
+        raise UserError("OpenAI API key not configured")
+        
+    # Mask key in logs
+    masked_key = api_key[:7] + '...' + api_key[-4:] if len(api_key) > 11 else '***'
+    _logger.info(f"Using OpenAI API key: {masked_key}")
+    
+    return {
+        'api_key': api_key,
+        'organization_id': ICPSudo.get_param('sc_marketing_automation_tool.openai_organization_id')
+    }
+```
+
+#### Input Validation
+```python
+@api.constrains('openai_api_key')
+def _check_api_key_format(self):
+    """Validate API key format"""
+    for record in self:
+        if record.openai_api_key and not record.openai_api_key.startswith('sk-'):
+            raise ValidationError("OpenAI API key must start with 'sk-'")
+
+@api.constrains('openai_organization_id')  
+def _check_organization_id_format(self):
+    """Validate organization ID format"""
+    for record in self:
+        if record.openai_organization_id and not record.openai_organization_id.startswith('org-'):
+            raise ValidationError("OpenAI Organization ID must start with 'org-'")
+```
+
+---
+
+## Customization and Extension
+
+### Agent Configuration Customization
+
+#### Custom Agent Instructions
+```python
+class ScAiAgentConfig(models.Model):
+    _inherit = 'sc.ai.agent.config'
+    
+    # Add industry-specific fields
+    industry_focus = fields.Selection([
+        ('technology', 'Technology'),
+        ('healthcare', 'Healthcare'), 
+        ('finance', 'Finance'),
+        ('education', 'Education'),
+        ('retail', 'Retail')
+    ], string='Industry Focus')
+    
+    target_audience = fields.Selection([
+        ('b2b', 'Business to Business'),
+        ('b2c', 'Business to Consumer'),
+        ('technical', 'Technical Professionals'),
+        ('general', 'General Audience')
+    ], string='Target Audience')
+    
+    @api.onchange('industry_focus', 'target_audience')
+    def _onchange_context_fields(self):
+        """Update instructions based on context"""
+        if self.industry_focus and self.target_audience:
+            self.instructions = self._generate_context_instructions()
+            
+    def _generate_context_instructions(self):
+        """Generate context-aware instructions"""
+        base_instructions = self.instructions or ""
+        
+        context_additions = []
+        
+        if self.industry_focus:
+            context_additions.append(f"Focus on {self.industry_focus} industry topics and terminology.")
+            
+        if self.target_audience:
+            context_additions.append(f"Write for a {self.target_audience} audience.")
+            
+        return base_instructions + "\n\n" + "\n".join(context_additions)
+```
+
+### Model Extensions
+
+#### Add Custom Fields to Existing Models
+```python
+class ScContentIdea(models.Model):
+    _inherit = 'sc.content.idea'
+    
+    # Add custom fields
+    content_category = fields.Selection([
+        ('blog_post', 'Blog Post'),
+        ('case_study', 'Case Study'),
+        ('whitepaper', 'Whitepaper'),
+        ('news', 'News Article')
+    ], string='Content Category', default='blog_post')
+    
+    seo_keywords = fields.Char(string='SEO Keywords')
+    target_word_count = fields.Integer(string='Target Word Count', default=800)
+    priority = fields.Selection([
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+        ('urgent', 'Urgent')
+    ], string='Priority', default='medium')
+    
+    # Add computed fields
+    days_since_published = fields.Integer(
+        string='Days Since Published',
+        compute='_compute_days_since_published'
+    )
+    
+    @api.depends('published_date')
+    def _compute_days_since_published(self):
+        """Calculate days since publication"""
+        today = fields.Date.today()
+        for record in self:
+            if record.published_date:
+                delta = today - record.published_date
+                record.days_since_published = delta.days
+            else:
+                record.days_since_published = 0
+```
+
+### Custom Workflow Extensions
+
+#### Approval Workflow
+```python
+class ScContentIdea(models.Model):
+    _inherit = 'sc.content.idea'
+    
+    # Add approval workflow
+    approval_state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted for Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('revision_required', 'Revision Required')
+    ], string='Approval State', default='draft')
+    
+    approver_id = fields.Many2one('res.users', string='Approver')
+    approval_notes = fields.Text(string='Approval Notes')
+    
+    def action_submit_for_approval(self):
+        """Submit idea for approval"""
+        self.approval_state = 'submitted'
+        
+        # Notify approvers
+        approvers = self.env.ref('sc_marketing_automation_tool.group_marketing_manager').users
+        self.message_notify(
+            partner_ids=approvers.mapped('partner_id').ids,
+            subject=f"Content idea approval required: {self.title}",
+            body=f"Content idea '{self.title}' has been submitted for approval."
+        )
+    
+    def action_approve_idea(self):
+        """Approve content idea"""
+        self.write({
+            'approval_state': 'approved',
+            'state': 'approved',
+            'approver_id': self.env.user.id
+        })
+        
+        # Notify submitter
+        self.message_post(
+            body=f"Content idea approved by {self.env.user.name}",
+            message_type='notification'
+        )
+```
+
+### Integration Extensions
+
+#### External CMS Integration
+```python
+class ScContentGenerationTask(models.Model):
+    _inherit = 'sc.content.generation.task'
+    
+    # Add external publishing options
+    external_cms = fields.Selection([
+        ('wordpress', 'WordPress'),
+        ('drupal', 'Drupal'),
+        ('contentful', 'Contentful')
+    ], string='External CMS')
+    
+    external_post_id = fields.Char(string='External Post ID')
+    
+    def action_publish_to_external_cms(self):
+        """Publish to external CMS"""
+        if not self.external_cms:
+            raise UserError("No external CMS configured")
+            
+        if self.external_cms == 'wordpress':
+            self._publish_to_wordpress()
+        elif self.external_cms == 'drupal':
+            self._publish_to_drupal()
+        elif self.external_cms == 'contentful':
+            self._publish_to_contentful()
+    
+    def _publish_to_wordpress(self):
+        """Publish content to WordPress via REST API"""
+        wp_config = self.env['ir.config_parameter'].sudo()
+        wp_url = wp_config.get_param('sc_marketing.wordpress_url')
+        wp_user = wp_config.get_param('sc_marketing.wordpress_user')
+        wp_password = wp_config.get_param('sc_marketing.wordpress_password')
+        
+        if not all([wp_url, wp_user, wp_password]):
+            raise UserError("WordPress configuration incomplete")
+            
+        # Prepare post data
+        post_data = {
+            'title': self.generated_blog_post_id.name,
+            'content': self.generated_blog_post_id.content,
+            'status': 'draft',
+            'excerpt': self.generated_blog_post_id.subtitle or ''
+        }
+        
+        # Make API call
+        response = requests.post(
+            f"{wp_url}/wp-json/wp/v2/posts",
+            json=post_data,
+            auth=(wp_user, wp_password)
+        )
+        
+        if response.status_code == 201:
+            post_id = response.json().get('id')
+            self.external_post_id = str(post_id)
+            self.message_post(body=f"Successfully published to WordPress (ID: {post_id})")
+        else:
+            raise UserError(f"WordPress publish failed: {response.text}")
+```
+
+---
+
+## Testing and Quality Assurance
+
+### Unit Testing Framework
+
+#### Test Structure
+```python
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError, ValidationError
+from unittest.mock import patch, MagicMock
+
+class TestContentIdea(TransactionCase):
+    
+    def setUp(self):
+        super().setUp()
+        self.ContentIdea = self.env['sc.content.idea']
+        self.ResearchTask = self.env['sc.content.idea.task']
+        
+        # Create test data
+        self.research_task = self.ResearchTask.create({
+            'name': 'Test Research Task',
+            'search_query': 'test query',
+            'number_of_suggestions': 5
+        })
+        
+    def test_content_idea_creation(self):
+        """Test content idea creation"""
+        idea = self.ContentIdea.create({
+            'title': 'Test Article',
+            'url': 'https://example.com/test',
+            'summary': 'Test summary',
+            'research_task_id': self.research_task.id
+        })
+        
+        self.assertEqual(idea.state, 'pending')
+        self.assertEqual(idea.title, 'Test Article')
+        
+    def test_content_idea_approval(self):
+        """Test content idea approval workflow"""
+        idea = self.ContentIdea.create({
+            'title': 'Test Article',
+            'url': 'https://example.com/test', 
+            'summary': 'Test summary',
+            'research_task_id': self.research_task.id
+        })
+        
+        # Test approval
+        idea.action_approve()
+        self.assertEqual(idea.state, 'approved')
+        
+        # Test rejection  
+        idea.action_reject()
+        self.assertEqual(idea.state, 'rejected')
+```
+
+#### Mock External APIs
+```python
+class TestOpenAIIntegration(TransactionCase):
+    
+    @patch('openai_agents.Agent')
+    def test_research_task_processing(self, mock_agent):
+        """Test research task processing with mocked OpenAI"""
+        # Mock OpenAI response
+        mock_agent_instance = MagicMock()
+        mock_agent.return_value = mock_agent_instance
+        
+        mock_response = {
+            'ideas': [
+                {
+                    'title': 'Test Article 1',
+                    'url': 'https://example.com/1',
+                    'summary': 'Test summary 1',
+                    'published_date': '2023-01-01'
+                },
+                {
+                    'title': 'Test Article 2', 
+                    'url': 'https://example.com/2',
+                    'summary': 'Test summary 2',
+                    'published_date': '2023-01-02'
+                }
+            ]
+        }
+        
+        mock_agent_instance.run.return_value = mock_response
+        
+        # Create and process research task
+        task = self.env['sc.content.idea.task'].create({
+            'name': 'Test Task',
+            'search_query': 'test query',
+            'number_of_suggestions': 2
+        })
+        
+        task._process_research_task()
+        
+        # Verify results
+        self.assertEqual(task.state, 'done')
+        self.assertEqual(len(task.generated_idea_ids), 2)
+        
+        # Verify mock was called correctly
+        mock_agent.assert_called_once()
+        mock_agent_instance.run.assert_called_once()
+```
+
+### Integration Testing
+
+#### API Integration Tests
+```python
+class TestAPIIntegration(TransactionCase):
+    
+    def test_openai_authentication(self):
+        """Test OpenAI API authentication"""
+        # Set up test credentials
+        self.env['ir.config_parameter'].sudo().set_param(
+            'sc_marketing_automation_tool.openai_api_key', 
+            'sk-test-key'
+        )
+        
+        # Test credential retrieval
+        config = self.env['res.config.settings'].create({})
+        credentials = config._get_openai_credentials()
+        
+        self.assertEqual(credentials['api_key'], 'sk-test-key')
+        
+    def test_invalid_api_key_handling(self):
+        """Test handling of invalid API key"""
+        # Clear API key
+        self.env['ir.config_parameter'].sudo().set_param(
+            'sc_marketing_automation_tool.openai_api_key', 
+            ''
+        )
+        
+        config = self.env['res.config.settings'].create({})
+        
+        with self.assertRaises(UserError):
+            config._get_openai_credentials()
+```
+
+### Performance Testing
+
+#### Load Testing
+```python
+class TestPerformance(TransactionCase):
+    
+    def test_bulk_idea_creation(self):
+        """Test bulk creation of content ideas"""
+        import time
+        
+        # Create research task
+        task = self.env['sc.content.idea.task'].create({
+            'name': 'Bulk Test Task',
+            'search_query': 'bulk test',
+            'number_of_suggestions': 100
+        })
+        
+        # Measure bulk creation time
+        start_time = time.time()
+        
+        ideas_data = []
+        for i in range(100):
+            ideas_data.append({
+                'title': f'Test Article {i}',
+                'url': f'https://example.com/{i}',
+                'summary': f'Test summary {i}',
+                'research_task_id': task.id
+            })
+        
+        ideas = self.env['sc.content.idea'].create(ideas_data)
+        
+        end_time = time.time()
+        creation_time = end_time - start_time
+        
+        # Performance assertion (should create 100 ideas in under 5 seconds)
+        self.assertLess(creation_time, 5.0)
+        self.assertEqual(len(ideas), 100)
+```
+
+### Quality Assurance Checklist
+
+#### Code Quality Standards
+- [ ] All methods have docstrings
+- [ ] Error handling implemented for external API calls
+- [ ] Input validation on user-facing fields
+- [ ] Logging implemented for debugging
+- [ ] Tests cover main functionality paths
+- [ ] Security rules properly implemented
+
+#### Odoo Standards Compliance
+- [ ] List views use `<list>` tag (not `<tree>`)
+- [ ] Kanban views have `default_group_by`
+- [ ] Models with mail integration include `<chatter/>`
+- [ ] Settings use stable anchors from core examples
+- [ ] ACL files properly formatted
+- [ ] Menu hierarchy follows Odoo conventions
+
+---
+
+## Deployment and Maintenance
+
+### Production Deployment
+
+#### Deployment Checklist
+- [ ] Backup existing database
+- [ ] Install/upgrade module in staging environment
+- [ ] Run full test suite
+- [ ] Configure production API credentials
+- [ ] Verify cron jobs are active
+- [ ] Test core workflows end-to-end
+- [ ] Monitor logs for errors
+
+#### Environment Configuration
+```bash
+# Production deployment script
+#!/bin/bash
+
+# Backup database
+pg_dump odoo_production > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Update module
+./odoo-bin -d odoo_production -u sc_marketing_automation_tool --stop-after-init
+
+# Run tests
+./odoo-bin -d odoo_production --test-enable --test-tags sc_marketing_automation_tool --stop-after-init
+
+# Start production server
+./odoo-bin -c /etc/odoo/odoo.conf
+```
+
+### Monitoring and Maintenance
+
+#### System Health Monitoring
+```python
+@api.model
+def system_health_check(self):
+    """Comprehensive system health check"""
+    health_status = {
+        'openai_connection': self._test_openai_connection(),
+        'pending_tasks': self._count_pending_tasks(),
+        'error_rate': self._calculate_error_rate(),
+        'disk_usage': self._check_disk_usage(),
+        'last_successful_run': self._get_last_successful_run()
+    }
+    
+    # Log health status
+    _logger.info(f"System health check: {health_status}")
+    
+    # Send alerts if needed
+    if health_status['error_rate'] > 0.1:  # More than 10% error rate
+        self._send_alert("High error rate detected")
+        
+    if health_status['pending_tasks'] > 100:  # Too many pending tasks
+        self._send_alert("High number of pending tasks")
+        
+    return health_status
+```
+
+#### Performance Monitoring
+```python
+@api.model
+def performance_metrics(self):
+    """Collect performance metrics"""
+    metrics = {
+        'avg_research_time': self._avg_processing_time('sc.content.idea.task'),
+        'avg_generation_time': self._avg_processing_time('sc.content.generation.task'),
+        'success_rate': self._success_rate(),
+        'api_cost_today': self._api_cost_today(),
+        'active_users': self._count_active_users()
+    }
+    
+    # Store metrics for trending
+    self.env['sc.system.metrics'].create({
+        'date': fields.Date.today(),
+        'metrics_data': json.dumps(metrics)
+    })
+    
+    return metrics
+```
+
+### Troubleshooting Tools
+
+#### Diagnostic Commands
+```python
+@api.model
+def diagnose_task_issues(self, task_id=None):
+    """Diagnose task processing issues"""
+    if task_id:
+        tasks = self.browse(task_id)
+    else:
+        # Get recent failed tasks
+        tasks = self.search([
+            ('state', '=', 'error'),
+            ('create_date', '>', fields.Datetime.now() - timedelta(days=1))
+        ])
+    
+    diagnosis = []
+    for task in tasks:
+        task_diagnosis = {
+            'task_id': task.id,
+            'error_message': task.error_message,
+            'last_attempt': task.write_date,
+            'retry_count': task.retry_count or 0,
+            'possible_causes': self._analyze_error(task.error_message),
+            'suggested_actions': self._suggest_fixes(task.error_message)
+        }
+        diagnosis.append(task_diagnosis)
+    
+    return diagnosis
+```
+
+#### Log Analysis
+```python
+@api.model
+def analyze_error_patterns(self, days=7):
+    """Analyze error patterns from logs"""
+    cutoff_date = fields.Datetime.now() - timedelta(days=days)
+    
+    error_logs = self.env['sc.openai.request.log'].search([
+        ('success', '=', False),
+        ('create_date', '>', cutoff_date)
+    ])
+    
+    error_patterns = {}
+    for log in error_logs:
+        error_type = self._categorize_error(log.error_message)
+        if error_type not in error_patterns:
+            error_patterns[error_type] = {
+                'count': 0,
+                'examples': []
+            }
+        error_patterns[error_type]['count'] += 1
+        if len(error_patterns[error_type]['examples']) < 3:
+            error_patterns[error_type]['examples'].append({
+                'timestamp': log.create_date,
+                'message': log.error_message[:200]
+            })
+    
+    return error_patterns
+```
+
+### Backup and Recovery
+
+#### Data Backup Strategy
+```python
+@api.model
+def backup_critical_data(self):
+    """Backup critical configuration and data"""
+    backup_data = {
+        'timestamp': fields.Datetime.now().isoformat(),
+        'agent_configs': self.env['sc.ai.agent.config'].search_read([]),
+        'system_settings': self._export_system_settings(),
+        'active_tasks': self.env['sc.content.idea.task'].search_read([
+            ('state', 'in', ['draft', 'in_progress'])
+        ]),
+        'recent_logs': self.env['sc.openai.request.log'].search_read([
+            ('create_date', '>', fields.Datetime.now() - timedelta(days=30))
+        ])
+    }
+    
+    # Store backup
+    backup_file = f"/tmp/sc_marketing_backup_{fields.Date.today()}.json"
+    with open(backup_file, 'w') as f:
+        json.dump(backup_data, f, indent=2, default=str)
+    
+    _logger.info(f"Backup completed: {backup_file}")
+    return backup_file
+```
+
+#### Recovery Procedures
+```python
+@api.model
+def restore_from_backup(self, backup_file):
+    """Restore system from backup file"""
+    try:
+        with open(backup_file, 'r') as f:
+            backup_data = json.load(f)
+            
+        # Restore agent configurations
+        for config_data in backup_data['agent_configs']:
+            existing = self.env['sc.ai.agent.config'].search([
+                ('name', '=', config_data['name'])
+            ])
+            if existing:
+                existing.write(config_data)
+            else:
+                self.env['sc.ai.agent.config'].create(config_data)
+        
+        # Restore system settings
+        self._import_system_settings(backup_data['system_settings'])
+        
+        _logger.info("System restored from backup successfully")
+        
+    except Exception as e:
+        _logger.error(f"Backup restore failed: {e}")
+        raise UserError(f"Restore failed: {e}")
+```
+
+---
+
+## External References
+
+### Core Odoo Examples
+- **Settings UI Patterns**: `odoo-src/odoo/addons/base/views/res_config_settings_views.xml`
+- **Mail Thread Integration**: `odoo-src/addons/mail/models/mail_thread.py`
+- **Cron Job Examples**: `odoo-src/addons/base/data/ir_cron_data.xml`
+- **Security Rule Patterns**: `odoo-src/addons/base/security/ir_rule.xml`
+
+### External API Documentation
+- **OpenAI Agents SDK**: [https://github.com/openai/openai-agents](https://github.com/openai/openai-agents) (v0.2.9+)
+- **OpenAI API Reference**: [https://platform.openai.com/docs/api-reference](https://platform.openai.com/docs/api-reference)
+- **Usage API Endpoints**: [https://platform.openai.com/docs/api-reference/usage](https://platform.openai.com/docs/api-reference/usage)
+
+### Python Libraries
+- **Requests**: HTTP client for web scraping and API calls
+- **BeautifulSoup4**: HTML parsing for content extraction
+- **JSON**: Data serialization for API responses
+
+### Rate Limits and Best Practices
+- **API Rate Limits**: Tier-based limits per OpenAI subscription level
+- **Retry Policies**: Exponential backoff with maximum 3 attempts
+- **Timeout Settings**: 30-60 seconds for content generation requests
+- **Error Handling**: Comprehensive error categorization and user feedback
+
+---
+
+*Technical documentation version: 18.0.1.0.1 | Last updated: September 20, 2025*
                     │   .task         │
                     │ • Image Utils   │
                     │ • Static Files  │

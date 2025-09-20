@@ -1,11 +1,14 @@
 # Herramienta de Gestión de Contenido para Odoo (sc_marketing_automation_tool)
 
 [![Versión de Odoo](https://img.shields.io/badge/Odoo-18.0-blue.svg)](https://odoo.com)
+[![Versión](https://img.shields.io/badge/Versión-18.0.1.0.1-green.svg)](https://github.com/Solutto-Consulting/marketing_automation_tool)
 [![Licencia](https://img.shields.io/badge/Licencia-LGPL--3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 ## Descripción General
 
-La **Herramienta de Gestión de Contenido para Odoo** es una plataforma integral de **automatización de contenido impulsada por IA** que cuenta con agentes de IA especializados para la investigación y generación de contenido. Esta herramienta optimiza el flujo de trabajo de creación de contenido desde la ideación hasta la publicación.
+La **Herramienta de Gestión de Contenido para Odoo v18.0.1.0.1** es una plataforma integral de **automatización de contenido impulsada por IA** que cuenta con agentes de IA especializados para la investigación y generación de contenido. Esta herramienta optimiza el flujo de trabajo de creación de contenido desde la ideación hasta la publicación.
+
+**🌍 [English Version](README.md) | 📚 [Documentación Completa](docs/)**
 
 ## Características Principales (v18.0.1.0.1)
 
@@ -13,40 +16,89 @@ La **Herramienta de Gestión de Contenido para Odoo** es una plataforma integral
 - **Agente de Investigación de Contenido**: Descubrimiento de temas impulsado por IA usando capacidades de búsqueda web
 - **Agente de Generación de Contenido**: Creación completa de publicaciones de blog a partir de ideas de investigación
 - **Generación de Imágenes con IA**: Imágenes profesionales de portada de blog usando el modelo gpt-image-1
+- **Instrucciones Configurables**: Prompts del sistema personalizables para cada tipo de agente
 
-### 📊 **Monitoreo y Optimización de Uso**
-- **Seguimiento Integral de Uso**: Monitoreo unificado para generación de texto e imágenes
-- **Panel de Control Avanzado**: Panel interactivo con desglose diario y tendencias
-- **Optimización de Costos Mejorada**: Desglose de uso de tokens y seguimiento de costos de generación de imágenes
-- **Almacenamiento de Datos Persistente**: Retención de datos mejorada y análisis histórico
-- **Seguimiento Específico por Operación**: Monitoreo dedicado para investigación, generación y generación de imágenes de contenido
+### 📊 **Monitoreo y Análisis de Uso**
+- **Seguimiento Integral de Uso**: Monitoreo en tiempo real para todas las operaciones de la API de OpenAI
+- **Panel de Control Interactivo**: Análisis visuales con desgloses diarios y seguimiento de costos
+- **Monitoreo Específico por Operación**: Seguimiento dedicado para investigación, generación y creación de imágenes
+- **Herramientas de Optimización de Costos**: Análisis de uso de tokens y monitoreo de presupuesto
 
-### ⚙️ **Configuración Centralizada**
-- **Configuraciones de Automatización de Marketing**: Sección de configuración dedicada para todos los agentes de IA
-- **Gestión de Modelos Estática**: Definiciones de modelos centralizadas y confiables independientes de llamadas API
-- **Configuración de Generación de Imágenes**: Configuraciones integrales para tamaño, calidad, formato
-- **Configuración Específica por Agente**: Configuraciones especializadas para cada tipo de agente de IA
-- **Seguridad Mejorada**: Gestión mejorada de credenciales y controles de acceso
+### ⚙️ **Configuración Empresarial**
+- **Configuraciones Centralizadas**: Panel de configuración dedicado para Automatización de Marketing
+- **Gestión de Modelos Estática**: Definiciones de modelos confiables independientes de la disponibilidad de la API
+- **Marco de Seguridad**: Gestión mejorada de credenciales y controles de acceso
+- **Soporte Multi-Empresa**: Configuraciones dependientes de la empresa y aislamiento de datos
 
-### 🔄 **Procesamiento Multi-Agente en Segundo Plano**
-- **Trabajos Cron Especializados**: Procesamiento independiente para investigación y generación
-- **Gestión de Tareas Mejorada**: Seguimiento integral de estado en todos los tipos de agentes
-- **Manejo de Errores Mejorado**: Patrones de error específicos por agente y mecanismos de recuperación
+### 🔄 **Procesamiento en Segundo Plano**
+- **Procesamiento Asíncrono de Tareas**: Ejecución no bloqueante para todas las operaciones de contenido
+- **Trabajos Cron Inteligentes**: Procesadores separados para tareas de investigación y generación
+- **Recuperación de Errores**: Manejo integral de errores con mecanismos de reintento
+- **Gestión de Estados**: Estados de tareas claros con pistas de auditoría
 
-## Especificaciones Técnicas
+## Documentación
 
-### Dependencias
-- **Módulos de Odoo**: base, website, website_blog, mail
-- **Librería Externa**: openai-agents (SDK de Python para integración con OpenAI)
-- **Versión de Python**: 3.9+ (requerido por openai-agents)
+### 📖 Guías de Usuario
+- **[Guía Funcional (Español)](docs/functional/guide.es.md)**: Flujos de trabajo y características para usuarios finales
+- **[Functional User Guide (English)](docs/functional/guide.en.md)**: End-user workflows and features
 
-### Modelos Principales
-- **sc.content.idea**: Gestiona ideas de contenido generadas por el agente de investigación
-- **sc.content.generation.task**: Rastrea tareas de generación de contenido de blog
-- **sc.openai.request.log**: Monitoreo integral de uso de API de OpenAI
-- **sc.openai.model.statistics**: Estadísticas agregadas de uso por modelo
-- **sc.openai.models**: Gestión centralizada de modelos OpenAI disponibles
-- **res.config.settings** (extendido): Gestión centralizada de configuración de Automatización de Marketing
+### 🔧 Documentación Técnica
+- **[Guía Técnica para Desarrolladores (Español)](docs/technical/guide.es.md)**: Arquitectura, patrones de desarrollo e integración de APIs
+- **[Technical Developer Guide (English)](docs/technical/guide.en.md)**: Architecture, development patterns, and API integration
+
+### 📋 Recursos Adicionales
+- **[Matriz de Cobertura de Características](docs/coverage-matrix.md)**: Mapeo completo de características a documentación
+- **[Historial de Versiones](docs/CHANGELOG.md)**: Historial detallado de versiones y actualizaciones de características
+- **[Plan de Desarrollo](docs/plan/PLAN.md)**: Hoja de ruta del proyecto y estado de implementación
+
+## Inicio Rápido
+
+### 1. Instalación
+```bash
+# Clonar o copiar módulo al directorio de addons personalizados
+cp -r sc_marketing_automation_tool /ruta/a/odoo/custom-addons/
+
+# Instalar dependencias Python
+pip install openai-agents>=0.2.9
+
+# Instalar módulo en Odoo
+./odoo-bin -d tu_base_datos -i sc_marketing_automation_tool
+```
+
+### 2. Configuración
+1. Navegar a **Configuración > Configuración General > Herramienta de Automatización de Marketing**
+2. Ingresar sus credenciales de la API de OpenAI
+3. Configurar instrucciones de agentes IA para su estrategia de contenido
+4. Probar la conexión y comenzar a crear contenido
+
+### 3. Flujo de Trabajo de Contenido
+1. **Investigación**: Crear tareas de investigación de contenido para descubrir temas en tendencia
+2. **Revisión**: Aprobar ideas de contenido descubiertas para generación
+3. **Generar**: Lanzar generación de contenido para ideas aprobadas
+4. **Publicar**: Revisar y publicar artículos de blog generados
+
+## Matriz de Características por Versión
+
+### ✅ Características Actuales (v18.0.1.0.1)
+
+#### **Estrategia de Contenido**
+- ✅ Agente de Investigación de Contenido con capacidades de búsqueda web
+- ✅ Agente de Generación de Contenido para creación de artículos de blog
+- ✅ Generación de imágenes impulsada por IA con modelo gpt-image-1
+- ✅ Flujo de trabajo multi-agente desde investigación hasta publicación
+- ✅ Sistema de aprobación y revisión de ideas de contenido
+
+#### **Monitoreo y Análisis**
+- ✅ Seguimiento integral de uso de OpenAI
+- ✅ Panel de control interactivo con análisis de costos
+- ✅ Informes de desglose diario y análisis de tendencias
+- ✅ Monitoreo específico por operación (investigación/generación/imágenes)
+
+#### **Arquitectura Técnica**
+- ✅ Integración con SDK de Agentes OpenAI (v0.2.9+)
+- ✅ Procesamiento asíncrono en segundo plano
+- ✅ Gestión de configuración centralizada
+- ✅ Seguridad mejorada y manejo de errores
 
 ## Instalación
 
