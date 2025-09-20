@@ -70,30 +70,6 @@
         <field name="sequence" eval="15"/>
     </record>
 
-    <!-- OpenAI Usage Dashboard Menu -->
-    <record id="menu_openai_usage_dashboard" model="ir.ui.menu">
-        <field name="name">Usage Dashboard</field>
-        <field name="parent_id" ref="menu_analytics"/>
-        <field name="action" ref="action_sc_openai_dashboard"/>
-        <field name="sequence" eval="10"/>
-    </record>
-
-    <!-- OpenAI Usage Statistics Menu -->
-    <record id="menu_openai_usage_statistics" model="ir.ui.menu">
-        <field name="name">Usage Statistics</field>
-        <field name="parent_id" ref="menu_analytics"/>
-        <field name="action" ref="action_sc_openai_usage_snapshot"/>
-        <field name="sequence" eval="20"/>
-    </record>
-
-    <!-- OpenAI Cost Analytics Menu -->
-    <record id="menu_openai_cost_analytics" model="ir.ui.menu">
-        <field name="name">Cost Analytics</field>
-        <field name="parent_id" ref="menu_analytics"/>
-        <field name="action" ref="action_sc_usage_statistics"/>
-        <field name="sequence" eval="30"/>
-    </record>
-
     <!-- NEW: Request History Menu -->
     <record id="menu_openai_request_history" model="ir.ui.menu">
         <field name="name">Request History</field>

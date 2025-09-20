@@ -298,107 +298,18 @@ Return ONLY the JSON object, no additional text or explanation.
             _logger.error("Content generation failed: %s", str(e))
             raise Exception(f"Content generation failed: {str(e)}")
 
-    @api.model
-    def fetch_and_store_usage_data(self):
-        """
-        Fetch usage data from OpenAI API and store in snapshots
-        
-        Returns:
-            dict: Summary of fetched data
-        """
-        try:
-            import requests
-            from datetime import datetime, timedelta
-            
-            # Get API credentials
-            api_key = self.env['ir.config_parameter'].sudo().get_param('sc_marketing_automation_tool.openai_api_key')
-            if not api_key:
-                raise Exception("OpenAI API key not configured")
-            
-            # Prepare headers
-            headers = {
-                'Authorization': f'Bearer {api_key}',
-                'Content-Type': 'application/json'
-            }
-            
-            org_id = self.env['ir.config_parameter'].sudo().get_param('sc_marketing_automation_tool.openai_organization_id')
-            if org_id:
-                headers['OpenAI-Organization'] = str(org_id)
-            
-            # Calculate date range (last 90 days)
-            end_date = datetime.now().date()
-            start_date = end_date - timedelta(days=90)
-            
-            # Note: OpenAI Usage API endpoint structure may vary
-            # This is a placeholder implementation - actual endpoint needs to be researched
-            usage_endpoints = [
-                'https://api.openai.com/v1/organization/usage/completions',
-                'https://api.openai.com/v1/organization/usage/embeddings',
-            ]
-            
-            total_records_updated = 0
-            
-            for endpoint in usage_endpoints:
-                try:
-                    # Make API call
-                    params = {
-                        'start_time': int(start_date.timestamp()),
-                        'end_time': int(end_date.timestamp()),
-                        'bucket_width': '1d',  # Daily buckets
-                    }
-                    
-                    response = requests.get(endpoint, headers=headers, params=params, timeout=30)
-                    response.raise_for_status()
-                    
-                    data = response.json()
-                    
-                    # Process the response (structure depends on actual API)
-                    # This is a placeholder - actual implementation needs API research
-                    if 'data' in data:
-                        for bucket in data['data']:
-                            # Extract date and token counts
-                            # Actual field names depend on API structure
-                            date = datetime.fromtimestamp(bucket.get('start_time', 0)).date()
-                            prompt_tokens = bucket.get('prompt_tokens', 0)
-                            completion_tokens = bucket.get('completion_tokens', 0)
-                            
-                            # Create or update snapshot record
-                            snapshot = self.env['sc.openai.usage.snapshot'].search([('date', '=', date)], limit=1)
-                            if snapshot:
-                                snapshot.write({
-                                    'prompt_tokens': snapshot.prompt_tokens + prompt_tokens,
-                                    'completion_tokens': snapshot.completion_tokens + completion_tokens,
-                                    'fetch_timestamp': fields.Datetime.now(),
-                                    'api_response_raw': json.dumps(bucket),
-                                })
-                            else:
-                                self.env['sc.openai.usage.snapshot'].create({
-                                    'date': date,
-                                    'prompt_tokens': prompt_tokens,
-                                    'completion_tokens': completion_tokens,
-                                    'fetch_timestamp': fields.Datetime.now(),
-                                    'api_response_raw': json.dumps(bucket),
-                                })
-                            
-                            total_records_updated += 1
-                
-                except requests.exceptions.RequestException as e:
-                    _logger.warning("Failed to fetch from %s: %s", endpoint, str(e))
-                    continue
-            
-            return {
-                'success': True,
-                'records_updated': total_records_updated,
-                'message': f"Successfully updated {total_records_updated} usage records"
-            }
-            
-        except Exception as e:
-            _logger.error("Failed to fetch usage data: %s", str(e))
-            return {
-                'success': False,
-                'error': str(e),
-                'message': f"Failed to fetch usage data: {str(e)}"
-            }
+    # @api.model
+    # def fetch_and_store_usage_data(self):
+    #     """
+    #     DEPRECATED: This method was used with sc.openai.usage.snapshot model
+    #     which has been removed. Usage statistics are now handled by other models.
+    #     """
+    #     _logger.warning("fetch_and_store_usage_data method is deprecated and disabled")
+    #     return {
+    #         'success': False,
+    #         'error': 'Method deprecated',
+    #         'message': 'Usage statistics are now handled by other models'
+    #     }
 
     @api.model
     def generate_content(self, model_name, system_instructions, content_source, user_prompt=""):
