@@ -1,0 +1,145 @@
+ODOO PROPRIETARY LICENSE v1.0 (OPL-1)
+
+This software and associated files (the "Software") may only be used 
+(executed, modified, executed after modifications) if you have 
+purchased a valid license from the authors, typically via Odoo Apps, 
+or if you have received a written agreement from the authors of the 
+Software (see the COPYRIGHT file).
+
+You may develop Odoo modules that depend on the Software without restriction, 
+but if you want to distribute the Software or a derivative work, you must 
+sign a specific agreement with the authors.
+
+If you have received a copy of the Software without purchasing a valid 
+license or having received a written agreement, you must immediately 
+stop using the Software and contact the authors.
+
+Copyright (C) 2025 Solutto Consulting LLC
+All rights reserved.
+
+SC MARKETING AUTOMATION TOOL MODULE
+Licensed Software Product
+
+=============================================================================
+
+GRANT OF LICENSE
+
+Subject to the terms and conditions of this License, Solutto Consulting LLC 
+("Licensor") hereby grants to the purchaser ("Licensee") a non-exclusive, 
+non-transferable license to use the SC Marketing Automation Tool module 
+("Licensed Software") solely for the Licensee's internal business purposes.
+
+PERMITTED USES
+
+1. Installation and use of the Licensed Software on Licensee's Odoo instances
+2. Customization of the Licensed Software for Licensee's internal use only
+3. Integration with other modules and systems for Licensee's business operations
+4. Use with both Odoo Community Edition and Odoo Enterprise Edition
+
+RESTRICTIONS
+
+The Licensee shall NOT:
+1. Distribute, sell, sublicense, or transfer the Licensed Software to any third party
+2. Make the Licensed Software available through any public repository, marketplace, or distribution channel
+3. Reverse engineer, decompile, or disassemble the Licensed Software
+4. Remove or modify any copyright notices, license terms, or proprietary markings
+5. Use the Licensed Software to create competing products or services
+6. Share access credentials or installation packages with unauthorized parties
+
+MODIFICATIONS AND DERIVATIVE WORKS
+
+1. Licensee may modify the Licensed Software for internal use only
+2. Any modifications or derivative works remain subject to this License
+3. Licensee may not distribute modified versions without explicit written permission from Licensor
+4. Technical support is provided only for unmodified versions of the Licensed Software
+
+SUPPORT AND UPDATES
+
+1. Technical support is provided to licensed users through official channels
+2. Updates and bug fixes are provided at Licensor's discretion
+3. New versions may require separate licensing agreements
+4. Support contact: support@soluttoconsulting.com
+
+REFUND POLICY
+
+Refunds are available under the following specific conditions:
+1. Client must demonstrate they were unable to install and use the module
+2. Client must show that adequate support was not provided to resolve issues
+3. Refund requests must be submitted within 30 days of purchase
+4. We cannot guarantee optimal performance if conflicts occur with third-party modules
+5. Refunds will not be granted for customization requests beyond the module's scope
+6. All refund requests must be submitted to: support@soluttoconsulting.com
+
+To request a refund, provide:
+- Purchase receipt/order number
+- Detailed description of installation/usage issues encountered
+- Evidence of support requests and responses received
+- System environment details (Odoo version, other modules installed)
+
+REDISTRIBUTION AND COMMERCIAL USE
+
+Any redistribution, resale, or commercial distribution of the Licensed Software 
+requires explicit written authorization from Solutto Consulting LLC. 
+Unauthorized distribution constitutes copyright infringement and breach of contract.
+
+To request redistribution rights, contact:
+Email: legal@soluttoconsulting.com
+Subject: WHATSAPP WEB BUTTON - Distribution License Request
+
+INTELLECTUAL PROPERTY
+
+The Licensed Software is protected by copyright laws and international copyright 
+treaties. Solutto Consulting LLC retains all right, title, and interest in and 
+to the Licensed Software, including all intellectual property rights therein.
+
+WARRANTY DISCLAIMER
+
+THE LICENSED SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL SOLUTTO CONSULTING LLC BE LIABLE FOR ANY CLAIM, DAMAGES 
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+OTHER DEALINGS IN THE SOFTWARE.
+
+LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL SOLUTTO CONSULTING LLC BE LIABLE FOR ANY INDIRECT, 
+INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT 
+LIMITATION, DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA, OR OTHER 
+INTANGIBLE LOSSES, EVEN IF SOLUTTO CONSULTING LLC HAS BEEN ADVISED OF 
+THE POSSIBILITY OF SUCH DAMAGES.
+
+TERMINATION
+
+This License is effective until terminated. Licensor may terminate this 
+License immediately upon notice if Licensee breaches any term of this License. 
+Upon termination, Licensee must cease all use of the Licensed Software and 
+destroy all copies in their possession.
+
+GOVERNING LAW
+
+This License shall be governed by and construed in accordance with the laws 
+of the jurisdiction where Solutto Consulting LLC is incorporated, without 
+regard to its conflict of law provisions.
+
+CONTACT INFORMATION
+
+Solutto Consulting LLC
+Website: https://soluttoconsulting.com
+Support Email: support@soluttoconsulting.com
+General Inquiries: info@soluttoconsulting.com
+Legal Inquiries: legal@soluttoconsulting.com
+
+For licensing inquiries and technical support:
+Gilson Rincón, CEO and Founder
+Email: gilson.rincon@soluttoconsulting.com
+
+=============================================================================
+
+This license is effective as of the date of purchase and remains in effect 
+until terminated in accordance with the terms herein.
+
+BY INSTALLING OR USING THE LICENSED SOFTWARE, LICENSEE ACKNOWLEDGES THAT 
+THEY HAVE READ THIS LICENSE AGREEMENT, UNDERSTAND IT, AND AGREE TO BE 
+BOUND BY ITS TERMS AND CONDITIONS.

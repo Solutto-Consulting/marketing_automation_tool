@@ -2,7 +2,16 @@
 
 [![Odoo Version](https://img.shields.io/badge/Odoo-18.0-blue.svg)](https://odoo.com)
 [![Version](https://img.shields.io/badge/Version-18.0.1.0.1-green.svg)](https://github.com/Solutto-Consulting/marketing_automation_tool)
-[![License](https://img.shields.io/badge/License-LGPL--3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![License](https://img.shields.io/badge/License-OPL--1-red.svg)](LICENSE)
+
+## 🏢 Commercial License
+
+**This is a commercial module developed by Solutto Consulting LLC.**
+
+- **Price**: $25 USD
+- **License**: Odoo Proprietary License v1.0 (OPL-1) — see LICENSE
+- **Support**: Professional support included (support@soluttoconsulting.com)
+- **Refund policy**: Refunds within 30 days only if you cannot install/use the module and adequate support was not provided; no guarantee with conflicting third-party modules.
 
 ## Overview
 
@@ -234,8 +243,15 @@ For technical support, feature requests, or bug reports, please contact:
 
 ## License
 
-This module is licensed under the GNU Lesser General Public License v3.0 (LGPL-3).  
+This module is licensed under the Odoo Proprietary License v1.0 (OPL-1).  
 See [LICENSE](LICENSE) for more details.
+
+**Commercial Module**: This is a paid module available for $25 USD. Purchase includes:
+- Lifetime license for your Odoo instance
+- Full source code access
+- Professional technical support
+- Free updates and bug fixes
+- Complete documentation package
 
 ## Version Information
 

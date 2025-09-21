@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SC Marketing Automation Tool - AI-Powered Content Automation for Odoo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .hero-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .hero-subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        .section {
+            padding: 3rem 2rem;
+        }
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .feature-card {
+            text-align: center;
+            padding: 1.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+        .screenshot-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .screenshot {
+            text-align: center;
+        }
+        .screenshot img {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .price-section {
+            background: #f8f9fa;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        .price-card {
+            background: #28a745;
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        .feature-list {
+            text-align: left;
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #fff;
+            font-weight: bold;
+        }
+        .support-section {
+            padding: 3rem 2rem;
+        }
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+        .support-card {
+            padding: 1.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .company-section {
+            background: #f8f9fa;
+            border-top: 3px solid #667eea;
+            padding: 2rem;
+        }
+        .company-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            align-items: center;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            font-weight: bold;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .bg-light {
+            background: #f8f9fa;
+        }
+        .text-muted {
+            color: #6c757d;
+        }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 1rem; }
+        .mb-4 { margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">SC Marketing Automation Tool</h1>
+            <p class="hero-subtitle">AI-Powered Content Automation with Research and Generation Agents</p>
+            <p>Transform your marketing workflow with intelligent content creation and automation</p>
+        </div>
+    </section>
+
+    <!-- Key Features -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Why Choose SC Marketing Automation Tool?</h2>
+            <p style="text-align: center; font-size: 1.1rem; color: #666; margin-bottom: 3rem;">
+                A comprehensive AI-powered solution for content research, generation, and automation in Odoo
+            </p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h4>AI Content Research Agent</h4>
+                    <p>AI-powered topic discovery using advanced web search capabilities to find trending content ideas</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✍️</div>
+                    <h4>Content Generation Agent</h4>
+                    <p>Complete blog post creation from research ideas with customizable instructions and prompts</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h4>AI Image Generation</h4>
+                    <p>Professional blog cover images using GPT Image-1 model with automatic integration</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h4>Usage Monitoring Dashboard</h4>
+                    <p>Real-time monitoring for all OpenAI API operations with cost tracking and analytics</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚙️</div>
+                    <h4>Centralized Configuration</h4>
+                    <p>Dedicated Marketing Automation settings panel with secure credential management</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h4>Background Processing</h4>
+                    <p>Asynchronous task processing with intelligent cron jobs and error recovery</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Gallery -->
+    <section class="section bg-light">
+        <div class="container">
+            <h2 class="section-title">See It In Action</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 3rem;">
+                Professional interface designed for marketing automation and content management
+            </p>
+            
+            <div class="screenshot-gallery">
+                <div class="screenshot">
+                    <img src="Screenshot_1.png" alt="Marketing Automation Dashboard">
+                    <h5>Marketing Automation Dashboard</h5>
+                </div>
+                <div class="screenshot">
+                    <img src="Screenshot_2.png" alt="Content Research Agent">
+                    <h5>AI Content Research Agent</h5>
+                </div>
+                <div class="screenshot">
+                    <img src="Screenshot_3.png" alt="Content Generation">
+                    <h5>Content Generation Interface</h5>
+                </div>
+                <div class="screenshot">
+                    <img src="Screenshot_4.png" alt="Usage Analytics">
+                    <h5>Usage Monitoring & Analytics</h5>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Perfect For Section -->
+    <section class="section">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 3rem;">
+                <div>
+                    <h3>Perfect For:</h3>
+                    <ul class="feature-list" style="color: #333;">
+                        <li><strong>Marketing Teams</strong> automating content creation workflows</li>
+                        <li><strong>Content Creators</strong> scaling blog post production</li>
+                        <li><strong>Digital Agencies</strong> managing multiple client content strategies</li>
+                        <li><strong>E-commerce Businesses</strong> creating product and promotional content</li>
+                        <li><strong>Organizations</strong> maintaining active content marketing presence</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Technical Features:</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <span style="background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Odoo 18.0 Compatible</span>
+                        <span style="background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">OpenAI Agents SDK</span>
+                        <span style="background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Multi-Agent Architecture</span>
+                        <span style="background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Web Search Integration</span>
+                        <span style="background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Background Processing</span>
+                        <span style="background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Usage Analytics</span>
+                        <span style="background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Multi-Language Support</span>
+                        <span style="background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Enterprise Security</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="price-section">
+        <div class="container">
+            <div class="price-card">
+                <h2>One-Time Purchase</h2>
+                <div class="price">$25 USD</div>
+                <p style="font-size: 1.1rem; margin-bottom: 2rem;">Complete Module + Professional Support</p>
+                <ul class="feature-list">
+                    <li>Lifetime license for your Odoo instance</li>
+                    <li>Full source code included</li>
+                    <li>Professional technical support</li>
+                    <li>Free updates and bug fixes</li>
+                    <li>Multi-language support (English/Spanish)</li>
+                    <li>Installation and configuration guidance</li>
+                    <li>OpenAI Agents SDK integration</li>
+                    <li>Complete documentation package</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Support & Refund Policy -->
+    <section class="support-section">
+        <div class="container">
+            <div class="support-grid">
+                <div class="support-card">
+                    <h3>Professional Support</h3>
+                    <p>Get expert help from our development team:</p>
+                    <div class="mb-2"><strong>Email Support:</strong> <a href="mailto:support@soluttoconsulting.com">support@soluttoconsulting.com</a></div>
+                    <div class="mb-2"><strong>Response Time:</strong> Within 24 hours (business days)</div>
+                    <div class="mb-2"><strong>Support Includes:</strong> Installation help, configuration assistance, bug fixes</div>
+                    <div class="mb-2"><strong>Documentation:</strong> Complete user and technical guides included</div>
+                </div>
+                <div class="support-card">
+                    <h3>Refund Policy</h3>
+                    <div class="alert-info">
+                        <p class="mb-2"><strong>Refunds are available when:</strong></p>
+                        <ul class="mb-2">
+                            <li>You can demonstrate inability to install/use the module</li>
+                            <li>We did not provide adequate support to resolve your issues</li>
+                            <li>Request submitted within 30 days of purchase</li>
+                        </ul>
+                        <p class="mb-2"><strong>Please note:</strong></p>
+                        <ul>
+                            <li>We cannot guarantee performance with conflicting third-party modules</li>
+                            <li>Customization requests beyond scope are not covered</li>
+                            <li>Contact <a href="mailto:support@soluttoconsulting.com">support@soluttoconsulting.com</a> for refund requests</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Our Module -->
+    <section class="section bg-light">
+        <div class="container">
+            <h2 class="section-title">Why Choose Our Module?</h2>
+            <p style="text-align: center; font-size: 1.1rem; margin-bottom: 3rem;">
+                Built natively for Odoo 18 with enterprise-grade AI integration, ensuring seamless performance and security
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">🛡️</div>
+                    <h5>Enterprise Security</h5>
+                    <p class="text-muted">Built with Odoo's security framework and OpenAI best practices</p>
+                </div>
+                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">🚀</div>
+                    <h5>Native Performance</h5>
+                    <p class="text-muted">Optimized for Odoo's architecture with async processing</p>
+                </div>
+                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">⚙️</div>
+                    <h5>Easy Integration</h5>
+                    <p class="text-muted">Works seamlessly with existing Odoo modules and workflows</p>
+                </div>
+                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">🎧</div>
+                    <h5>Professional Support</h5>
+                    <p class="text-muted">Expert AI and Odoo development team assistance</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Company Attribution -->
+    <section class="company-section">
+        <div class="container">
+            <div class="company-info">
+                <div>
+                    <h3>Developed by Solutto Consulting LLC</h3>
+                    <p style="font-size: 1.1rem; margin-bottom: 1rem;">Professional IT Consulting with expertise in AI adoption, software development, and Business Process Automation</p>
+                    <p class="text-muted">
+                        <strong>Founder & CEO:</strong> Gilson Rincón - 
+                        <a href="mailto:gilson.rincon@soluttoconsulting.com">gilson.rincon@soluttoconsulting.com</a>
+                    </p>
+                </div>
+                <div style="text-align: right;">
+                    <a href="https://soluttoconsulting.com" class="btn-primary">
+                        🌐 Visit Our Website
+                    </a>
+                </div>
+            </div>
+            <hr style="margin: 2rem 0; border: 0; border-top: 1px solid #ddd;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div>
+                    <h5>Contact Information</h5>
+                    <p class="mb-2">📧 Support: support@soluttoconsulting.com</p>
+                    <p class="mb-2">📧 General: info@soluttoconsulting.com</p>
+                    <p>🌐 Website: https://soluttoconsulting.com</p>
+                </div>
+                <div>
+                    <h5>Location</h5>
+                    <p class="mb-2">📍 Orlando, Florida, United States</p>
+                    <p class="mb-2">📍 Envigado, Antioquia, Colombia</p>
+                    <p>© 2025 Solutto Consulting LLC - All Rights Reserved</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Requirements -->
+    <section style="background: #343a40; color: white; padding: 2rem;">
+        <div class="container">
+            <h5 style="text-align: center; margin-bottom: 1.5rem;">Installation Requirements</h5>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; text-align: center;">
+                <div><small>✓ Odoo 18.0+</small></div>
+                <div><small>✓ Website & Blog Modules</small></div>
+                <div><small>✓ Python 3.9+</small></div>
+                <div><small>✓ OpenAI API Access</small></div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
