@@ -179,14 +179,3 @@ class ResConfigSettings(models.TransientModel):
             _logger.info("OpenAI API key updated, model list will refresh on next load")
         
         return result
-    
-    def action_view_usage_statistics(self):
-        """Open the usage statistics view"""
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('OpenAI Usage Statistics'),
-            'res_model': 'sc.usage.statistics',
-            'view_mode': 'list,form',
-            'target': 'current',
-            'context': {}
-        }

@@ -94,9 +94,9 @@
                                 View OpenAI usage statistics and costs for this project. Requires admin key and project ID configuration above.
                             </div>
                             <div class="mt16">
-                                <button name="action_view_usage_statistics" 
+                                <button name="%(action_sc_openai_request_analytics)d" 
                                         string="View Usage Statistics" 
-                                        type="object" 
+                                        type="action" 
                                         class="btn btn-primary"
                                         icon="fa-bar-chart"/>
                             </div>
