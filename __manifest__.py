@@ -73,14 +73,16 @@ Technical Requirements:
         # Views (must load before menus that reference them)
         # AI agent config views MUST load before settings views (action dependency)
         'views/sc_ai_agent_config_views.xml',
+        
+        # OpenAI monitoring views - actions MUST load before settings view that references them
+        'views/sc_openai_request_log_views.xml',
+        'views/sc_openai_model_statistics_views.xml',
+        
+        # Settings view MUST load after all actions it references are defined
         'views/res_config_settings_views.xml',
         'views/sc_content_idea_views.xml',
         'views/sc_content_idea_task_views.xml',
         'views/sc_content_generation_task_views.xml',
-        
-        # OpenAI monitoring views - actions MUST load before menus
-        'views/sc_openai_request_log_views.xml',
-        'views/sc_openai_model_statistics_views.xml',
         
         # Wizard views (contain actions referenced by menus)
         'views/sc_generate_ideas_wizard_views.xml',
