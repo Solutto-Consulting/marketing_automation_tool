@@ -20,15 +20,12 @@ La **Herramienta de Gestión de Contenido para Odoo v18.0.1.0.1** es una platafo
 
 ### 📊 **Monitoreo y Análisis de Uso**
 - **Seguimiento Integral de Uso**: Monitoreo en tiempo real para todas las operaciones de la API de OpenAI
-- **Panel de Control Interactivo**: Análisis visuales con desgloses diarios y seguimiento de costos
 - **Monitoreo Específico por Operación**: Seguimiento dedicado para investigación, generación y creación de imágenes
-- **Herramientas de Optimización de Costos**: Análisis de uso de tokens y monitoreo de presupuesto
 
 ### ⚙️ **Configuración Empresarial**
 - **Configuraciones Centralizadas**: Panel de configuración dedicado para Automatización de Marketing
 - **Gestión de Modelos Estática**: Definiciones de modelos confiables independientes de la disponibilidad de la API
 - **Marco de Seguridad**: Gestión mejorada de credenciales y controles de acceso
-- **Soporte Multi-Empresa**: Configuraciones dependientes de la empresa y aislamiento de datos
 
 ### 🔄 **Procesamiento en Segundo Plano**
 - **Procesamiento Asíncrono de Tareas**: Ejecución no bloqueante para todas las operaciones de contenido
