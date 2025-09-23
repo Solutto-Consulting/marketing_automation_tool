@@ -621,8 +621,8 @@ class ScContentGenerationTask(models.Model):
                     cover_properties = {
                         "background_color_class": "o_cc o_cc1",  # Default color class
                         "background-image": f"url('{image_path}')",
-                        "opacity": "0.4",  # Default opacity
-                        "resize_class": "o_half_screen_height"  # Default resize class
+                        "opacity": "0.8",  # Default opacity
+                        "resize_class": "o_record_has_cover o_half_screen_height"  # Default resize class
                     }
                     blog_post.cover_properties = json.dumps(cover_properties)
                     _logger.info(f"Cover image generated and set in cover_properties for blog post {blog_post.id}")

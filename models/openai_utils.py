@@ -215,7 +215,7 @@ Return ONLY the JSON array, no additional text or explanation.
             user_prompt (str): Additional user instructions
             
         Returns:
-            dict: Generated content with structure {'title': str, 'content': str, 'meta_description': str, 'keywords': str}
+            dict: Generated content with structure {'title': str, 'subtitle': str, 'content': str, 'meta_description': str, 'keywords': str}
         """
         try:
             # Import here to avoid import errors if package not installed
@@ -244,18 +244,35 @@ Generate a complete blog post and return it as a JSON object with the following 
 
 {{
   "title": "SEO-friendly blog post title",
+  "subtitle": "Compelling subtitle that complements the main title",
   "content": "Complete HTML content with proper headings and formatting",
   "meta_description": "Compelling meta description for SEO (150-160 characters)",
   "keywords": "Relevant keywords separated by commas"
 }}
 
+IMPORTANT CONTENT FORMATTING RULES:
+- DO NOT include H1 tags in the content - Odoo handles the main title automatically
+- Start the content directly with an engaging introduction paragraph
+- Use H2 tags for main sections and H3 tags for subsections
+- The subtitle should be a compelling tagline that enhances the main title (keep it under 100 characters)
+
 Content Requirements:
 - Create original content that adds value beyond the source material
-- Use proper HTML structure with H2/H3 headings for organization
+- Use proper HTML structure starting with H2/H3 headings for organization
 - Aim for 800-1500 words of engaging, actionable content
-- Include a strong introduction and conclusion
+- Include a strong introduction paragraph (no H1 heading)
 - Write in a professional yet engaging tone
 - Ensure content is SEO-optimized and business-focused
+- End with a compelling conclusion that encourages engagement
+
+HTML Structure Example:
+<p>Start with an engaging introduction paragraph that hooks the reader...</p>
+<h2>First Main Section</h2>
+<p>Section content...</p>
+<h3>Subsection</h3>
+<p>Subsection content...</p>
+<h2>Second Main Section</h2>
+<p>More content...</p>
 
 Return ONLY the JSON object, no additional text or explanation.
 """
@@ -280,7 +297,7 @@ Return ONLY the JSON object, no additional text or explanation.
                 content = json.loads(response_text)
                 
                 # Validate the structure
-                required_fields = ['title', 'content', 'meta_description', 'keywords']
+                required_fields = ['title', 'subtitle', 'content', 'meta_description', 'keywords']
                 if not all(key in content for key in required_fields):
                     raise ValueError(f"Response must contain all required fields: {required_fields}")
                 
@@ -298,19 +315,6 @@ Return ONLY the JSON object, no additional text or explanation.
             _logger.error("Content generation failed: %s", str(e))
             raise Exception(f"Content generation failed: {str(e)}")
 
-    # @api.model
-    # def fetch_and_store_usage_data(self):
-    #     """
-    #     DEPRECATED: This method was used with sc.openai.usage.snapshot model
-    #     which has been removed. Usage statistics are now handled by other models.
-    #     """
-    #     _logger.warning("fetch_and_store_usage_data method is deprecated and disabled")
-    #     return {
-    #         'success': False,
-    #         'error': 'Method deprecated',
-    #         'message': 'Usage statistics are now handled by other models'
-    #     }
-
     @api.model
     def generate_content(self, model_name, system_instructions, content_source, user_prompt=""):
         """
@@ -323,7 +327,7 @@ Return ONLY the JSON object, no additional text or explanation.
             user_prompt (str): Additional user instructions
             
         Returns:
-            dict: Generated content with structure {'title': str, 'content': str, 'meta_description': str, 'keywords': str}
+            dict: Generated content with structure {'title': str, 'subtitle': str, 'content': str, 'meta_description': str, 'keywords': str}
         """
         try:
             # Get API configuration from Odoo settings

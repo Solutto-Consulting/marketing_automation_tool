@@ -181,12 +181,15 @@ class OpenAIDirectImagesGenerator:
 Article summary: {article_content[:500]}...
 
 Generate a professional, eye-catching image that:
-- Represents the main theme of the article
+- Represents the main theme of the article visually through symbols, objects, or abstract concepts
 - Is suitable for a blog cover image
 - Has modern, clean aesthetics
 - Would attract readers' attention
+- Contains NO TEXT, NO WORDS, NO LETTERS, NO TITLES whatsoever
+- Uses only visual elements like icons, illustrations, photography, or abstract designs
+- Communicates the theme purely through visual metaphors and imagery
 
-Make it visually appealing and relevant to the content."""
+IMPORTANT: The image must be completely text-free. Do not include any written words, titles, labels, or text overlays."""
             
             return prompt_text.strip()
     

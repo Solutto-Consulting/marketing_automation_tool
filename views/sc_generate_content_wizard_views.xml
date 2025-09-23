@@ -79,7 +79,7 @@
                                 <field name="image_output_format" invisible="not generate_cover_image"/>
                                 <field name="image_background" invisible="not generate_cover_image"/>
                                 <field name="image_moderation" invisible="not generate_cover_image"/>
-                                <field name="image_partial_images" invisible="not generate_cover_image"/>
+                                <field name="image_partial_images" invisible="1"/>
                             </group>
                         </group>
                         

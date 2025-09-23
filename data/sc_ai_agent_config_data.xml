@@ -23,7 +23,7 @@ Focus on:
 - Authoritative sources and industry publications
 - Trending topics and emerging insights
 - Actionable information that can inspire blog content</field>
-        <field name="default_query">Find recent articles about digital marketing trends and best practices published after {today}</field>
+        <field name="default_query">Find recent articles about digital marketing trends and best practices published within the last 30 days. Today is {today}.</field>
         <field name="notes">Default configuration for content research tasks. Optimized for finding high-quality marketing content ideas.</field>
     </record>
 
