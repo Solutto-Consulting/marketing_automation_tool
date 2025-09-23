@@ -4,8 +4,6 @@
 - **Module**: sc_marketing_automation_tool
 - **Target Version**: 18.0.1.0.1
 - **Spec Version**: 18.0.1.0.1
-- **Spec Path**: `/home/gilsonrincon/development/odoo18/custom-addons/sc_marketing_automation_tool/docs/Technical Specifications v18.0.1.0.1.md`
-- **Module Path**: `/home/gilsonrincon/development/odoo18/custom-addons/sc_marketing_automation_tool`
 - **Last Updated**: 2025-09-11T17:00:00Z
 
 ---
