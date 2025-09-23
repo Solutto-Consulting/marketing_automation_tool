@@ -101,17 +101,7 @@ Technical Requirements:
     'test': [],
     
     # Static Resources
-    'images': [
-        'static/description/icon.png',
-        'static/description/banner.png',
-        'static/description/Screenshot_1.png',
-        'static/description/Screenshot_2.png',
-        'static/description/Screenshot_3.png',
-        'static/description/Screenshot_4.png',
-        'static/description/Screenshot_5.png',
-        'static/description/Screenshot_6.png',
-        'static/description/Screenshot_8.png',
-    ],
+    'images': ['static/description/banner.png'],
     
     # Installation Properties
     'installable': True,
