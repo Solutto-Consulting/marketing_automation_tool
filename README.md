@@ -1,6 +1,15 @@
-# Content Management Tool for Odoo (sc_marketing_automation_tool)
+# Content Management Tool for Odoo (sc_marketing_auto## Documentation
 
-[![Odoo Version](https://img.shields.io/badge/Odoo-18.0-blue.svg)](https://odoo.com)
+### 📖 User Guides
+- **[Functional User Guide (English)](docs/functional/guide.en.md)**: Complete user manual with workflows and examples
+- **[Guía Funcional del Usuario (Español)](docs/functional/guide.es.md)**: Manual completo de usuario con flujos de trabajo y ejemplos
+
+### 🔧 Technical Documentation  
+- **[Technical Developer Guide](docs/technical/guide.en.md)**: Architecture overview, model structure, and development guidelines
+
+### 📋 Additional Resources
+- **[Version Changelog](docs/CHANGELOG.md)**: Detailed version history and feature updates
+- **[Development Plan](docs/plan/PLAN.md)**: Project roadmap and implementation status[![Odoo Version](https://img.shields.io/badge/Odoo-18.0-blue.svg)](https://odoo.com)
 [![Version](https://img.shields.io/badge/Version-18.0.1.0.1-green.svg)](https://github.com/Solutto-Consulting/marketing_automation_tool)
 [![License](https://img.shields.io/badge/License-OPL--1-red.svg)](LICENSE)
 
@@ -24,11 +33,17 @@ The **Content Management Tool for Odoo v18.0.1.0.1** is a comprehensive **AI-pow
 ### 🤖 **Agent-Based Content Strategy**
 - **Content Research Agent**: AI-powered topic discovery using web search capabilities
 - **Content Generation Agent**: Complete blog post creation from research ideas  
-- **AI-Powered Image Generation**: Professional blog cover images using gpt-image-1 model
+- **AI-Powered Image Generation**: Professional blog cover images using gpt-image-1 model with brand colors, custom styles, and personalized prompts
 - **Configurable Instructions**: Customizable system prompts for each agent type
 
+### 🎨 **Enhanced Image Generation**
+- **Brand Color Integration**: Native color pickers with hex validation for consistent brand identity
+- **8 Professional Styles**: Realistic, illustration, minimalist, abstract, photographic, artistic, modern, and vintage options
+- **Custom Prompt Templates**: Personalized prompts with dynamic placeholders (`{article_title}`, `{brand_colors}`, `{image_style}`)
+- **Multiple Format Support**: PNG, JPEG, WebP with various size and quality options
+
 ### 📊 **Usage Monitoring & Analytics**
-- **Comprehensive Usage Tracking**: Real-time monitoring for all OpenAI API operations
+- **Comprehensive Usage Tracking**: Real-time monitoring for all OpenAI API operations including image generation
 - **Interactive Usage Dashboard**: Visual analytics with daily breakdowns and cost tracking
 - **Operation-Specific Monitoring**: Dedicated tracking for research, generation, and image creation
 - **Cost Optimization Tools**: Token usage analysis and budget monitoring
@@ -43,7 +58,7 @@ The **Content Management Tool for Odoo v18.0.1.0.1** is a comprehensive **AI-pow
 - **Asynchronous Task Processing**: Non-blocking execution for all content operations
 - **Intelligent Cron Jobs**: Separate processors for research and generation tasks
 - **Error Recovery**: Comprehensive error handling with retry mechanisms
-- **State Management**: Clear task states with audit trails
+- **State Management**: Clear task states with audit trails and automatic view refresh
 
 ## Documentation
 

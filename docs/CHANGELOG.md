@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [18.0.1.0.1] - 2025-09-23 (Enhanced Image Generation & Documentation Simplification)
+
+### Enhanced - Image Generation with Advanced Customization
+- **Brand Color Integration**: Native color picker widgets with hex validation for consistent brand identity
+- **Professional Style Selection**: 8 image styles including realistic, illustration, minimalist, abstract, photographic, artistic, modern, and vintage
+- **Custom Prompt Templates**: Personalized image prompts with dynamic placeholders (`{article_title}`, `{brand_colors}`, `{image_style}`, `{word_count}`)
+- **Real-time Color Validation**: Instant hex format validation with visual feedback for brand color configuration
+- **Enhanced UI/UX**: Organized sections for branding options, custom prompt templates, and style selection
+
+### Enhanced - Task Management and User Experience  
+- **Automatic View Refresh**: Task execution now automatically reloads views to show updated states and results
+- **Improved Status Feedback**: Success and error messages posted to chatter for better visibility
+- **Consistent Action Behavior**: All task action methods now provide immediate visual feedback and state updates
+
+### Simplified - Documentation Structure
+- **Streamlined Documentation**: Removed redundant analysis files, coverage matrices, and detailed technical specifications
+- **Focus on Essentials**: Maintained only functional guides (EN/ES), technical architecture overview, and implementation plan
+- **Updated Feature Coverage**: Enhanced functional guides with comprehensive image generation documentation
+- **Bilingual Support**: Complete Spanish translation of new image generation features
+
+### Technical - Code Quality Improvements
+- **Color Validation**: Added hex format constraints with real-time validation
+- **Placeholder Processing**: Intelligent template processing with dynamic content replacement
+- **Error Handling**: Enhanced error management for image generation failures
+- **UI Components**: Native Odoo 18.0 color picker widgets for improved user experience
+
 ## [18.0.1.0.1] - 2025-09-21 (Complete Documentation Update & Alignment)
 
 ### Enhanced - Comprehensive Documentation Refresh

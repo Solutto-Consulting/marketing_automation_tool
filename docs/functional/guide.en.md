@@ -225,18 +225,133 @@ From a single research idea about "AI in Healthcare":
 
 ## AI-Powered Blog Cover Images
 
-The Content Management Tool includes advanced image generation capabilities using OpenAI's **gpt-image-1** model, the latest in AI image generation technology. This feature automatically creates professional blog cover images that are perfectly aligned with your content.
+The Content Management Tool includes advanced image generation capabilities using OpenAI's **gpt-image-1** model, the latest in AI image generation technology. This feature automatically creates professional blog cover images with extensive customization options including brand colors, visual styles, and personalized prompts.
 
-### Image Generation Overview
+### Enhanced Image Generation Features (Latest Update)
 
-When generating blog content, the system can automatically create custom cover images using:
-- **gpt-image-1 Model**: OpenAI's latest and most advanced image generation model
-- **Dynamic Format Support**: PNG, JPEG, and WebP formats
-- **Multiple Size Options**: Optimized for different blog layouts
-- **Quality Control**: Adjustable quality levels for performance vs. visual appeal
-- **Background Options**: Transparent, opaque, or automatic background handling
+#### Brand Color Integration
+- **Native Color Pickers**: Visual color selection tools for intuitive brand color management
+- **Primary & Secondary Colors**: Define your brand palette with hex color validation
+- **Automatic Color Integration**: Brand colors are intelligently incorporated into image prompts
+- **Hex Format Validation**: System ensures proper color format with real-time validation
 
-### Configuring Image Generation
+#### Advanced Style Selection
+Choose from 8 professional image styles:
+- **Realistic Photography**: Photographic quality images for professional content
+- **Illustration**: Clean, vector-style illustrations perfect for tech and business topics
+- **Minimalist Design**: Simple, elegant designs with focus on clarity
+- **Abstract Art**: Creative, artistic interpretations for innovative content
+- **Photographic Style**: High-quality photo-realistic renders
+- **Artistic/Painterly**: Hand-painted aesthetic for creative industries
+- **Modern/Contemporary**: Clean, current design trends
+- **Vintage/Retro**: Classic styling for nostalgic or traditional content
+
+#### Custom Prompt Templates
+Create personalized image generation prompts with placeholder support:
+- **Dynamic Placeholders**: Use `{article_title}`, `{article_content}`, `{brand_colors}`, `{image_style}`, and `{word_count}`
+- **Template Library**: Save and reuse custom prompt templates across projects
+- **Intelligent Processing**: System automatically replaces placeholders with actual content
+- **Flexible Customization**: Override default prompts for specific content needs
+
+### Image Generation Workflow
+
+#### Step 1: Enable Image Generation
+In the Content Generation wizard:
+1. Check **"Generate Cover Image"** option
+2. System automatically configures optimal settings
+
+#### Step 2: Configure Brand Colors (Optional)
+1. Enable **"Use Brand Colors"** toggle
+2. Use **color picker widgets** to select:
+   - **Primary Brand Color**: Main brand color (default: #3498DB)
+   - **Secondary Brand Color**: Accent color (default: #E74C3C)
+3. Colors are validated in real-time for proper hex format
+
+#### Step 3: Select Image Style
+Choose from the style dropdown:
+- Consider your content type and target audience
+- **Realistic** works well for business and professional content
+- **Illustration** is perfect for technical tutorials and guides
+- **Minimalist** suits modern, clean brand aesthetics
+
+#### Step 4: Customize Image Prompt (Advanced)
+1. Enable **"Use Custom Prompt"** for advanced control
+2. Create custom prompt template with placeholders:
+   ```
+   Create a {image_style} cover image for '{article_title}'. 
+   {brand_colors} The image should represent the article theme 
+   without any text overlays.
+   ```
+3. Available placeholders automatically populate with:
+   - `{article_title}`: Your blog post title
+   - `{article_content}`: Summary of article content
+   - `{brand_colors}`: Description of your selected brand colors
+   - `{image_style}`: Chosen visual style
+   - `{word_count}`: Target article length
+
+#### Step 5: Configure Technical Settings
+- **Size**: Choose from portrait, landscape, or square formats
+- **Quality**: Standard or HD quality options
+- **Format**: PNG, JPEG, or WebP output
+- **Background**: Opaque or transparent options
+
+#### Step 6: Generate and Review
+1. Submit the generation task
+2. Monitor progress in task management
+3. Review generated image and regenerate if needed
+4. Image automatically applies to your blog post
+
+### Technical Specifications
+
+#### Image Generation Models
+- **Primary Model**: gpt-image-1 (OpenAI's latest image generation)
+- **Output Formats**: PNG, JPEG, WebP
+- **Supported Sizes**: 
+  - 1024x1024 (Square)
+  - 1024x1792 (Portrait)
+  - 1792x1024 (Landscape)
+  - 1536x1024 (Widescreen)
+  - 1024x1536 (Tall)
+
+#### Color Management
+- **Format**: Hex color codes (#RRGGBB)
+- **Validation**: Real-time format checking
+- **Integration**: Colors are intelligently described and included in generation prompts
+- **Consistency**: Same colors used across all generated images
+
+### Best Practices for Enhanced Image Generation
+
+#### Brand Consistency
+- **Set Standard Colors**: Configure your brand colors once and reuse across all content
+- **Consistent Style**: Choose a primary image style that matches your brand aesthetic
+- **Template Reuse**: Create and save custom prompt templates for different content types
+
+#### Content Optimization
+- **Style Matching**: Match image style to content type (realistic for news, illustration for tutorials)
+- **Color Psychology**: Use brand colors strategically to reinforce brand recognition
+- **Prompt Clarity**: Write specific, descriptive custom prompts for better results
+
+#### Performance Considerations
+- **Quality vs Speed**: Use standard quality for faster generation, HD for premium content
+- **Format Selection**: WebP for modern blogs, PNG for transparency needs, JPEG for compatibility
+- **Style Impact**: Complex styles (artistic, abstract) may take longer to generate
+
+### Troubleshooting Enhanced Features
+
+#### Color Picker Issues
+- **Invalid Colors**: System shows red validation for malformed hex codes
+- **Color Not Applied**: Ensure brand colors are enabled and properly formatted
+- **Inconsistent Results**: Check that color descriptions in prompts are accurate
+
+#### Custom Prompt Problems
+- **Placeholders Not Working**: Verify placeholder syntax with curly braces `{placeholder}`
+- **Poor Results**: Try simpler, more descriptive language in custom prompts
+- **Missing Content**: Ensure all required fields (title, content) are filled before generation
+
+#### Style Selection
+- **Unexpected Results**: Different styles can vary significantly; try alternative styles
+- **Brand Mismatch**: Ensure selected style aligns with your brand and content type
+- **Quality Issues**: Some styles work better with specific quality settings
 
 #### Access Image Settings
 1. Navigate to **Settings → General Settings**

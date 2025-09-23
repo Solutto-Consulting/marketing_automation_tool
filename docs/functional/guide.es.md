@@ -6,11 +6,12 @@
 3. [Configuración de IA](#configuración-de-ia)
 4. [Flujo de Trabajo de Investigación de Contenido](#flujo-de-trabajo-de-investigación-de-contenido)
 5. [Flujo de Trabajo de Generación de Contenido](#flujo-de-trabajo-de-generación-de-contenido)
-6. [Gestión de Tareas](#gestión-de-tareas)
-7. [Monitoreo y Análisis](#monitoreo-y-análisis)
-8. [Administración](#administración)
-9. [Solución de Problemas](#solución-de-problemas)
-10. [Mejores Prácticas](#mejores-prácticas)
+6. [Generación de Imágenes de Portada con IA](#generación-de-imágenes-de-portada-con-ia)
+7. [Gestión de Tareas](#gestión-de-tareas)
+8. [Monitoreo y Análisis](#monitoreo-y-análisis)
+9. [Administración](#administración)
+10. [Solución de Problemas](#solución-de-problemas)
+11. [Mejores Prácticas](#mejores-prácticas)
 
 ---
 
@@ -350,6 +351,138 @@ El flujo de trabajo de Generación de Contenido transforma ideas de contenido ap
 1. Copie contenido de la vista previa
 2. Pegue en editor externo para modificaciones
 3. Cree manualmente publicación de blog cuando esté listo
+
+---
+
+## Generación de Imágenes de Portada con IA
+
+La Herramienta de Gestión de Contenido incluye capacidades avanzadas de generación de imágenes utilizando el modelo **gpt-image-1** de OpenAI, la tecnología más reciente en generación de imágenes con IA. Esta funcionalidad crea automáticamente imágenes profesionales de portada para blogs con amplias opciones de personalización incluyendo colores de marca, estilos visuales y prompts personalizados.
+
+### Funcionalidades Mejoradas de Generación de Imágenes (Actualización Reciente)
+
+#### Integración de Colores de Marca
+- **Selectores de Color Nativos**: Herramientas visuales de selección de color para gestión intuitiva de colores de marca
+- **Colores Primario y Secundario**: Define tu paleta de marca con validación de colores hexadecimales
+- **Integración Automática de Colores**: Los colores de marca se incorporan inteligentemente en los prompts de imagen
+- **Validación de Formato Hex**: El sistema asegura el formato correcto de color con validación en tiempo real
+
+#### Selección Avanzada de Estilos
+Elige entre 8 estilos profesionales de imagen:
+- **Fotografía Realista**: Imágenes de calidad fotográfica para contenido profesional
+- **Ilustración**: Ilustraciones limpias, estilo vectorial perfectas para temas tecnológicos y empresariales
+- **Diseño Minimalista**: Diseños simples y elegantes con enfoque en la claridad
+- **Arte Abstracto**: Interpretaciones creativas y artísticas para contenido innovador
+- **Estilo Fotográfico**: Renders foto-realistas de alta calidad
+- **Artístico/Pictórico**: Estética pintada a mano para industrias creativas
+- **Moderno/Contemporáneo**: Tendencias de diseño actuales y limpias
+- **Vintage/Retro**: Estilo clásico para contenido nostálgico o tradicional
+
+#### Plantillas de Prompt Personalizadas
+Crea prompts personalizados de generación de imágenes con soporte de marcadores de posición:
+- **Marcadores Dinámicos**: Usa `{article_title}`, `{article_content}`, `{brand_colors}`, `{image_style}`, y `{word_count}`
+- **Biblioteca de Plantillas**: Guarda y reutiliza plantillas de prompt personalizadas en todos los proyectos
+- **Procesamiento Inteligente**: El sistema reemplaza automáticamente los marcadores con contenido real
+- **Personalización Flexible**: Anula prompts predeterminados para necesidades específicas de contenido
+
+### Flujo de Trabajo de Generación de Imágenes
+
+#### Paso 1: Habilitar Generación de Imágenes
+En el asistente de Generación de Contenido:
+1. Marque la opción **"Generar Imagen de Portada"**
+2. El sistema configura automáticamente los ajustes óptimos
+
+#### Paso 2: Configurar Colores de Marca (Opcional)
+1. Habilite el interruptor **"Usar Colores de Marca"**
+2. Use los **widgets de selector de color** para seleccionar:
+   - **Color Primario de Marca**: Color principal de marca (predeterminado: #3498DB)
+   - **Color Secundario de Marca**: Color de acento (predeterminado: #E74C3C)
+3. Los colores se validan en tiempo real para formato hex correcto
+
+#### Paso 3: Seleccionar Estilo de Imagen
+Elija del menú desplegable de estilos:
+- Considere su tipo de contenido y audiencia objetivo
+- **Realista** funciona bien para contenido empresarial y profesional
+- **Ilustración** es perfecta para tutoriales técnicos y guías
+- **Minimalista** se adapta a estéticas de marca modernas y limpias
+
+#### Paso 4: Personalizar Prompt de Imagen (Avanzado)
+1. Habilite **"Usar Prompt Personalizado"** para control avanzado
+2. Cree plantilla de prompt personalizada con marcadores de posición:
+   ```
+   Crea una imagen de portada {image_style} para '{article_title}'. 
+   {brand_colors} La imagen debe representar el tema del artículo 
+   sin superposiciones de texto.
+   ```
+3. Los marcadores disponibles se completan automáticamente con:
+   - `{article_title}`: El título de tu publicación de blog
+   - `{article_content}`: Resumen del contenido del artículo
+   - `{brand_colors}`: Descripción de tus colores de marca seleccionados
+   - `{image_style}`: Estilo visual elegido
+   - `{word_count}`: Longitud objetivo del artículo
+
+#### Paso 5: Configurar Ajustes Técnicos
+- **Tamaño**: Elija entre formatos vertical, horizontal o cuadrado
+- **Calidad**: Opciones de calidad estándar o HD
+- **Formato**: Salida PNG, JPEG o WebP
+- **Fondo**: Opciones opaco o transparente
+
+#### Paso 6: Generar y Revisar
+1. Envíe la tarea de generación
+2. Monitoree el progreso en gestión de tareas
+3. Revise la imagen generada y regenere si es necesario
+4. La imagen se aplica automáticamente a su publicación de blog
+
+### Especificaciones Técnicas
+
+#### Modelos de Generación de Imágenes
+- **Modelo Primario**: gpt-image-1 (última generación de imágenes de OpenAI)
+- **Formatos de Salida**: PNG, JPEG, WebP
+- **Tamaños Soportados**: 
+  - 1024x1024 (Cuadrado)
+  - 1024x1792 (Vertical)
+  - 1792x1024 (Horizontal)
+  - 1536x1024 (Pantalla Ancha)
+  - 1024x1536 (Alto)
+
+#### Gestión de Colores
+- **Formato**: Códigos de color hexadecimales (#RRGGBB)
+- **Validación**: Verificación de formato en tiempo real
+- **Integración**: Los colores se describen inteligentemente e incluyen en prompts de generación
+- **Consistencia**: Mismos colores usados en todas las imágenes generadas
+
+### Mejores Prácticas para Generación Mejorada de Imágenes
+
+#### Consistencia de Marca
+- **Establecer Colores Estándar**: Configure sus colores de marca una vez y reutilice en todo el contenido
+- **Estilo Consistente**: Elija un estilo de imagen primario que coincida con su estética de marca
+- **Reutilización de Plantillas**: Cree y guarde plantillas de prompt personalizadas para diferentes tipos de contenido
+
+#### Optimización de Contenido
+- **Coincidencia de Estilo**: Haga coincidir el estilo de imagen con el tipo de contenido (realista para noticias, ilustración para tutoriales)
+- **Psicología del Color**: Use los colores de marca estratégicamente para reforzar el reconocimiento de marca
+- **Claridad del Prompt**: Escriba prompts personalizados específicos y descriptivos para mejores resultados
+
+#### Consideraciones de Rendimiento
+- **Calidad vs Velocidad**: Use calidad estándar para generación más rápida, HD para contenido premium
+- **Selección de Formato**: WebP para blogs modernos, PNG para necesidades de transparencia, JPEG para compatibilidad
+- **Impacto del Estilo**: Estilos complejos (artístico, abstracto) pueden tomar más tiempo para generar
+
+### Solución de Problemas de Funcionalidades Mejoradas
+
+#### Problemas del Selector de Color
+- **Colores Inválidos**: El sistema muestra validación roja para códigos hex mal formados
+- **Color No Aplicado**: Asegúrese de que los colores de marca estén habilitados y formateados correctamente
+- **Resultados Inconsistentes**: Verifique que las descripciones de color en prompts sean precisas
+
+#### Problemas de Prompt Personalizado
+- **Marcadores No Funcionan**: Verifique la sintaxis de marcadores con llaves `{marcador}`
+- **Resultados Pobres**: Pruebe lenguaje más simple y descriptivo en prompts personalizados
+- **Contenido Faltante**: Asegúrese de que todos los campos requeridos (título, contenido) estén completados antes de la generación
+
+#### Selección de Estilo
+- **Resultados Inesperados**: Diferentes estilos pueden variar significativamente; pruebe estilos alternativos
+- **Desajuste de Marca**: Asegúrese de que el estilo seleccionado se alinee con su marca y tipo de contenido
+- **Problemas de Calidad**: Algunos estilos funcionan mejor con configuraciones específicas de calidad
 
 ---
 

@@ -1,24 +1,14 @@
 # Technical Developer Guide: Content Management Tool v18.0.1.0.1
 
-## Table of Contents
-1. [Architecture Overview](#architecture-overview)
-2. [Development Environment Setup](#development-environment-setup)
-3. [Core Models Reference](#core-models-reference)
-4. [API Integration Patterns](#api-integration-patterns)
-5. [View and Interface Development](#view-and-interface-development)
-6. [Background Processing](#background-processing)
-7. [Security Implementation](#security-implementation)
-8. [Customization and Extension](#customization-and-extension)
-9. [Testing and Quality Assurance](#testing-and-quality-assurance)
-10. [Deployment and Maintenance](#deployment-and-maintenance)
+## Overview
+
+The Content Management Tool is an AI-powered content automation platform built for Odoo 18.0. It provides specialized agents for content research and generation with comprehensive usage monitoring.
 
 ---
 
 ## Architecture Overview
 
 ### System Architecture
-
-The Content Management Tool v18.0.1.0.1 follows a modular, agent-based architecture designed for scalability and maintainability.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -36,8 +26,7 @@ The Content Management Tool v18.0.1.0.1 follows a modular, agent-based architect
 ┌─────────────────────────────────────────────────────────────┐
 │                  Integration Layer                          │
 ├─────────────────────────────────────────────────────────────┤
-│     OpenAI Agents SDK    │    Web Content Reader           │
-│     Request Logging      │    Usage Monitoring             │
+│     OpenAI Agents SDK    │    Usage Monitoring             │
 └─────────────────────────────────────────────────────────────┘
                               │
 ┌─────────────────────────────────────────────────────────────┐
@@ -47,57 +36,114 @@ The Content Management Tool v18.0.1.0.1 follows a modular, agent-based architect
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Key Design Patterns
+### Core Design Patterns
 
-#### 1. Agent-Based Processing
-- **Content Research Agent**: Specialized for web search and content discovery
-- **Content Generation Agent**: Optimized for blog post creation and formatting
-- **Configurable Instructions**: Customizable behavior per agent via system prompts
-
-#### 2. Model Methods First
-All business logic is implemented in model methods rather than server actions:
-```python
-# In models, not server actions
-@api.model
-def action_process_research_tasks(self):
-    """Process pending research tasks in background"""
-    tasks = self.search([('state', '=', 'draft')], limit=10)
-    for task in tasks:
-        task._process_research_task()
-```
-
-#### 3. Async Background Processing
-- **Cron Jobs**: Separate processing for research and generation tasks
-- **State Management**: Clear state transitions (draft → in_progress → done/error)
-- **Error Isolation**: Individual task failures don't affect batch processing
-
-#### 4. Comprehensive Logging
-- **Request Logging**: All OpenAI API calls logged with cost tracking
-- **Error Tracking**: Detailed error capture for troubleshooting
-- **Usage Monitoring**: Real-time cost and usage analytics
-
-### Module Dependencies
-
-#### Core Odoo Dependencies
-- `base`: Core Odoo framework
-- `mail`: Chatter and threading support
-- `website`: Website and blog integration
-- `website_blog`: Blog post creation and management
-
-#### External Dependencies
-- `openai-agents` (>=0.2.9): OpenAI Agents SDK for AI operations
-- Python standard libraries: `json`, `logging`, `datetime`, `requests`
+- **Agent-Based Processing**: Specialized AI agents for different content tasks
+- **Background Processing**: Async task execution via cron jobs  
+- **Model Methods First**: Business logic in model methods, not server actions
+- **Comprehensive Logging**: All OpenAI API calls tracked with usage monitoring
 
 ---
 
-## Development Environment Setup
+## Core Models Structure
 
-### Prerequisites
+### Primary Models
 
-#### System Requirements
-- Python 3.8+ with pip
-- Odoo 18.0 Community or Enterprise
-- Git for version control
+#### Content Research System
+- **`sc.content.idea`**: Stores generated content ideas with source URLs and summaries
+- **`sc.content.idea.task`**: Tracks research task execution and status  
+
+#### Content Generation System
+- **`sc.content.generation.task`**: Manages blog post generation pipeline
+- **`blog.post`**: Standard Odoo blog posts (enhanced with generation tracking)
+
+#### Configuration & Monitoring
+- **`sc.ai.agent.config`**: AI agent configuration and system prompts
+- **`sc.openai.request.log`**: OpenAI API request logging and cost tracking
+- **`sc.openai.usage.snapshot`**: Daily usage statistics and analytics
+
+#### Settings Integration
+- **`res.config.settings`**: Centralized OpenAI configuration in Marketing Automation section
+
+### Model Relationships
+
+```
+sc.content.idea.task (1) ──── (many) sc.content.idea
+       │
+       └─── (many) sc.content.generation.task ──── (1) blog.post
+                    │
+                    └─── (many) sc.openai.request.log
+```
+
+### Key Field Types
+
+#### State Management
+- **Selection Fields**: `[('draft', 'Draft'), ('in_progress', 'In Progress'), ('done', 'Done'), ('error', 'Error')]`
+- **Tracking**: All state changes logged via `tracking=True`
+
+#### Agent Configuration
+- **Text Fields**: System instructions and prompt templates
+- **Selection Fields**: Model selection and agent types
+- **Boolean Fields**: Feature toggles and defaults
+
+#### Usage Monitoring  
+- **Float Fields**: Token counts, costs, response times
+- **Datetime Fields**: Request timestamps and execution tracking
+- **JSON Fields**: Raw API responses and metadata
+
+---
+
+## Dependencies
+
+### Odoo Modules
+- `base`, `mail`, `website`, `website_blog`
+
+### External Libraries
+- `openai-agents` (>=0.2.9): OpenAI Agents SDK
+
+### API Integration
+- **OpenAI API**: Text generation, image generation, usage tracking
+- **Web Search**: Content discovery via OpenAI Agents SDK
+
+---
+
+## Development Guidelines
+
+### Code Organization
+- **Models**: All business logic in model methods
+- **Utils**: Reusable API integration utilities  
+- **Views**: Standard Odoo 18.0 patterns (list views, kanban with default_group_by)
+- **Security**: Groups, ACLs, and record rules
+
+### Extension Points
+- **Agent Instructions**: Customizable via `sc.ai.agent.config` 
+- **Task Processing**: Override `_process_task()` methods for custom workflows
+- **Usage Monitoring**: Extend logging for additional metrics
+
+### Testing
+- Unit tests for model methods
+- Integration tests for API workflows
+- UI tests for wizard functionality
+
+---
+
+## Deployment
+
+### Installation
+1. Install `openai-agents` dependency  
+2. Configure OpenAI API credentials in Marketing Automation settings
+3. Set up cron jobs for background processing
+4. Configure agent instructions per requirements
+
+### Monitoring
+- Check OpenAI usage dashboard for cost tracking
+- Monitor task queues for processing bottlenecks  
+- Review error logs for API failures
+
+### Maintenance
+- Regular cleanup of old request logs
+- Monitor API rate limits and quotas
+- Update agent instructions as needed
 - Text editor with Python support
 
 #### API Access
