@@ -84,8 +84,13 @@ class OpenAIDirectImagesGenerator:
             Dict with success status, image data, and metadata
         """
         try:
-            # Prepare the image prompt
-            prompt = self._prepare_image_prompt(article_title, article_content, custom_prompt)
+            # Prepare the image prompt with additional options
+            prompt = self._prepare_image_prompt(
+                article_title, 
+                article_content, 
+                custom_prompt, 
+                **generation_options
+            )
             
             # Get generation parameters for direct API
             params = self._get_image_generation_params(prompt, **generation_options)
@@ -167,20 +172,82 @@ class OpenAIDirectImagesGenerator:
         self, 
         article_title: str, 
         article_content: str, 
-        custom_prompt: Optional[str] = None
+        custom_prompt: Optional[str] = None,
+        **prompt_options
     ) -> str:
-        """Prepare the image prompt for the Direct Images API"""
+        """
+        Prepare the image prompt for the Direct Images API with support for:
+        - Custom prompt templates with placeholders
+        - Brand colors integration
+        - Style customization
+        """
         
-        if custom_prompt:
-            # Use custom prompt directly
+        # Extract additional options
+        image_style = prompt_options.get('image_style', 'realistic')
+        enable_brand_colors = prompt_options.get('enable_brand_colors', False)
+        brand_primary_color = prompt_options.get('brand_primary_color', '')
+        brand_secondary_color = prompt_options.get('brand_secondary_color', '')
+        use_custom_prompt = prompt_options.get('use_custom_prompt', False)
+        custom_template = prompt_options.get('custom_image_prompt_template', '')
+        target_word_count = prompt_options.get('target_word_count', 800)
+        
+        # Build brand colors description
+        brand_colors_desc = ""
+        if enable_brand_colors and (brand_primary_color or brand_secondary_color):
+            colors_list = []
+            if brand_primary_color:
+                colors_list.append(f"primary color: {brand_primary_color}")
+            if brand_secondary_color:
+                colors_list.append(f"secondary color: {brand_secondary_color}")
+            brand_colors_desc = f"Use these brand colors: {', '.join(colors_list)}. "
+        
+        # Get style description
+        style_descriptions = {
+            'illustration': 'illustrated style with clean lines and vibrant colors',
+            'realistic': 'realistic photographic style with natural lighting',
+            'minimalist': 'minimalist design with clean, simple elements',
+            'abstract': 'abstract artistic style with creative interpretation',
+            'photographic': 'professional photography style with high detail',
+            'artistic': 'artistic painterly style with creative expression',
+            'modern': 'modern contemporary design with sleek aesthetics',
+            'vintage': 'vintage retro style with classic appeal'
+        }
+        
+        style_description = style_descriptions.get(image_style, 'professional style')
+        
+        if use_custom_prompt and custom_template:
+            # Use custom prompt template with placeholder replacement
+            prompt_text = custom_template
+            
+            # Replace placeholders
+            placeholders = {
+                '{article_title}': article_title,
+                '{article_content}': article_content[:500] + "..." if len(article_content) > 500 else article_content,
+                '{brand_colors}': brand_colors_desc,
+                '{image_style}': style_description,
+                '{word_count}': str(target_word_count)
+            }
+            
+            for placeholder, value in placeholders.items():
+                prompt_text = prompt_text.replace(placeholder, str(value))
+            
+            # Ensure text-free requirement is included
+            if "NO TEXT" not in prompt_text.upper() and "TEXT-FREE" not in prompt_text.upper():
+                prompt_text += "\n\nIMPORTANT: The image must be completely text-free. Do not include any written words, titles, labels, or text overlays."
+            
+            return prompt_text.strip()
+        
+        elif custom_prompt:
+            # Use direct custom prompt (backward compatibility)
             return custom_prompt.strip()
+        
         else:
-            # Generate context-aware prompt
+            # Generate default context-aware prompt with new features
             prompt_text = f"""Create a compelling cover image for a blog article titled "{article_title}".
 
 Article summary: {article_content[:500]}...
 
-Generate a professional, eye-catching image that:
+Generate a professional, eye-catching image in {style_description} that:
 - Represents the main theme of the article visually through symbols, objects, or abstract concepts
 - Is suitable for a blog cover image
 - Has modern, clean aesthetics
@@ -188,6 +255,10 @@ Generate a professional, eye-catching image that:
 - Contains NO TEXT, NO WORDS, NO LETTERS, NO TITLES whatsoever
 - Uses only visual elements like icons, illustrations, photography, or abstract designs
 - Communicates the theme purely through visual metaphors and imagery
+
+{brand_colors_desc}
+
+Style requirements: Create the image using {style_description}.
 
 IMPORTANT: The image must be completely text-free. Do not include any written words, titles, labels, or text overlays."""
             
@@ -339,17 +410,35 @@ IMPORTANT: The image must be completely text-free. Do not include any written wo
         """Extract image generation options from a content generation task"""
         options = {}
         
+        # Basic image generation options
         if task.image_size:
             options['size'] = task.image_size
         if task.image_quality:
             options['quality'] = task.image_quality
-        if task.image_style:
-            # Map style to background (approximate mapping)
-            style_to_background = {
-                'vivid': 'opaque',
-                'natural': 'transparent'
-            }
-            options['background'] = style_to_background.get(task.image_style, 'opaque')
+        if hasattr(task, 'image_output_format') and task.image_output_format:
+            options['output_format'] = task.image_output_format
+        if hasattr(task, 'image_background') and task.image_background:
+            options['background'] = task.image_background
+        if hasattr(task, 'image_moderation') and task.image_moderation:
+            options['moderation'] = task.image_moderation
+        if hasattr(task, 'image_partial_images') and task.image_partial_images:
+            options['partial_images'] = task.image_partial_images
+        
+        # New advanced options
+        if hasattr(task, 'image_style') and task.image_style:
+            options['image_style'] = task.image_style
+        if hasattr(task, 'enable_brand_colors'):
+            options['enable_brand_colors'] = task.enable_brand_colors
+        if hasattr(task, 'brand_primary_color') and task.brand_primary_color:
+            options['brand_primary_color'] = task.brand_primary_color
+        if hasattr(task, 'brand_secondary_color') and task.brand_secondary_color:
+            options['brand_secondary_color'] = task.brand_secondary_color
+        if hasattr(task, 'use_custom_prompt'):
+            options['use_custom_prompt'] = task.use_custom_prompt
+        if hasattr(task, 'custom_image_prompt_template') and task.custom_image_prompt_template:
+            options['custom_image_prompt_template'] = task.custom_image_prompt_template
+        if hasattr(task, 'target_word_count') and task.target_word_count:
+            options['target_word_count'] = task.target_word_count
         
         return options
 

@@ -44,17 +44,20 @@
                                 class="btn-success" invisible="state != 'draft'"/>
                         <button name="action_retry" type="object" string="Retry" 
                                 class="btn-secondary" invisible="state not in ('error', 'done')"/>
-                        <button name="action_view_blog_post" type="object" string="View Generated Post" 
-                                class="oe_highlight" invisible="not generated_blog_post_id"/>
+                        <button name="action_view_blog_post" type="object" string="View Blog Post" 
+                                class="oe_highlight" invisible="not generated_blog_post_id"
+                                icon="fa-external-link"
+                                help="Open the generated blog post on the website in a new tab"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,done"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
-                            <button name="action_view_blog_post" type="object" class="oe_stat_button" icon="fa-file-text-o"
-                                    invisible="not generated_blog_post_id">
+                            <button name="action_view_blog_post" type="object" class="oe_stat_button" icon="fa-external-link"
+                                    invisible="not generated_blog_post_id"
+                                    help="Open the generated blog post on the website in a new tab">
                                 <div class="o_field_widget o_stat_info">
-                                    <span class="o_stat_text">Blog Post</span>
-                                    <span class="o_stat_value">Generated</span>
+                                    <span class="o_stat_text">View on</span>
+                                    <span class="o_stat_value">Website</span>
                                 </div>
                             </button>
                         </div>
@@ -204,7 +207,9 @@
                                             </t>
                                             <t t-if="record.generated_blog_post_id.raw_value">
                                                 <button name="action_view_blog_post" type="object" 
-                                                        class="btn btn-sm btn-success">View Post</button>
+                                                        class="btn btn-sm btn-primary">
+                                                    <i class="fa fa-external-link"/> View Blog
+                                                </button>
                                             </t>
                                         </div>
                                     </div>

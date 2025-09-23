@@ -344,30 +344,39 @@ class ScContentIdeaTask(models.Model):
                 # Process the task
                 task._process_task()
                 
-                # Return success notification
+                # Post message about successful execution
+                task.message_post(
+                    body=_('Task executed successfully! Generated %d ideas.') % task.generated_ideas_count,
+                    message_type='notification'
+                )
+                
+                # Reload the current form view to show updated state
                 return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': _('Task Executed Successfully'),
-                        'message': _('Content research task "%s" has been executed. Generated %d ideas.') % (task.name, task.generated_ideas_count),
-                        'type': 'success',
-                        'sticky': False,
-                    }
+                    'type': 'ir.actions.act_window',
+                    'res_model': self._name,
+                    'res_id': self.id,
+                    'view_mode': 'form',
+                    'target': 'current',
+                    'context': self.env.context,
                 }
                 
             except Exception as e:
-                # Log error and show notification
+                # Log error and post message
                 error_msg = str(e)
                 _logger.error("Content idea task %s failed: %s", task.id, error_msg)
                 
+                # Post error message
+                task.message_post(
+                    body=_('Task execution failed: %s') % error_msg,
+                    message_type='notification'
+                )
+                
+                # Reload the current form view
                 return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': _('Task Execution Failed'),
-                        'message': _('Content research task failed: %s') % error_msg,
-                        'type': 'danger',
-                        'sticky': True,
-                    }
+                    'type': 'ir.actions.act_window',
+                    'res_model': self._name,
+                    'res_id': self.id,
+                    'view_mode': 'form',
+                    'target': 'current',
+                    'context': self.env.context,
                 }

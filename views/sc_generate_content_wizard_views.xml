@@ -69,9 +69,8 @@
                         <group string="Cover Image Generation">
                             <group>
                                 <field name="generate_cover_image" string="Generate Cover Image"/>
-                                <field name="image_prompt_override" 
-                                       placeholder="Optional: Custom prompt for image generation..."
-                                       invisible="not generate_cover_image"/>
+                                <field name="image_style" invisible="not generate_cover_image" 
+                                       string="Image Style"/>
                             </group>
                             <group>
                                 <field name="image_size" invisible="not generate_cover_image"/>
@@ -79,8 +78,58 @@
                                 <field name="image_output_format" invisible="not generate_cover_image"/>
                                 <field name="image_background" invisible="not generate_cover_image"/>
                                 <field name="image_moderation" invisible="not generate_cover_image"/>
-                                <field name="image_partial_images" invisible="1"/>
                             </group>
+                        </group>
+                        
+                        <!-- Brand Colors Section -->
+                        <group string="Brand Colors" invisible="not generate_cover_image">
+                            <group>
+                                <field name="enable_brand_colors" string="Use Brand Colors"/>
+                                <field name="brand_primary_color" 
+                                       widget="color"
+                                       placeholder="e.g., #FF0000"
+                                       invisible="not enable_brand_colors"/>
+                            </group>
+                            <group>
+                                <div invisible="not enable_brand_colors">
+                                    <div class="text-muted">
+                                        Include your brand colors in the image generation
+                                    </div>
+                                </div>
+                                <field name="brand_secondary_color" 
+                                       widget="color"
+                                       placeholder="e.g., #0000FF"
+                                       invisible="not enable_brand_colors"/>
+                            </group>
+                        </group>
+                        
+                        <!-- Custom Prompt Section -->
+                        <group string="Custom Image Prompt" invisible="not generate_cover_image">
+                            <group>
+                                <field name="use_custom_prompt" string="Use Custom Prompt Template"/>
+                                <div invisible="not use_custom_prompt" class="alert alert-info">
+                                    <strong>Available Placeholders:</strong><br/>
+                                    • <code>{article_title}</code> - Article title<br/>
+                                    • <code>{article_content}</code> - Article content summary<br/>
+                                    • <code>{brand_colors}</code> - Brand colors description<br/>
+                                    • <code>{image_style}</code> - Selected image style<br/>
+                                    • <code>{word_count}</code> - Target word count
+                                </div>
+                            </group>
+                            <group>
+                                <field name="custom_image_prompt_template" 
+                                       invisible="not use_custom_prompt"
+                                       nolabel="1"
+                                       placeholder="Create a {image_style} cover image for '{article_title}'. {brand_colors} The image should represent the article theme without any text..."
+                                       widget="text"/>
+                            </group>
+                        </group>
+                        
+                        <!-- Legacy Image Override (for backward compatibility) -->
+                        <group string="Simple Image Prompt Override" invisible="use_custom_prompt or not generate_cover_image">
+                            <field name="image_prompt_override" 
+                                   placeholder="Optional: Simple custom prompt for image generation..."
+                                   nolabel="1"/>
                         </group>
                         
                         <notebook>
@@ -129,7 +178,9 @@
                                 <li>The AI agent will use the selected content idea as a source</li>
                                 <li>It will generate a complete blog post with the specified word count</li>
                                 <li>SEO meta tags will be automatically generated if enabled</li>
-                                <li>Cover images will be automatically generated using gpt-image-1 if enabled</li>
+                                <li>Cover images will be automatically generated using gpt-image-1 with customizable styles and brand colors</li>
+                                <li>You can customize the image generation with brand colors, styles (realistic, illustration, minimalist, etc.)</li>
+                                <li>Use custom prompt templates with placeholders for complete control over image generation</li>
                                 <li>The post can be auto-published or saved as draft</li>
                                 <li>Processing may take 2-3 minutes depending on content length and image generation</li>
                             </ul>

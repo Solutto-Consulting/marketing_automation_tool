@@ -128,6 +128,60 @@ class ScContentGenerationTask(models.Model):
         default=0
     )
     
+    # Advanced Image Generation Options
+    image_style = fields.Selection(
+        selection=[
+            ('illustration', 'Illustration'),
+            ('realistic', 'Realistic Photography'),
+            ('minimalist', 'Minimalist Design'),
+            ('abstract', 'Abstract Art'),
+            ('photographic', 'Photographic Style'),
+            ('artistic', 'Artistic/Painterly'),
+            ('modern', 'Modern/Contemporary'),
+            ('vintage', 'Vintage/Retro'),
+        ],
+        string="Image Style",
+        default='realistic',
+        help="Visual style for the generated image"
+    )
+    
+    # Branding Options
+    enable_brand_colors = fields.Boolean(
+        string="Use Brand Colors",
+        default=False,
+        help="Include brand colors in the image generation prompt"
+    )
+    
+    brand_primary_color = fields.Char(
+        string="Primary Brand Color",
+        default="#3498DB",
+        help="Primary brand color in hex format (e.g., #FF0000)"
+    )
+    
+    brand_secondary_color = fields.Char(
+        string="Secondary Brand Color",
+        default="#E74C3C", 
+        help="Secondary brand color in hex format (e.g., #0000FF)"
+    )
+    
+    # Custom Prompt with Placeholders
+    use_custom_prompt = fields.Boolean(
+        string="Use Custom Prompt",
+        default=False,
+        help="Use a custom prompt template instead of the default one"
+    )
+    
+    custom_image_prompt_template = fields.Text(
+        string="Custom Prompt Template",
+        help="Custom prompt template with placeholders. Available placeholders:\n"
+             "• {article_title} - Article title\n"
+             "• {article_content} - Article content summary\n"
+             "• {brand_colors} - Brand colors description\n"
+             "• {image_style} - Selected image style\n"
+             "• {word_count} - Target word count",
+        placeholder="Create a {image_style} cover image for '{article_title}'. {brand_colors} The image should represent the article theme without any text..."
+    )
+    
     # Image Generation Results
     generated_image_path = fields.Char(
         string="Generated Image Path",
@@ -276,6 +330,23 @@ class ScContentGenerationTask(models.Model):
                     "• Custom Topic AND Custom Instructions"
                 ))
     
+    @api.constrains('brand_primary_color', 'brand_secondary_color')
+    def _check_color_format(self):
+        """Validate that color fields are in valid hex format"""
+        import re
+        hex_pattern = r'^#[0-9A-Fa-f]{6}$'
+        
+        for record in self:
+            if record.enable_brand_colors:
+                if record.brand_primary_color and not re.match(hex_pattern, record.brand_primary_color):
+                    raise ValidationError(_(
+                        "Primary brand color must be in valid hex format (e.g., #FF0000)"
+                    ))
+                if record.brand_secondary_color and not re.match(hex_pattern, record.brand_secondary_color):
+                    raise ValidationError(_(
+                        "Secondary brand color must be in valid hex format (e.g., #0000FF)"
+                    ))
+    
     @api.model
     def _get_default_website_language(self):
         """Get the default language from the website configuration"""
@@ -364,6 +435,12 @@ class ScContentGenerationTask(models.Model):
                 # Process the task
                 task._process_task()
                 
+                # Post message about successful execution
+                task.message_post(
+                    body=_('Task executed successfully! Blog post created: %s') % task.generated_blog_post_id.name if task.generated_blog_post_id else _('Task executed successfully!'),
+                    message_type='notification'
+                )
+                
                 # Reload current record to show updated state
                 return {
                     'type': 'ir.actions.act_window',
@@ -371,48 +448,47 @@ class ScContentGenerationTask(models.Model):
                     'res_id': self.id,
                     'view_mode': 'form',
                     'target': 'current',
-                    'context': dict(self.env.context, 
-                        show_notification={
-                            'title': _('Task Executed Successfully'),
-                            'message': _('Content generation task "%s" has been executed. Blog post created successfully.') % task.name,
-                            'type': 'success'
-                        }
-                    ),
+                    'context': self.env.context,
                 }
                 
             except Exception as e:
-                # Log error and reload with error notification
+                # Log error and post message
                 error_msg = str(e)
                 _logger.error("Content generation task %s failed: %s", task.id, error_msg)
                 
+                # Post error message
+                task.message_post(
+                    body=_('Task execution failed: %s') % error_msg,
+                    message_type='notification'
+                )
+                
+                # Reload current record
                 return {
                     'type': 'ir.actions.act_window',
                     'res_model': self._name,
                     'res_id': self.id,
                     'view_mode': 'form',
                     'target': 'current',
-                    'context': dict(self.env.context,
-                        show_notification={
-                            'title': _('Task Execution Failed'),
-                            'message': _('Content generation task failed: %s') % error_msg,
-                            'type': 'danger'
-                        }
-                    ),
+                    'context': self.env.context,
                 }
     
     def action_view_blog_post(self):
-        """View the generated blog post"""
+        """Open the generated blog post in the website in a new tab"""
         self.ensure_one()
         if not self.generated_blog_post_id:
             raise ValidationError(_("No blog post has been generated yet"))
         
+        # Get the blog post URL in the website
+        blog_post = self.generated_blog_post_id
+        website_url = blog_post.website_url
+        
+        if not website_url:
+            raise ValidationError(_("Blog post URL is not available"))
+        
         return {
-            'type': 'ir.actions.act_window',
-            'name': _('Generated Blog Post'),
-            'res_model': 'blog.post',
-            'res_id': self.generated_blog_post_id.id,
-            'view_mode': 'form',
-            'target': 'current',
+            'type': 'ir.actions.act_url',
+            'url': website_url,
+            'target': 'new',  # Open in new tab
         }
     
     def _mark_in_progress(self):

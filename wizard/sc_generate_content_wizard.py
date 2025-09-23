@@ -154,6 +154,60 @@ class ScGenerateContentWizard(models.TransientModel):
         default=0
     )
     
+    # Advanced Image Generation Options
+    image_style = fields.Selection(
+        selection=[
+            ('illustration', 'Illustration'),
+            ('realistic', 'Realistic Photography'),
+            ('minimalist', 'Minimalist Design'),
+            ('abstract', 'Abstract Art'),
+            ('photographic', 'Photographic Style'),
+            ('artistic', 'Artistic/Painterly'),
+            ('modern', 'Modern/Contemporary'),
+            ('vintage', 'Vintage/Retro'),
+        ],
+        string="Image Style",
+        default='realistic',
+        help="Visual style for the generated image"
+    )
+    
+    # Branding Options
+    enable_brand_colors = fields.Boolean(
+        string="Use Brand Colors",
+        default=False,
+        help="Include brand colors in the image generation prompt"
+    )
+    
+    brand_primary_color = fields.Char(
+        string="Primary Brand Color",
+        default="#3498DB",
+        help="Primary brand color in hex format (e.g., #FF0000)"
+    )
+    
+    brand_secondary_color = fields.Char(
+        string="Secondary Brand Color", 
+        default="#E74C3C",
+        help="Secondary brand color in hex format (e.g., #0000FF)"
+    )
+    
+    # Custom Prompt with Placeholders
+    use_custom_prompt = fields.Boolean(
+        string="Use Custom Prompt",
+        default=False,
+        help="Use a custom prompt template instead of the default one"
+    )
+    
+    custom_image_prompt_template = fields.Text(
+        string="Custom Prompt Template",
+        help="Custom prompt template with placeholders. Available placeholders:\n"
+             "• {article_title} - Article title\n"
+             "• {article_content} - Article content summary\n"
+             "• {brand_colors} - Brand colors description\n"
+             "• {image_style} - Selected image style\n"
+             "• {word_count} - Target word count",
+        placeholder="Create a {image_style} cover image for '{article_title}'. {brand_colors} The image should represent the article theme without any text..."
+    )
+    
     target_lang_id = fields.Many2one(
         'res.lang',
         string="Language",
@@ -356,6 +410,23 @@ class ScGenerateContentWizard(models.TransientModel):
                     "• Custom Topic + Instructions"
                 ))
     
+    @api.constrains('brand_primary_color', 'brand_secondary_color')
+    def _check_color_format(self):
+        """Validate that color fields are in valid hex format"""
+        import re
+        hex_pattern = r'^#[0-9A-Fa-f]{6}$'
+        
+        for record in self:
+            if record.enable_brand_colors:
+                if record.brand_primary_color and not re.match(hex_pattern, record.brand_primary_color):
+                    raise ValidationError(_(
+                        "Primary brand color must be in valid hex format (e.g., #FF0000)"
+                    ))
+                if record.brand_secondary_color and not re.match(hex_pattern, record.brand_secondary_color):
+                    raise ValidationError(_(
+                        "Secondary brand color must be in valid hex format (e.g., #0000FF)"
+                    ))
+    
     def action_generate_content(self):
         """Create a content generation task and queue it for processing"""
         self.ensure_one()
@@ -394,6 +465,13 @@ class ScGenerateContentWizard(models.TransientModel):
             'image_background': self.image_background,
             'image_moderation': self.image_moderation,
             'image_partial_images': self.image_partial_images,
+            # New image customization options
+            'image_style': self.image_style,
+            'enable_brand_colors': self.enable_brand_colors,
+            'brand_primary_color': self.brand_primary_color,
+            'brand_secondary_color': self.brand_secondary_color,
+            'use_custom_prompt': self.use_custom_prompt,
+            'custom_image_prompt_template': self.custom_image_prompt_template,
         }
         
         # Add content source specific fields
