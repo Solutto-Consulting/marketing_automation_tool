@@ -977,11 +977,6 @@ Funciones administrativas para configuración del sistema, gestión de usuarios 
 
 ## Referencias Externas
 
-### Implementación de Configuración Principal
-- **Referencia**: `/home/gilsonrincon/development/odoo18/odoo-src/addons/base_setup/views/res_config_settings_views.xml`
-- **Anclaje Usado**: `//setting[@id='partner_autocomplete']` con `position="after"`
-- **Patrón**: Selectores xpath estables siguiendo estándares de Odoo 18.0
-
 ### Documentación Oficial
 - **SDK OpenAI Agents**: https://github.com/openai/openai-agents-python
 - **Documentación API OpenAI**: https://platform.openai.com/docs

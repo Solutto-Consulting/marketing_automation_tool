@@ -898,11 +898,6 @@ The system now provides complete tracking for all image generation operations:
 
 ## External References
 
-### Core Settings Implementation
-- **Reference**: `/home/gilsonrincon/development/odoo18/odoo-src/addons/base_setup/views/res_config_settings_views.xml`
-- **Anchor Used**: `//setting[@id='partner_autocomplete']` with `position="after"`
-- **Pattern**: Stable xpath selectors following Odoo 18.0 standards
-
 ### Official Documentation
 - **OpenAI Agents SDK**: https://github.com/openai/openai-agents-python
 - **OpenAI API Documentation**: https://platform.openai.com/docs

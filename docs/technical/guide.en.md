@@ -2517,13 +2517,6 @@ access_sc_translation_task_user,sc.translation.task.user,model_sc_translation_ta
 </record>
 ```
 
-**Core Reference Used**:
-- **File**: `/home/gilsonrincon/development/odoo18/odoo-src/addons/base_setup/views/res_config_settings_views.xml`
-- **Anchor**: `//setting[@id='partner_autocomplete']` (stable selector)
-- **Position**: `after` (safe insertion point)
-
----
-
 ## Background Processing
 
 ### Cron Job Configuration
@@ -2770,11 +2763,6 @@ class TestTranslationTask(common.TransactionCase):
 ---
 
 ## External References
-
-### Core Implementation References
-- **Base Settings Pattern**: `/home/gilsonrincon/development/odoo18/odoo-src/addons/base_setup/views/res_config_settings_views.xml`
-- **Anchor Used**: `//setting[@id='partner_autocomplete']` (stable selector)
-- **Mail Integration**: Standard Odoo `mail.thread` and `mail.activity.mixin` patterns
 
 ### Official Documentation
 - **OpenAI Agents SDK**: https://github.com/openai/openai-agents-python
